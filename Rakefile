@@ -1,0 +1,14 @@
+# -*- ruby -*-
+
+require 'rubygems'
+require 'hoe'
+require './lib/pcap/version.rb'
+
+Hoe.new('pcap-ffi', FFI::PCap::VERSION) do |p|
+  p.rubyforge_name = 'pcap-ffi'
+  p.developer('Postmodern','postmodern.mod3@gmail.com')
+  p.remote_rdoc_dir = ''
+  p.extra_deps = ['ffi']
+end
+
+# vim: syntax=Ruby

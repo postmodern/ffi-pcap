@@ -1,0 +1,13 @@
+History.txt
+Manifest.txt
+Rakefile
+README.txt
+lib/pcap.rb
+lib/pcap/typedefs.rb
+lib/pcap/if.rb
+lib/pcap/addr.rb
+lib/pcap/file_header.rb
+lib/pcap/packet_header.rb
+lib/pcap/stat.rb
+lib/pcap/version.rb
+lib/pcap/pcap.rb

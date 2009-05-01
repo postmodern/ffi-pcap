@@ -1,0 +1,7 @@
+require 'pcap/if'
+require 'pcap/addr'
+require 'pcap/file_header'
+require 'pcap/packet_header'
+require 'pcap/stat'
+require 'pcap/version'
+require 'pcap/pcap'
