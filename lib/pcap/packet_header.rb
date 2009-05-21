@@ -1,5 +1,5 @@
 require 'pcap/typedefs'
-require 'pcap/timeval'
+require 'pcap/time_val'
 
 require 'ffi/struct'
 
