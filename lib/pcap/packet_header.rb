@@ -6,7 +6,7 @@ require 'ffi/struct'
 module FFI
   module PCap
     class PacketHeader < FFI::Struct
-      layout :ts, TimeVal
+      layout :ts, TimeVal,
              :caplen, :bpf_uint32,
              :len, :bpf_uint32
     end
