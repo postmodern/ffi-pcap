@@ -1,4 +1,5 @@
 require 'pcap/typedefs'
+require 'pcap/addr'
 
 require 'ffi/struct'
 
@@ -8,11 +9,20 @@ module FFI
       # interface is loopback
       LOOPBACK = 0x00000001
 
-      layout :pcap_if, :pointer,
-             :name, :pointer,
-             :description, :pointer,
+      layout :next, :pointer,
+             :name, :string,
+             :description, :string,
              :addresses, :pointer,
              :flags, :bpf_uint32
+
+      def next
+        IF.new(self[:next])
+      end
+
+      def addresses
+        Addr.new(self[:addresses])
+      end
+
     end
   end
 end
