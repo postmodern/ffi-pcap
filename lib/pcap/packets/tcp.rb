@@ -9,6 +9,9 @@ module FFI
 
         # TCP flags
         FLAGS = [
+          # Null flags
+          NULL = 0x00,
+
           # Final packet flag
           FIN = 0x01,
 
@@ -83,6 +86,13 @@ module FFI
         end
 
         #
+        # Returns +true+ if the packet has no flags set, +false+ otherwise.
+        #
+        def null?
+          self[:th_flags] == NULL
+        end
+
+        #
         # Returns +true+ if the packet has the FIN flag set, returns
         # +false+ otherwise.
         #
@@ -144,6 +154,13 @@ module FFI
         #
         def cwr?
           (self[:th_flags] & CWR) != 0
+        end
+
+        #
+        # Returns +true+ if the packet has all flags set, +false+ otherwise.
+        #
+        def xmas?
+          (self[:th_flags] & XMAS) == XMAS
         end
 
       end
