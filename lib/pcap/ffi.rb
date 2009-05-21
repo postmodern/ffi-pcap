@@ -6,6 +6,8 @@ module FFI
 
     ffi_lib 'libpcap'
 
+    ERRBUF_SIZE = 256
+
     DIRECTIONS = [
       INOUT = 0,
       IN = 1,
