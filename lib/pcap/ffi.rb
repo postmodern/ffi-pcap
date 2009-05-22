@@ -8,10 +8,10 @@ module FFI
 
     ERRBUF_SIZE = 256
 
-    DIRECTIONS = [
-      INOUT = 0,
-      IN = 1,
-      OUT = 2
+    enum :pcap_direction, [
+      :pcap_d_inout,
+      :pcap_d_in,
+      :pcap_d_out
     ]
 
     callback :pcap_handler, [:pointer, :pointer, :pointer], :void
