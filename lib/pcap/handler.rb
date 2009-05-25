@@ -35,7 +35,9 @@ module FFI
       end
 
       def direction=(dir)
-        PCap.pcap_setdirection(@pcap,dir)
+        directions = PCap.enum_type(:pcap_direction)
+
+        return PCap.pcap_setdirection(@pcap,directions[:"pcap_d_#{dir}"])
       end
 
       def loop(data=nil,&block)
