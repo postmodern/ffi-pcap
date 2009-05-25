@@ -23,7 +23,7 @@ module FFI
       return Handler.new(ptr)
     end
 
-    def self.open_dead(datalink,snaplen=SNAPLEN)
+    def PCap.open_dead(datalink,snaplen=SNAPLEN)
       datalink = DataLink[datalink]
 
       return Handler.new(PCap.pcap_open_dead(datalink,snaplen))
