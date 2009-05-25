@@ -28,6 +28,5 @@ module FFI
 
       return Handler.new(PCap.pcap_open_dead(datalink,snaplen))
     end
-
   end
 end
