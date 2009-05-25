@@ -46,7 +46,7 @@ module FFI
         PCap.pcap_loop(@pcap,@count,@callback,data)
       end
 
-      alias :each :loop
+      alias each loop
 
       def dispatch(data=nil,&block)
         callback(&block) if block
