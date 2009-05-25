@@ -38,7 +38,7 @@ module FFI
         PCap.pcap_setdirection(@pcap,dir)
       end
 
-      def loop(data,&block)
+      def loop(data=nil,&block)
         callback(&block) if block
 
         PCap.pcap_loop(@pcap,@count,@callback,data)
@@ -46,7 +46,7 @@ module FFI
 
       alias :each :loop
 
-      def dispatch(data,&block)
+      def dispatch(data=nil,&block)
         callback(&block) if block
 
         PCap.pcap_dispatch(@pcap,@count,@callback,data)
