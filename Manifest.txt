@@ -2,6 +2,7 @@ History.txt
 Manifest.txt
 Rakefile
 README.txt
+tasks/spec.rb
 lib/pcap.rb
 lib/pcap/typedefs.rb
 lib/pcap/time_val.rb
@@ -24,3 +25,5 @@ lib/pcap/dumper.rb
 lib/pcap/version.rb
 lib/pcap/ffi.rb
 lib/pcap/pcap.rb
+spec/spec_helper.rb
+spec/pcap_spec.rb
