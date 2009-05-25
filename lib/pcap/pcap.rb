@@ -11,7 +11,7 @@ module FFI
                 else
                   0
                 end
-      snaplen = (options[:snaplen] || SNAPLEN)
+      snaplen = (options[:snaplen] || Handler::SNAPLEN)
       to_ms = (options[:timeout] || 0)
 
       ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,nil)
@@ -23,7 +23,7 @@ module FFI
       return Handler.new(ptr)
     end
 
-    def PCap.open_dead(datalink,snaplen=SNAPLEN)
+    def PCap.open_dead(datalink,snaplen=Handler::SNAPLEN)
       datalink = DataLink[datalink]
 
       return Handler.new(PCap.pcap_open_dead(datalink,snaplen))
