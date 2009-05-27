@@ -2,13 +2,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{pcap-ffi}
-  s.version = "0.0.1"
+  s.version = "0.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Postmodern, Dakrone"]
-  s.date = %q{2009-05-23}
+  s.date = %q{2009-05-27}
   s.description = %q{Bindings to sniff packets using the FFI interface in Ruby.}
-  s.email = %q{lee@writequit.org}
+  s.email = %q{postmodern.mod3@gmail.com}
   s.extra_rdoc_files = [
     "README.txt"
   ]
@@ -18,10 +18,12 @@ Gem::Specification.new do |s|
      "Manifest.txt",
      "README.txt",
      "Rakefile",
+     "VERSION",
      "lib/pcap.rb",
      "lib/pcap/addr.rb",
      "lib/pcap/data_link.rb",
      "lib/pcap/dumper.rb",
+     "lib/pcap/error_buffer.rb",
      "lib/pcap/ffi.rb",
      "lib/pcap/file_header.rb",
      "lib/pcap/handler.rb",
@@ -39,17 +41,29 @@ Gem::Specification.new do |s|
      "lib/pcap/stat.rb",
      "lib/pcap/time_val.rb",
      "lib/pcap/typedefs.rb",
-     "lib/pcap/version.rb"
+     "lib/pcap/version.rb",
+     "pcap-ffi.gemspec",
+     "spec/error_buffer.rb",
+     "spec/pcap_spec.rb",
+     "spec/spec_helper.rb",
+     "tasks/spec.rb"
   ]
-  s.homepage = %q{http://github.com/dakrone/pcap-ffi}
+  s.has_rdoc = true
+  s.homepage = %q{http://github.com/postmodern/pcap-ffi}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.3}
+  s.rubyforge_project = %q{pcap-ffi}
+  s.rubygems_version = %q{1.3.1}
   s.summary = %q{FFI bindings for libpcap}
+  s.test_files = [
+    "spec/spec_helper.rb",
+     "spec/pcap_spec.rb",
+     "spec/error_buffer.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
+    s.specification_version = 2
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
     else
