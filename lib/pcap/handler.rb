@@ -20,6 +20,8 @@ module FFI
 
       def initialize(pcap)
         @pcap = pcap
+        # Default is to infinitely loop over packets.
+        @count = -1;
       end
 
       def datalink
