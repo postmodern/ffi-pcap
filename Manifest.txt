@@ -20,6 +20,7 @@ lib/pcap/packets/ip.rb
 lib/pcap/packets/tcp.rb
 lib/pcap/stat.rb
 lib/pcap/data_link.rb
+lib/pcap/error_buffer.rb
 lib/pcap/handler.rb
 lib/pcap/dumper.rb
 lib/pcap/version.rb

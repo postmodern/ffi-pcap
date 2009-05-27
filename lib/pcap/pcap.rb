@@ -1,6 +1,7 @@
 require 'pcap/ffi'
 require 'pcap/data_link'
 require 'pcap/handler'
+require 'pcap/error_buffer'
 
 module FFI
   module PCap
@@ -13,12 +14,12 @@ module FFI
                 end
       snaplen = (options[:snaplen] || Handler::SNAPLEN)
       to_ms = (options[:timeout] || 0)
-      errbuf = MemoryPointer.new(ERRBUF_SIZE)
+      errbuf = ErrorBuffer.new
 
       ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,nil)
 
       unless ptr
-        raise(StandardError,errbuf.get_string(ERRBUF_SIZE),caller)
+        raise(StandardError,errbuf.to_s,caller)
       end
 
       return Handler.new(ptr)
@@ -32,12 +33,12 @@ module FFI
 
     def PCap.open_offline(path)
       path = File.expand_path(path)
-      errbuf = MemoryPointer.new(ERRBUF_SIZE)
+      errbuf = ErrorBuffer.new
 
       ptr = PCap.pcap_open_offline(path,errbuf)
 
       unless ptr
-        raise(StandardError,errbuf.get_string(ERRBUF_SIZE),caller)
+        raise(StandardError,errbuf.to_s,caller)
       end
 
       return Handler.new(ptr)

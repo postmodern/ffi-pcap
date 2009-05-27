@@ -6,8 +6,6 @@ module FFI
 
     ffi_lib 'libpcap'
 
-    ERRBUF_SIZE = 256
-
     enum :pcap_direction, [
       :pcap_d_inout,
       :pcap_d_in,
