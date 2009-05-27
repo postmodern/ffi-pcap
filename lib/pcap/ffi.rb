@@ -16,11 +16,11 @@ module FFI
 
     callback :pcap_handler, [:pointer, :pointer, :pointer], :void
 
-    attach_function :pcap_lookupdev, [:string], :string
-    attach_function :pcap_lookupnet, [:string, :pointer, :pointer, :string], :int
-    attach_function :pcap_open_live, [:string, :int, :int, :int, :string], :pointer
+    attach_function :pcap_lookupdev, [:pointer], :string
+    attach_function :pcap_lookupnet, [:string, :pointer, :pointer, :pointer], :int
+    attach_function :pcap_open_live, [:string, :int, :int, :int, :pointer], :pointer
     attach_function :pcap_open_dead, [:int, :int], :pointer
-    attach_function :pcap_open_offline, [:string, :string], :pointer
+    attach_function :pcap_open_offline, [:string, :pointer], :pointer
     attach_function :pcap_fopen_offline, [:pointer, :string], :pointer
     attach_function :pcap_close, [:pointer], :void
     attach_function :pcap_loop, [:pointer, :int, :pcap_handler, :pointer], :int
@@ -31,8 +31,8 @@ module FFI
     attach_function :pcap_stats, [:pointer, :pointer], :int
     attach_function :pcap_setfilter, [:pointer, :pointer], :int
     attach_function :pcap_setdirection, [:pointer, :pcap_direction], :int
-    attach_function :pcap_getnonblock, [:pointer, :string], :int
-    attach_function :pcap_setnonblock, [:pointer, :int, :string], :int
+    attach_function :pcap_getnonblock, [:pointer, :pointer], :int
+    attach_function :pcap_setnonblock, [:pointer, :int, :pointer], :int
     attach_function :pcap_perror, [:pointer, :string], :void
     attach_function :pcap_inject, [:pointer, :pointer, :int], :int
     attach_function :pcap_sendpacket, [:pointer, :pointer, :int], :int
