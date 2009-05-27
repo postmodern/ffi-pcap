@@ -19,8 +19,16 @@ module FFI
         IF.new(self[:next])
       end
 
+      def name
+        self[:name]
+      end
+
       def addresses
         Addr.new(self[:addresses])
+      end
+
+      def to_s
+        self[:name]
       end
 
     end
