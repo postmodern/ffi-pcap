@@ -11,8 +11,8 @@ begin
     gemspec.rubyforge_project = 'pcap-ffi'
     gemspec.name = "pcap-ffi"
     gemspec.summary = "FFI bindings for libpcap"
-    gemspec.email = "lee@writequit.org"
-    gemspec.homepage = "http://github.com/dakrone/pcap-ffi"
+    gemspec.email = "postmodern.mod3@gmail.com"
+    gemspec.homepage = "http://github.com/postmodern/pcap-ffi"
     gemspec.description = "Bindings to sniff packets using the FFI interface in Ruby."
     gemspec.authors = ["Postmodern, Dakrone"]
   end
