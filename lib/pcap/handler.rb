@@ -61,6 +61,10 @@ module FFI
         return [header, data]
       end
 
+      def open_dump(path)
+        Dumper.new(PCap.pcap_dump_open(@pcap,File.expand_path(path)))
+      end
+
       def stop
         PCap.pcap_breakloop(@pcap)
       end
