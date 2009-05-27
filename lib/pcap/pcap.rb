@@ -1,5 +1,6 @@
 require 'pcap/ffi'
 require 'pcap/data_link'
+require 'pcap/if'
 require 'pcap/handler'
 require 'pcap/error_buffer'
 
@@ -13,6 +14,28 @@ module FFI
       end
 
       return name
+    end
+
+    def PCap.each_device(&block)
+      devices = MemoryPointer.new(:pointer)
+      errbuf = ErrorBuffer.new
+
+      PCap.pcap_findalldevs(devices,errbuf)
+      node = devices.get_pointer(0)
+
+      if node.null?
+        raise(StandardError,errbuf.to_s,caller)
+      end
+
+      device = IF.new(node)
+
+      until device
+        block.call(device) if block
+        device = device.next
+      end
+
+      PCap.pcap_freealldevs(devices.get_pointer(0))
+      return nil
     end
 
     def PCap.open_live(options={})

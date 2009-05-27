@@ -14,4 +14,11 @@ describe PCap do
     dev.should_not be_nil
     dev.should_not be_empty
   end
+
+  it "should enumerate over all usable devices" do
+    PCap.each_device do |dev|
+      dev.should_not be_null
+      dev.class.should == PCap::IF
+    end
+  end
 end
