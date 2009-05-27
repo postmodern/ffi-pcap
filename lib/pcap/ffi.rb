@@ -28,7 +28,7 @@ module FFI
     attach_function :pcap_breakloop, [:pointer], :void
     attach_function :pcap_stats, [:pointer, :pointer], :int
     attach_function :pcap_setfilter, [:pointer, :pointer], :int
-    attach_function :pcap_setdirection, [:pointer, :pcap_direction_t], :int
+    attach_function :pcap_setdirection, [:pointer, :pcap_direction], :int
     attach_function :pcap_getnonblock, [:pointer, :string], :int
     attach_function :pcap_setnonblock, [:pointer, :int, :string], :int
     attach_function :pcap_perror, [:pointer, :string], :void
