@@ -63,7 +63,7 @@ module FFI
     attach_function :pcap_dump_close, [:pointer], :void
     attach_function :pcap_dump, [:pointer, :pointer, :pointer], :void
 
-    attach_function :pcap_findalldevs, [:pointer, :string], :int
+    attach_function :pcap_findalldevs, [:pointer, :pointer], :int
     attach_function :pcap_freealldevs, [:pointer], :void
 
     attach_function :pcap_lib_version, [], :string
