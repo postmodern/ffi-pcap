@@ -8,6 +8,7 @@ require './tasks/spec.rb'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
+    gemspec.rubyforge_project = 'pcap-ffi'
     gemspec.name = "pcap-ffi"
     gemspec.summary = "FFI bindings for libpcap"
     gemspec.email = "lee@writequit.org"
