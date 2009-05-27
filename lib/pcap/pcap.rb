@@ -5,6 +5,16 @@ require 'pcap/error_buffer'
 
 module FFI
   module PCap
+    def PCap.device
+      errbuf = ErrorBuffer.new
+
+      unless (name = PCap.pcap_lookupdev(errbuf))
+        raise(StandardError,errbuf.to_s,caller)
+      end
+
+      return name
+    end
+
     def PCap.open_live(options={})
       device = options[:device]
       promisc = if options[:promisc]
