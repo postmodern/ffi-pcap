@@ -1,3 +1,5 @@
+require 'pcap/typedefs'
+
 require 'ffi'
 
 module FFI
