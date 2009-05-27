@@ -8,6 +8,10 @@ describe PCap do
     PCap.const_defined?('VERSION').should == true
   end
 
+  it "should have a library version" do
+    PCap.lib_version.should_not be_empty
+  end
+
   it "should return the name of a device suitable for open_live" do
     dev = PCap.device
 

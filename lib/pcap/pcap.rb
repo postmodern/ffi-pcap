@@ -6,6 +6,10 @@ require 'pcap/error_buffer'
 
 module FFI
   module PCap
+    def PCap.lib_version
+      PCap.pcap_lib_version
+    end
+
     def PCap.device
       errbuf = ErrorBuffer.new
 
