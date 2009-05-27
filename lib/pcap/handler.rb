@@ -78,7 +78,7 @@ module FFI
       end
 
       def inspect
-        "#<#{self.class}: 0x#{@pcap.to_s(16)}>"
+        "#<#{self.class}: 0x#{@pcap.address.to_s(16)}>"
       end
 
     end

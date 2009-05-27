@@ -27,7 +27,7 @@ module FFI
       end
 
       def inspect
-        "#<#{self.class}: 0x#{@dumper.to_s(16)}>"
+        "#<#{self.class}: 0x#{@dumper.address.to_s(16)}>"
       end
 
     end
