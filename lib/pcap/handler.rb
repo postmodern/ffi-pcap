@@ -73,6 +73,10 @@ module FFI
         PCap.pcap_close(@pcap)
       end
 
+      def to_ptr
+        @pcap
+      end
+
       def inspect
         "#<#{self.class}: 0x#{@pcap.to_s(16)}>"
       end
