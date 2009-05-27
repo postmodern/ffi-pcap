@@ -27,4 +27,5 @@ lib/pcap/version.rb
 lib/pcap/ffi.rb
 lib/pcap/pcap.rb
 spec/spec_helper.rb
+spec/error_buffer.rb
 spec/pcap_spec.rb
