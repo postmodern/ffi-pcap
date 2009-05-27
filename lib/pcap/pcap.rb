@@ -51,7 +51,7 @@ module FFI
 
       ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,nil)
 
-      unless ptr
+      if ptr.null?
         raise(StandardError,errbuf.to_s,caller)
       end
 
@@ -70,7 +70,7 @@ module FFI
 
       ptr = PCap.pcap_open_offline(path,errbuf)
 
-      unless ptr
+      if ptr.null?
         raise(StandardError,errbuf.to_s,caller)
       end
 
