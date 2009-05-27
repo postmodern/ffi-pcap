@@ -1,3 +1,5 @@
+require 'ffi'
+
 module FFI
   module PCap
     class ErrorBuffer < FFI::Buffer
