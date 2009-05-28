@@ -22,16 +22,22 @@ module FFI
       # Number of packets to sniff
       attr_accessor :count
 
-      def initialize(pcap,&block)
+      def initialize(pcap,options={},&block)
         @pcap = pcap
 
         # Default is to infinitely loop over packets.
-        @count = -1
+        @count = (options[:count] || -1)
 
-        # Default the callback to an empty Proc
-        @callback = Proc.new {}
+        if options[:direction]
+          self.direction = options[:direction]
+        end
 
-        callback(&block) if block
+        if block
+          callback(&block)
+        else
+          # Default the callback to an empty Proc
+          @callback = Proc.new
+        end
       end
 
       def datalink
