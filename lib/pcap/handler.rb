@@ -19,11 +19,13 @@ module FFI
       # Number of packets to sniff
       attr_accessor :count
 
-      def initialize(pcap)
+      def initialize(pcap,&block)
         @pcap = pcap
 
         # Default is to infinitely loop over packets.
         @count = -1
+
+        callback(&block) if block
       end
 
       def datalink
