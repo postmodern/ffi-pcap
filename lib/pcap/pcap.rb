@@ -63,8 +63,8 @@ module FFI
     end
 
     def PCap.open_dead(datalink,options={})
-      snaplen = (options[:snaplen] || Handler::SNAPLEN)
       datalink = DataLink[datalink]
+      snaplen = (options[:snaplen] || Handler::SNAPLEN)
 
       return Handler.new(PCap.pcap_open_dead(datalink,snaplen),options)
     end
