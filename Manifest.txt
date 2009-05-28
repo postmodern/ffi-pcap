@@ -33,4 +33,5 @@ spec/helpers/dumps.rb
 spec/dumps/simple_tcp.pcap
 spec/error_buffer.rb
 spec/handler_examples.rb
+spec/handler_spec.rb
 spec/pcap_spec.rb
