@@ -1,5 +1,6 @@
 require 'pcap/exceptions/read_error'
 require 'pcap/ffi'
+require 'pcap/error_buffer'
 require 'pcap/data_link'
 require 'pcap/stat'
 
@@ -91,6 +92,10 @@ module FFI
 
         PCap.pcap_stats(@pcap,stats)
         return stats
+      end
+
+      def error
+        PCap.pcap_geterr(@pcap).get_string(ErrorBuffer::SIZE)
       end
 
       def stop
