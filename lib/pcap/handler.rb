@@ -76,6 +76,7 @@ module FFI
         header = PacketHeader.new
         data = PCap.pcap_next(@pcap,header)
 
+        return [nil, nil] if data.null?
         return [header, data]
       end
 
