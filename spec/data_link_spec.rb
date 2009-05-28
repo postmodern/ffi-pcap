@@ -22,4 +22,8 @@ describe DataLink do
   it "should be able to convert to an Integer" do
     @datalink.to_i.should == 0
   end
+
+  it "should be able to convert to a String" do
+    @datalink.to_s.should == 'NULL'
+  end
 end
