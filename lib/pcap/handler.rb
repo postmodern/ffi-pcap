@@ -27,6 +27,9 @@ module FFI
         # Default is to infinitely loop over packets.
         @count = -1
 
+        # Default the callback to an empty Proc
+        @callback = Proc.new {}
+
         callback(&block) if block
       end
 
