@@ -81,7 +81,7 @@ module FFI
 
       def next_extra
         header_ptr = MemoryPointer.new(:pointer)
-        data_ptr = Memory_pointer.new(:pointer)
+        data_ptr = MemoryPointer.new(:pointer)
 
         case PCap.pcap_next_ex(@pcap,header_ptr,data_ptr)
         when -1
