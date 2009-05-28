@@ -40,6 +40,8 @@ module FFI
         end
 
         callback(&block)
+
+        trap('SIGINT') { self.close }
       end
 
       def datalink
