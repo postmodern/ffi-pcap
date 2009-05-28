@@ -16,6 +16,10 @@ module FFI
         self[:tv_usec]
       end
 
+      def to_time
+        Time.at(self[:tv_sec],self[:tv_usec])
+      end
+
     end
   end
 end
