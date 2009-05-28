@@ -38,7 +38,7 @@ module FFI
         device = device.next
       end
 
-      PCap.pcap_freealldevs(devices.get_pointer(0))
+      PCap.pcap_freealldevs(node)
       return nil
     end
 
