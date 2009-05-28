@@ -2,6 +2,7 @@ require 'pcap/exceptions/read_error'
 require 'pcap/ffi'
 require 'pcap/error_buffer'
 require 'pcap/data_link'
+require 'pcap/packet_header'
 require 'pcap/stat'
 
 require 'ffi'
