@@ -1,3 +1,4 @@
+require 'pcap/exceptions/read_error'
 require 'pcap/ffi'
 require 'pcap/data_link'
 require 'pcap/stat'
@@ -65,6 +66,20 @@ module FFI
         data = PCap.pcap_next(@pcap,header)
 
         return [header, data]
+      end
+
+      def next_extra
+        header_ptr = MemoryPointer.new(:pointer)
+        data_ptr = Memory_pointer.new(:pointer)
+
+        case PCap.pcap_next_ex(@pcap,header_ptr,data_ptr)
+        when -1
+          raise(ReadError,"an error occurred while reading the packet",caller)
+        when -2
+          raise(ReadError,"the 'savefile' contains no more packets",caller)
+        end
+
+        return [header_ptr.get_pointer(0), data_ptr.get_pointer(0)]
       end
 
       def open_dump(path)
