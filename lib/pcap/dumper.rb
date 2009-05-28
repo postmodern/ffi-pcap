@@ -10,6 +10,10 @@ module FFI
         @dumper = dumper
       end
 
+      def write(header,bytes)
+        PCap.pcap_dump(@dumper,header,bytes)
+      end
+
       def tell
         PCap.pcap_dump_ftell(@dumper)
       end
