@@ -59,16 +59,17 @@ module FFI
         raise(StandardError,errbuf.to_s,caller)
       end
 
-      return Handler.new(ptr,&block)
+      return Handler.new(ptr,options,&block)
     end
 
-    def PCap.open_dead(datalink,snaplen=Handler::SNAPLEN)
+    def PCap.open_dead(datalink,options={})
+      snaplen = (options[:snaplen] || Handler::SNAPLEN)
       datalink = DataLink[datalink]
 
-      return Handler.new(PCap.pcap_open_dead(datalink,snaplen))
+      return Handler.new(PCap.pcap_open_dead(datalink,snaplen),options)
     end
 
-    def PCap.open_offline(path)
+    def PCap.open_offline(path,options={})
       path = File.expand_path(path)
       errbuf = ErrorBuffer.new
 
@@ -78,7 +79,7 @@ module FFI
         raise(StandardError,errbuf.to_s,caller)
       end
 
-      return Handler.new(ptr)
+      return Handler.new(ptr,options)
     end
   end
 end
