@@ -36,7 +36,7 @@ module FFI
           callback(&block)
         else
           # Default the callback to an empty Proc
-          @callback = Proc.new
+          @callback = Proc.new {}
         end
       end
 
