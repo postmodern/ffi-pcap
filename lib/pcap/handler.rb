@@ -95,7 +95,7 @@ module FFI
       def dispatch(data=nil,&block)
         callback(&block) if block
 
-        PCap.pcap_dispatch(@pcap,@count,@callback,data)
+        return PCap.pcap_dispatch(@pcap,@count,@callback,data)
       end
 
       def next
