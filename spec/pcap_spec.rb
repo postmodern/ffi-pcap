@@ -2,6 +2,7 @@ require 'pcap/pcap'
 require 'pcap/version'
 
 require 'spec_helper'
+require 'helpers/dumps'
 
 describe PCap do
   it "should define a VERSION constant" do
@@ -24,5 +25,26 @@ describe PCap do
       dev.should_not be_null
       dev.class.should == PCap::IF
     end
+  end
+
+  it "should be able to open a live pcap handler" do
+    lambda {
+      pcap = PCap.open_live
+      pcap.close
+    }.should_not raise_error(StandardError)
+  end
+
+  it "should be able to open a dead pcap handler" do
+    lambda {
+      pcap = PCap.open_dead('null')
+      pcap.close
+    }.should_not raise_error(StandardError)
+  end
+
+  it "should be able to open a pcap dump file" do
+    lambda {
+      pcap = PCap.open_offline(dump_path('simple_tcp'))
+      pcap.close
+    }.should_not raise_error(StandardError)
   end
 end
