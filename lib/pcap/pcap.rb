@@ -42,7 +42,7 @@ module FFI
       return nil
     end
 
-    def PCap.open_live(options={})
+    def PCap.open_live(options={},&block)
       device = options[:device]
       promisc = if options[:promisc]
                   1
@@ -59,7 +59,7 @@ module FFI
         raise(StandardError,errbuf.to_s,caller)
       end
 
-      return Handler.new(ptr)
+      return Handler.new(ptr,&block)
     end
 
     def PCap.open_dead(datalink,snaplen=Handler::SNAPLEN)
