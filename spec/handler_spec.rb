@@ -19,8 +19,7 @@ describe PCap::Handler do
 
   describe "live" do
     before(:each) do
-      @pcap = PCap.open_live
-      @pcap.count = 2
+      @pcap = PCap.open_live(:count => 2)
     end
 
     after(:each) do
