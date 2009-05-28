@@ -32,7 +32,7 @@ module FFI
           self.direction = options[:direction]
         end
 
-        @callback_wrapper = lambda do |user,header,bytes|
+        @callback_wrapper = Proc.new do |user,header,bytes|
           if @callback
             @callback.call(user,PacketHeader.new(header),bytes)
           end
@@ -46,7 +46,7 @@ module FFI
       end
 
       def callback(&block)
-        @callback = block if block
+        @callback = block
         return @callback
       end
 
