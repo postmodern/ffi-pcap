@@ -1,5 +1,6 @@
 require 'pcap/ffi'
 require 'pcap/data_link'
+require 'pcap/stat'
 
 require 'ffi'
 
@@ -66,6 +67,13 @@ module FFI
 
       def open_dump(path)
         Dumper.new(PCap.pcap_dump_open(@pcap,File.expand_path(path)))
+      end
+
+      def stats
+        stats = Stat.new
+
+        PCap.pcap_stats(@pcap,stats)
+        return stats
       end
 
       def stop
