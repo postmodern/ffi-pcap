@@ -11,10 +11,9 @@ shared_examples_for "Handler" do
   end
 
   it "should pass packets to a callback" do
-    @pcap.callback do |user,pkthdr,bytes|
-      hdr = PacketHeader.new(pkthdr)
-      hdr.captured.should_not == 0
-      hdr.length.should_not == 0
+    @pcap.callback do |user,header,bytes|
+      header.captured.should_not == 0
+      header.length.should_not == 0
 
       bytes.should_not be_null
     end

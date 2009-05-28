@@ -32,12 +32,13 @@ module FFI
           self.direction = options[:direction]
         end
 
-        if block
-          callback(&block)
-        else
-          # Default the callback to an empty Proc
-          @callback = Proc.new {}
+        @callback_wrapper = lambda do |user,header,bytes|
+          if @callback
+            @callback.call(user,PacketHeader.new(header),bytes)
+          end
         end
+
+        callback(&block)
       end
 
       def datalink
@@ -45,10 +46,7 @@ module FFI
       end
 
       def callback(&block)
-        if block
-          @callback = block
-        end
-
+        @callback = block if block
         return @callback
       end
 
@@ -87,7 +85,7 @@ module FFI
       def loop(data=nil,&block)
         callback(&block) if block
 
-        PCap.pcap_loop(@pcap,@count,@callback,data)
+        PCap.pcap_loop(@pcap,@count,@callback_wrapper,data)
       end
 
       alias each loop
@@ -95,7 +93,7 @@ module FFI
       def dispatch(data=nil,&block)
         callback(&block) if block
 
-        return PCap.pcap_dispatch(@pcap,@count,@callback,data)
+        return PCap.pcap_dispatch(@pcap,@count,@callback_wrapper,data)
       end
 
       def next
