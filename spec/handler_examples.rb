@@ -59,4 +59,13 @@ shared_examples_for "Handler" do
 
     stopped.should == true
   end
+
+  it "should prevent double closes" do
+    @pcap.close
+    @pcap.should be_closed
+
+    lambda {
+      @pcap.close
+    }.should_not raise_error(StandardError)
+  end
 end
