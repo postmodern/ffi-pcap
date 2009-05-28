@@ -10,4 +10,9 @@ describe PCap::ErrorBuffer do
   it "should have a size of 256" do
     @errbuf.size.should == 256
   end
+
+  it "should return the error message for to_s" do
+    @errbuf.write_string('test')
+    @errbuf.to_s.should == 'test'
+  end
 end
