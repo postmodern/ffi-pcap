@@ -33,6 +33,19 @@ shared_examples_for "Handler" do
     data.should_not be_null
   end
 
+  it "should be able to open a dump file" do
+    lambda {
+      dumper = @pcap.open_dump(Tempfile.new.path)
+      dumper.close
+    }.should_not raise_error(RuntimeError)
+  end
+
+  it "should raise an exception when opening a bad dump file" do
+    lambda {
+      @pcap.open_dump(File.join('','obviously','not','there'))
+    }.should raise_error(RuntimeError)
+  end
+
   it "should return an empty String when an error has not occurred" do
     @pcap.error.should be_empty
   end
