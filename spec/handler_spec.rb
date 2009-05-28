@@ -15,6 +15,23 @@ describe PCap::Handler do
     end
 
     it_should_behave_like "Handler"
+
+    it "should return a nil if there are no packets left in the dump file" do
+      @pcap.loop
+
+      header, data = @pcap.next
+
+      header.should be_nil
+      data.should be_nil
+    end
+
+    it "should raise a ReadError when reading past the end of a dump file" do
+      @pcap.loop
+
+      lambda {
+        @pcap.next_extra
+      }.should raise_error(ReadError)
+    end
   end
 
   describe "live" do
