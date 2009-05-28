@@ -19,11 +19,14 @@ Gem::Specification.new do |s|
      "README.txt",
      "Rakefile",
      "VERSION",
+     "examples/print_bytes.rb",
      "lib/pcap.rb",
      "lib/pcap/addr.rb",
      "lib/pcap/data_link.rb",
      "lib/pcap/dumper.rb",
      "lib/pcap/error_buffer.rb",
+     "lib/pcap/exceptions.rb",
+     "lib/pcap/exceptions/read_error.rb",
      "lib/pcap/ffi.rb",
      "lib/pcap/file_header.rb",
      "lib/pcap/handler.rb",
@@ -43,7 +46,12 @@ Gem::Specification.new do |s|
      "lib/pcap/typedefs.rb",
      "lib/pcap/version.rb",
      "pcap-ffi.gemspec",
+     "spec/data_link_spec.rb",
+     "spec/dumps/simple_tcp.pcap",
      "spec/error_buffer.rb",
+     "spec/handler_examples.rb",
+     "spec/handler_spec.rb",
+     "spec/helpers/dumps.rb",
      "spec/pcap_spec.rb",
      "spec/spec_helper.rb",
      "tasks/spec.rb"
@@ -56,9 +64,14 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{FFI bindings for libpcap}
   s.test_files = [
-    "spec/spec_helper.rb",
-     "spec/pcap_spec.rb",
-     "spec/error_buffer.rb"
+    "spec/pcap_spec.rb",
+     "spec/data_link_spec.rb",
+     "spec/error_buffer.rb",
+     "spec/spec_helper.rb",
+     "spec/handler_spec.rb",
+     "spec/handler_examples.rb",
+     "spec/helpers/dumps.rb",
+     "examples/print_bytes.rb"
   ]
 
   if s.respond_to? :specification_version then
