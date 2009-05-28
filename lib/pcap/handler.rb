@@ -24,6 +24,7 @@ module FFI
 
       def initialize(pcap,options={},&block)
         @pcap = pcap
+        @closed = false
 
         # Default is to infinitely loop over packets.
         @count = (options[:count] || -1)
@@ -143,8 +144,15 @@ module FFI
         PCap.pcap_breakloop(@pcap)
       end
 
+      def closed?
+        @closed == true
+      end
+
       def close
-        PCap.pcap_close(@pcap)
+        unless @closed
+          @closed = true
+          PCap.pcap_close(@pcap)
+        end
       end
 
       def to_ptr
