@@ -1,4 +1,5 @@
 require 'pcap/packets/typedefs'
+require 'pcap/mac_addr'
 require 'pcap/packet'
 
 require 'ffi'
@@ -10,14 +11,11 @@ module FFI
 
         include Packet
 
-        # Number of bytes for an ethernet address
-        ADDR_LEN = 6
-
         # Size of an Ethernet header
         SIZE = 14
 
-        layout :ether_dhost, [:uchar, ADDR_LEN],
-               :ether_shost, [:uchar, ADDR_LEN],
+        layout :ether_dhost, MACAddr,
+               :ether_shost, MACAddr,
                :ether_type, :ushort
 
         #

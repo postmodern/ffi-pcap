@@ -8,6 +8,7 @@ lib/pcap/exceptions.rb
 lib/pcap/exceptions/read_error.rb
 lib/pcap/typedefs.rb
 lib/pcap/time_val.rb
+lib/pcap/mac_addr.rb
 lib/pcap/in_addr.rb
 lib/pcap/sock_addr.rb
 lib/pcap/sock_addr_in.rb
