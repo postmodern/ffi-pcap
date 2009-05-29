@@ -2,6 +2,18 @@ module FFI
   module PCap
     class DataLink
 
+      NULL = 0        # BSD loopback encapsulation
+      EN10MB = 1      # Ethernet (10Mb)
+      EN3MB = 2       # Experimental Ethernet (3Mb)
+      AX25 = 3        # Amateur Radio AX.25
+      PRONET = 4      # Proteon ProNET Token Ring
+      CHAOS = 5       # Chaos
+      IEEE802 = 6     # 802.5 Token Ring
+      ARCNET = 7      # ARCNET, with BSD-style header
+      SLIP = 8        # Serial Line IP
+      PPP = 9         # Point-to-point Protocol
+      FDDI = 10       # FDDI
+
       # PCap datalink numeric value
       attr_reader :value
 
