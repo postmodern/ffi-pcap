@@ -9,6 +9,18 @@ module FFI
       layout :bytes, [:uchar, SIZE]
 
       #
+      # Returns +true+ if the MAC is a broadcast address, returns +false+
+      # otherwise.
+      #
+      def broadcast?
+        self[:bytes].each do |b|
+          return false unless b == 0xff
+        end
+
+        return true
+      end
+
+      #
       # Converts the MAC address to hex form.
       #
       def to_s
