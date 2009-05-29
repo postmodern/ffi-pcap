@@ -6,11 +6,11 @@ require 'handler_examples'
 
 describe PCap::Handler do
   describe "offline" do
-    before(:all) do
+    before(:each) do
       @pcap = PCap.open_offline(dump_path('simple_tcp'))
     end
 
-    after(:all) do
+    after(:each) do
       @pcap.close
     end
 
