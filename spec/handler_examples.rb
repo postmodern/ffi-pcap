@@ -32,4 +32,19 @@ shared_examples_for "Handler" do
     data.should_not be_nil
     data.should_not be_null
   end
+
+  it "should return an empty String when an error has not occurred" do
+    @pcap.error.should be_empty
+  end
+
+  it "should be able to break out of the Handler#loop" do
+    stopped = false
+
+    @pcap.loop do |user,pkthdr,bytes|
+      stopped = true
+      @pcap.stop
+    end
+
+    stopped.should == true
+  end
 end
