@@ -16,6 +16,11 @@ describe PCap::Handler do
 
     it_should_behave_like "Handler"
 
+    it "should not support non-blocking mode" do
+      @pcap.non_blocking = true
+      @pcap.should_not be_non_blocking
+    end
+
     it "should return a nil if there are no packets left in the dump file" do
       @pcap.loop
 
@@ -45,6 +50,11 @@ describe PCap::Handler do
 
     it_should_behave_like "Handler"
 
+    it "should support non-blocking mode" do
+      @pcap.non_blocking = true
+      @pcap.should be_non_blocking
+    end
+
     it "should provide statistics about packets received/dropped" do
       @pcap.loop
 
@@ -60,6 +70,11 @@ describe PCap::Handler do
 
     after(:each) do
       @pcap.close
+    end
+
+    it "should support non-blocking mode" do
+      @pcap.non_blocking = true
+      @pcap.should be_non_blocking
     end
   end
 end
