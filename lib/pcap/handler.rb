@@ -19,11 +19,16 @@ module FFI
       # Pointer to the pcap opaque type
       attr_reader :pcap
 
+      # DataLink for the pcap descriptor
+      attr_reader :datalink
+
       # Number of packets to sniff
       attr_accessor :count
 
       def initialize(pcap,options={},&block)
         @pcap = pcap
+        @datalink = DataLink.new(PCap.pcap_datalink(@pcap))
+
         @closed = false
 
         # Default is to infinitely loop over packets.
@@ -42,10 +47,6 @@ module FFI
         callback(&block)
 
         trap('SIGINT') { self.close }
-      end
-
-      def datalink
-        DataLink.new(PCap.pcap_datalink(@pcap))
       end
 
       def callback(&block)
