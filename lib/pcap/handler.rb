@@ -106,7 +106,7 @@ module FFI
       end
 
       def error
-        PCap.pcap_geterr(@pcap).get_string(ErrorBuffer::SIZE)
+        PCap.pcap_geterr(@pcap)
       end
 
       def stop
