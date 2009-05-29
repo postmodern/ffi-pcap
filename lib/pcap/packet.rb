@@ -22,7 +22,7 @@ module FFI
       # Returns the data payload of the packet.
       #
       def payload
-        self + self.size
+        self.to_ptr + self.size
       end
 
       #
