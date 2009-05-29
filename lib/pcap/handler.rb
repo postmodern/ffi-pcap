@@ -95,7 +95,13 @@ module FFI
       end
 
       def open_dump(path)
-        Dumper.new(PCap.pcap_dump_open(@pcap,File.expand_path(path)))
+        dump_ptr = PCap.pcap_dump_open(@pcap,File.expand_path(path))
+
+        if dump_ptr.null?
+          raise(RuntimeError,error,caller)
+        end
+
+        return Dumper.new(dump_ptr)
       end
 
       def stats
