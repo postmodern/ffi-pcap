@@ -1,4 +1,5 @@
 require 'pcap/packets/typedefs'
+require 'pcap/packet'
 
 require 'ffi'
 
@@ -6,6 +7,8 @@ module FFI
   module PCap
     module Packets
       class TCP < FFI::Struct
+
+        include Packet
 
         # TCP flags
         FLAGS = [

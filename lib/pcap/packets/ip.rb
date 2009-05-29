@@ -1,3 +1,4 @@
+require 'pcap/packet'
 require 'pcap/in_addr'
 
 require 'ffi'
@@ -6,6 +7,8 @@ module FFI
   module PCap
     module Packets
       class IPv4 < FFI::Struct
+
+        include Packet
 
         # IPv4 flags
         FLAGS = [

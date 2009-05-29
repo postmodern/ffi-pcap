@@ -15,6 +15,7 @@ lib/pcap/if.rb
 lib/pcap/addr.rb
 lib/pcap/file_header.rb
 lib/pcap/packet_header.rb
+lib/pcap/packet.rb
 lib/pcap/packets.rb
 lib/pcap/packets/typedefs.rb
 lib/pcap/packets/ethernet.rb
