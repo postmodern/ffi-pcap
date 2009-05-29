@@ -85,7 +85,7 @@ module FFI
         end
 
         def is_loopback?
-          self[:ether_type] == IPV6_TYPE
+          self[:ether_type] == LOOPBACK_TYPE
         end
 
       end
