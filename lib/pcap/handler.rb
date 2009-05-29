@@ -58,6 +58,32 @@ module FFI
         return PCap.pcap_setdirection(@pcap,directions[:"pcap_d_#{dir}"])
       end
 
+      def non_blocking=(mode)
+        errbuf = ErrorBuffer.new
+        mode = if mode
+          1
+        else
+          0
+        end
+
+        if PCap.pcap_setnonblock(@pcap,mode,errbuf) == -1
+          raise(RuntimeError,errbuf.to_s,caller)
+        end
+
+        return mode == 1
+      end
+
+      def non_blocking?
+        errbuf = ErrorBuffer.new
+        result = PCap.pcap_getnonblock(@pcap,errbuf)
+
+        if result == -1
+          raise(RuntimeError,errbuf.to_s,caller)
+        end
+
+        return result == 1
+      end
+
       def loop(data=nil,&block)
         callback(&block) if block
 
