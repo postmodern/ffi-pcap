@@ -9,6 +9,10 @@ describe Packets::Ethernet do
     @pcap = load_dump('http')
   end
 
+  after(:each) do
+    @pcap.close
+  end
+
   it "should be a Packet" do
     Packets::Ethernet.include?(Packet).should == true
   end
