@@ -11,7 +11,7 @@ module FFI
           # Length of the packets payload
           attr_reader :payload_length
 
-          # previous packet in the payload
+          # Previous packet in the payload
           attr_reader :prev
 
           def self.release(ptr)
@@ -20,8 +20,8 @@ module FFI
       end
 
       #
-      # Creates a new packet from the specified _ptr_ and the
-      # given _prev_ packet.
+      # Creates a new packet from the specified _ptr_, _length_
+      # and the given _prev_ packet.
       #
       def initialize(ptr,length,prev=nil)
         super(ptr)
