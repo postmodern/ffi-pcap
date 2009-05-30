@@ -34,6 +34,31 @@ module FFI
       end
 
       #
+      # Returns the bytes at the specified _index_or_range_.
+      #
+      #   pkt[0]
+      #   # => 255
+      #
+      #   pkt[0..2]
+      #   # => [255, 255, 25]
+      #
+      def [](index_or_range)
+        if index_or_range.kind_of?(Range)
+          start = index_or_range.begin
+          stop = index_or_range.end
+        else
+          start = index_or_range
+          stop = index_or_range + 1
+        end
+
+        if start >= @payload_length
+          return nil
+        end
+
+        return @payload.get_array_of_uint8(start,stop - start)
+      end
+
+      #
       # Default method which returns the next packet in the payload.
       #
       def next
