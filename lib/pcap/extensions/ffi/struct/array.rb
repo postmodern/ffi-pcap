@@ -1,4 +1,4 @@
-require 'pcap/struct/exceptions/unknown_endianness'
+require 'pcap/extensions/ffi/exceptions/unknown_endianness'
 
 require 'rubygems'
 require 'ffi'
