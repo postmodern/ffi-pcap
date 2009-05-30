@@ -29,6 +29,7 @@ lib/pcap/packets/typedefs.rb
 lib/pcap/packets/raw.rb
 lib/pcap/packets/fddi.rb
 lib/pcap/packets/ethernet.rb
+lib/pcap/packets/token_ring.rb
 lib/pcap/packets/ip.rb
 lib/pcap/packets/icmp.rb
 lib/pcap/packets/icmp/data.rb
