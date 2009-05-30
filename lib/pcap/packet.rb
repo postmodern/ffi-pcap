@@ -1,3 +1,5 @@
+require 'pcap/extensions/ffi/struct/array'
+
 module FFI
   module PCap
     module Packet
