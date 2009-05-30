@@ -10,7 +10,7 @@ module FFI
 
         layout :dest_mac, MACAddr,
                :src_mac, MACAddr,
-               :length, :uint16,
+               :length, [NativeType::UINT8, 2],
                :dsap, :uint8,
                :ssap, :uint8,
                :control, :uint8
@@ -24,7 +24,7 @@ module FFI
         end
 
         def length
-          self[:length]
+          self[:length].to_endian(:big)
         end
 
         def dsap
