@@ -39,6 +39,7 @@ tasks/spec.rb
 spec/spec_helper.rb
 spec/helpers/dumps.rb
 spec/dumps/simple_tcp.pcap
+spec/dumps/http.pcap
 spec/error_buffer.rb
 spec/data_link_spec.rb
 spec/mac_addr_spec.rb
