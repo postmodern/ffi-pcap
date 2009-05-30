@@ -6,7 +6,7 @@ module FFI
       # Number of bytes for an ethernet address
       SIZE = 6
 
-      layout :bytes, [:uchar, SIZE]
+      layout :bytes, [FFI::NativeType::UINT8, SIZE]
 
       def self.parse(str)
         digits = str.split(':').map { |b| b.hex }
