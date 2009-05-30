@@ -43,15 +43,15 @@ module FFI
           XMAS = (FIN | SYN | RST | PUSH | ACK | URG | ECE | CWR)
         ]
 
-        layout :th_sport, :ushort,
-               :th_dport, :ushort,
+        layout :th_sport, :uint16,
+               :th_dport, :uint16,
                :th_seq, :tcp_seq,
                :th_ack, :tcp_seq,
-               :th_offx2, :uchar,
-               :th_flags, :uchar,
-               :th_win, :ushort,
-               :th_sum, :ushort,
-               :th_urp, :ushort
+               :th_offx2, :uint8,
+               :th_flags, :uint8,
+               :th_win, :uint16,
+               :th_sum, :uint16,
+               :th_urp, :uint16
 
         #
         # Returns the source port.
