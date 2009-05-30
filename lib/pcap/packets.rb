@@ -1,5 +1,6 @@
 require 'pcap/packets/typedefs'
 require 'pcap/packets/ethernet'
 require 'pcap/packets/ieee_802_3'
+require 'pcap/packets/ieee_802_2'
 require 'pcap/packets/ip'
 require 'pcap/packets/tcp'
