@@ -1,5 +1,8 @@
 require 'pcap/struct/exceptions/unknown_endianness'
 
+require 'rubygems'
+require 'ffi'
+
 module FFI
   class Struct
     class Array
