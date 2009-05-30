@@ -29,11 +29,12 @@ module FFI
 
         layout :ether_dhost, MACAddr,
                :ether_shost, MACAddr,
-               :ether_type_low, :uint8,
-               :ether_type_high, :uint8
+               :ether_type, [NativeType::UINT8, 2]
 
         def type
-          (self[:ether_type_low] << 8) | self[:ether_type_high]
+          bytes = self[:ether_type].to_ptr.get_array_of_uint8(0,2)
+
+          return (bytes[0] << 8) | bytes[1]
         end
 
         #
@@ -51,51 +52,51 @@ module FFI
         end
 
         def pup?
-          type == PUP_TYPE
+          self.type == PUP_TYPE
         end
 
         def sprite?
-          type == SPRITE_TYPE
+          self.type == SPRITE_TYPE
         end
 
         def xns?
-          type == XNS_TYPE
+          self.type == XNS_TYPE
         end
 
         def ip?
-          type == IP_TYPE
+          self.type == IP_TYPE
         end
 
         def arp?
-          type == ARP_TYPE
+          self.type == ARP_TYPE
         end
 
         def rarp?
-          type == RARP_TYPE
+          self.type == RARP_TYPE
         end
 
         def apple_talk?
-          type == APPLE_TALK_TYPE
+          self.type == APPLE_TALK_TYPE
         end
 
         def aarp?
-          type == AARP_TYPE
+          self.type == AARP_TYPE
         end
 
         def vlan?
-          type == VLAN_TYPE
+          self.type == VLAN_TYPE
         end
 
         def ipx?
-          type == IPX_TYPE
+          self.type == IPX_TYPE
         end
 
         def ipv6?
-          type == IPV6_TYPE
+          self.type == IPV6_TYPE
         end
 
         def loopback?
-          type == LOOPBACK_TYPE
+          self.type == LOOPBACK_TYPE
         end
 
       end
