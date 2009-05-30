@@ -25,14 +25,14 @@ module FFI
         # Mask for fragment flags
         FRAGMENT_MASK = 0x1fff
         
-        layout :ip_vhl, :uchar,
-               :ip_tos, :uchar,
-               :ip_len, :ushort,
-               :ip_id, :ushort,
-               :ip_off, :ushort,
-               :ip_ttl, :uchar,
-               :ip_p, :uchar,
-               :ip_sum, :ushort,
+        layout :ip_vhl, :uint8,
+               :ip_tos, :uint8,
+               :ip_len, :uint16,
+               :ip_id, :uint16,
+               :ip_off, :uint16,
+               :ip_ttl, :uint8,
+               :ip_p, :uint8,
+               :ip_sum, :uint16,
                :ip_src, InAddr,
                :ip_dst, InAddr
 
