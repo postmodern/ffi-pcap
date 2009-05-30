@@ -7,6 +7,10 @@ describe MACAddr do
     @mac = MACAddr.parse('ff:ff:c3:0d:25:e3')
   end
 
+  it "should be exactly 6 bytes long" do
+    @mac.size.should == 6
+  end
+
   it "should parse MAC addresses" do
     @mac[0].should == 0xff
     @mac[1].should == 0xff
