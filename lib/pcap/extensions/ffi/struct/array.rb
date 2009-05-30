@@ -14,11 +14,11 @@ module FFI
         case type.to_sym
         when :little, :network
           return (0...length).inject(0) do |num,i|
-            num |= (bytes[i] << (length - i))
+            num |= (bytes[i] << i * 8)
           end
         when :big
           return (0...length).inject(0) do |num,i|
-            num |= (bytes[i] << i)
+            num |= (bytes[i] << ((length - i -1) * 8))
           end
         else
           raise(UnknownEndianness,"unknown endianness #{type}",caller)
