@@ -48,47 +48,47 @@ module FFI
           self[:ether_dhost]
         end
 
-        def is_pup?
+        def pup?
           self[:ether_type] == PUP_TYPE
         end
 
-        def is_sprite?
+        def sprite?
           self[:ether_type] == SPRITE_TYPE
         end
 
-        def is_ip?
+        def ip?
           self[:ether_type] == IP_TYPE
         end
 
-        def is_arp?
+        def arp?
           self[:ether_type] == ARP_TYPE
         end
 
-        def is_rarp?
+        def rarp?
           self[:ether_type] == RARP_TYPE
         end
 
-        def is_apple_talk?
+        def apple_talk?
           self[:ether_type] == APPLE_TALK_TYPE
         end
 
-        def is_aarp?
+        def aarp?
           self[:ether_type] == AARP_TYPE
         end
 
-        def is_vlan?
+        def vlan?
           self[:ether_type] == VLAN_TYPE
         end
 
-        def is_ipx?
+        def ipx?
           self[:ether_type] == IPX_TYPE
         end
 
-        def is_ipv6?
+        def ipv6?
           self[:ether_type] == IPV6_TYPE
         end
 
-        def is_loopback?
+        def loopback?
           self[:ether_type] == LOOPBACK_TYPE
         end
 
