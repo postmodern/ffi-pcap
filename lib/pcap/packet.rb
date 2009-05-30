@@ -5,6 +5,9 @@ module FFI
         base.module_eval do
           # previous packet in the payload
           attr_reader :prev
+
+          def self.release(ptr)
+          end
         end
       end
 
