@@ -5,6 +5,12 @@ module FFI
     module Packet
       def self.included(base)
         base.module_eval do
+          # Payload of the packet
+          attr_reader :payload
+
+          # Length of the packets payload
+          attr_reader :payload_length
+
           # previous packet in the payload
           attr_reader :prev
 
@@ -17,17 +23,14 @@ module FFI
       # Creates a new packet from the specified _ptr_ and the
       # given _prev_ packet.
       #
-      def initialize(ptr,prev=nil)
+      def initialize(ptr,length,prev=nil)
         super(ptr)
 
-        @prev = prev
-      end
+        @length = length
+        @payload = self.to_ptr + self.size
+        @payload_length = @length - self.size
 
-      #
-      # Returns the data payload of the packet.
-      #
-      def payload
-        self.to_ptr + self.size
+        @prev = prev
       end
 
       #
