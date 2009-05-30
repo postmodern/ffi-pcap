@@ -25,6 +25,13 @@ describe Packets::Ethernet do
     }.should_not raise_error
   end
 
+  it "should be exactly 14 bytes long" do
+    header, bytes = @pcap.next
+    ether = Packets::Ethernet.new(bytes)
+
+    ether.size.should == 14
+  end
+
   it "should have a source MAC address" do
     header, bytes = @pcap.next
     ether = Packets::Ethernet.new(bytes)
