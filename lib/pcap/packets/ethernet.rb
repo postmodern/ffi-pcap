@@ -27,13 +27,13 @@ module FFI
         # Size of an Ethernet header
         SIZE = 14
 
-        layout :start_delimiter, :uint8,
-               :ether_dhost, MACAddr,
+        layout :ether_dhost, MACAddr,
                :ether_shost, MACAddr,
-               :ether_type, :uint16
+               :ether_type_low, :uint8,
+               :ether_type_high, :uint8
 
         def type
-          self[:ether_type]
+          (self[:ether_type_low] << 8) | self[:ether_type_high]
         end
 
         #
@@ -51,51 +51,51 @@ module FFI
         end
 
         def pup?
-          self[:ether_type] == PUP_TYPE
+          type == PUP_TYPE
         end
 
         def sprite?
-          self[:ether_type] == SPRITE_TYPE
+          type == SPRITE_TYPE
         end
 
         def xns?
-          self[:ether_type] == XNS_TYPE
+          type == XNS_TYPE
         end
 
         def ip?
-          self[:ether_type] == IP_TYPE
+          type == IP_TYPE
         end
 
         def arp?
-          self[:ether_type] == ARP_TYPE
+          type == ARP_TYPE
         end
 
         def rarp?
-          self[:ether_type] == RARP_TYPE
+          type == RARP_TYPE
         end
 
         def apple_talk?
-          self[:ether_type] == APPLE_TALK_TYPE
+          type == APPLE_TALK_TYPE
         end
 
         def aarp?
-          self[:ether_type] == AARP_TYPE
+          type == AARP_TYPE
         end
 
         def vlan?
-          self[:ether_type] == VLAN_TYPE
+          type == VLAN_TYPE
         end
 
         def ipx?
-          self[:ether_type] == IPX_TYPE
+          type == IPX_TYPE
         end
 
         def ipv6?
-          self[:ether_type] == IPV6_TYPE
+          type == IPV6_TYPE
         end
 
         def loopback?
-          self[:ether_type] == LOOPBACK_TYPE
+          type == LOOPBACK_TYPE
         end
 
       end
