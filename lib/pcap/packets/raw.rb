@@ -7,6 +7,14 @@ module FFI
 
         include Packet
 
+        def size
+          0
+        end
+
+        def to_ptr
+          @payload.to_ptr
+        end
+
       end
     end
   end
