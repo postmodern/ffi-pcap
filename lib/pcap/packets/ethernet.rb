@@ -30,6 +30,10 @@ module FFI
                :ether_shost, MACAddr,
                :ether_type, :ushort
 
+        def type
+          self[:ether_type]
+        end
+
         #
         # Returns the source MAC address.
         #
