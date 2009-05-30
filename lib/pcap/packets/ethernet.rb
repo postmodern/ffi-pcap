@@ -28,7 +28,7 @@ module FFI
 
         layout :ether_dhost, MACAddr,
                :ether_shost, MACAddr,
-               :ether_type, :ushort
+               :ether_type, :uint16
 
         def type
           self[:ether_type]
