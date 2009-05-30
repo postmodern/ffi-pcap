@@ -45,6 +45,10 @@ module FFI
         end
       end
 
+      def ==(other)
+        self.to_a == other.to_a
+      end
+
       def to_a
         self[:bytes].to_a
       end

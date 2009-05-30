@@ -26,6 +26,11 @@ describe MACAddr do
     @mac[0].should == 0xff
   end
 
+  it "should be able to be compared with other MACs" do
+    @mac.should == [0xff, 0xff, 0xc3, 0x0d, 0x25, 0xe3]
+    @mac.should_not == [0xff, 0xff, 0x00, 0x0d, 0x00, 0xe3]
+  end
+
   it "should be able to be converted to an Array" do
     @mac.to_a.should == [0xff, 0xff, 0xc3, 0x0d, 0x25, 0xe3]
   end
