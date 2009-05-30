@@ -32,9 +32,7 @@ module FFI
                :ether_type, [NativeType::UINT8, 2]
 
         def type
-          bytes = self[:ether_type].to_ptr.get_array_of_uint8(0,2)
-
-          return (bytes[0] << 8) | bytes[1]
+          self[:ether_type].to_endian(:big)
         end
 
         #
