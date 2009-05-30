@@ -6,6 +6,12 @@ examples/print_bytes.rb
 lib/pcap.rb
 lib/pcap/exceptions.rb
 lib/pcap/exceptions/read_error.rb
+lib/pcap/extensions/ffi.rb
+lib/pcap/extensions/ffi/exceptions.rb
+lib/pcap/extensions/ffi/exceptions/unknown_endianness.rb
+lib/pcap/extensions/ffi/types.rb
+lib/pcap/extensions/ffi/struct.rb
+lib/pcap/extensions/ffi/struct/array.rb
 lib/pcap/typedefs.rb
 lib/pcap/time_val.rb
 lib/pcap/mac_addr.rb

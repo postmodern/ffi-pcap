@@ -1,11 +1,6 @@
-require 'rubygems'
-require 'ffi'
+require 'pcap/extensions/ffi/types'
 
 module FFI
-  def self.alias_type(type,aliased)
-    add_typedef(find_type(type),aliased.to_sym)
-  end
-
   alias_type :long, :time_t
   alias_type :long, :suseconds_t
   alias_type :ushort, :sa_family_t
