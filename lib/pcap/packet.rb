@@ -46,16 +46,11 @@ module FFI
         if index_or_range.kind_of?(Range)
           start = index_or_range.begin
           stop = index_or_range.end
-        else
-          start = index_or_range
-          stop = index_or_range + 1
+
+          return @payload.get_array_of_uint8(start,stop - start)
         end
 
-        if start >= @payload_length
-          return nil
-        end
-
-        return @payload.get_array_of_uint8(start,stop - start)
+        return @payload.get_uint8(index_or_range)
       end
 
       #
