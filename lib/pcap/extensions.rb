@@ -1,0 +1,1 @@
+require 'pcap/extensions/ffi'
