@@ -13,6 +13,7 @@ module FFI
 
         PUP_TYPE = 0x0200             # Xerox PUP
         SPRITE_TYPE = 0x0500          # Sprite
+        XNS_TYPE = 0x0600             # XNS
         IP_TYPE = 0x0800              # IP
         ARP_TYPE = 0x0806             # Address Resolution Protocol
         RARP_TYPE = 0x8035            # Reverse ARP
@@ -26,7 +27,8 @@ module FFI
         # Size of an Ethernet header
         SIZE = 14
 
-        layout :ether_dhost, MACAddr,
+        layout :start_delimiter, :uint8,
+               :ether_dhost, MACAddr,
                :ether_shost, MACAddr,
                :ether_type, :uint16
 
@@ -54,6 +56,10 @@ module FFI
 
         def sprite?
           self[:ether_type] == SPRITE_TYPE
+        end
+
+        def xns?
+          self[:ether_type] == XNS_TYPE
         end
 
         def ip?
