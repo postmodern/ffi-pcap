@@ -4,6 +4,7 @@ require 'pcap/error_buffer'
 require 'pcap/data_link'
 require 'pcap/packet_header'
 require 'pcap/stat'
+require 'pcap/packets/raw'
 
 require 'ffi'
 
@@ -38,9 +39,12 @@ module FFI
           self.direction = options[:direction]
         end
 
-        @callback_wrapper = Proc.new do |user,header,bytes|
+        @callback_wrapper = Proc.new do |user,pkthdr,bytes|
           if @callback
-            @callback.call(user,PacketHeader.new(header),bytes)
+            header = PacketHeader.new(pkthdr)
+            raw = Packets::Raw.new(bytes,header.captured,@datalink)
+
+            @callback.call(user,header,raw)
           end
         end
 
