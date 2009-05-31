@@ -5,6 +5,8 @@ module FFI
     module Packet
       def self.included(base)
         base.module_eval do
+          include Enumerable
+
           # Payload of the packet
           attr_reader :payload
 
@@ -31,6 +33,19 @@ module FFI
         @payload_length = @length - self.size
 
         @prev = prev
+      end
+
+      #
+      # Enumerate over every byte in the payload.
+      #
+      def each(&block)
+        if block
+          (0...@payload_length).each do |i|
+            block.call(@payload.get_uint8(i))
+          end
+        end
+
+        return self
       end
 
       #
