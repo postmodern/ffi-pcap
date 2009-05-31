@@ -7,6 +7,9 @@ module FFI
         base.module_eval do
           include Enumerable
 
+          # Total length
+          attr_reader :length
+
           # Payload of the packet
           attr_reader :payload
 
