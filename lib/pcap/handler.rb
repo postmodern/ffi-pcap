@@ -116,9 +116,9 @@ module FFI
 
       def next_extra
         header_ptr = MemoryPointer.new(:pointer)
-        data_ptr = MemoryPointer.new(:pointer)
+        bytes_ptr = MemoryPointer.new(:pointer)
 
-        case PCap.pcap_next_ex(@pcap,header_ptr,data_ptr)
+        case PCap.pcap_next_ex(@pcap,header_ptr,bytes_ptr)
         when -1
           raise(ReadError,"an error occurred while reading the packet",caller)
         when -2
@@ -126,7 +126,7 @@ module FFI
         end
 
         header = header_ptr.get_pointer(0)
-        raw = Packets::Raw.new(data_ptr.get_pointer(0),header.captured,@datalink)
+        raw = Packets::Raw.new(bytes_ptr.get_pointer(0),header.captured,@datalink)
 
         return [header, raw]
       end
