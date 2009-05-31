@@ -42,6 +42,15 @@ module FFI
           end
         end
 
+        protected
+
+        #
+        # Delegates all additional method calls to the payload.
+        #
+        def method_missing(name,*arguments,&block)
+          @payload.send(name,*arguments,&block)
+        end
+
       end
     end
   end
