@@ -108,7 +108,7 @@ module FFI
         header = PacketHeader.new
         bytes = PCap.pcap_next(@pcap,header)
 
-        return [nil, nil] if data.null?
+        return [nil, nil] if bytes.null?
 
         raw = Packets::Raw.new(bytes,header.captured,@datalink)
         return [header, raw]
