@@ -17,13 +17,16 @@ module FFI
         # with the specified _length_ and _datalink_.
         #
         def initialize(ptr,length,datalink)
-          super(ptr,length)
+          @length = length
+          @payload = ptr
+          @payload_length = @length
 
           @datalink = datalink
+          @prev = nil
         end
 
         def size
-          0
+          @length
         end
 
         def to_ptr
