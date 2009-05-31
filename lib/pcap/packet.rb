@@ -31,6 +31,10 @@ module FFI
       def initialize(ptr,length,prev=nil)
         super(ptr)
 
+        if self.size > length
+          raise(RuntimeError,"packet not big enough",caller)
+        end
+
         @length = length
         @payload = self.to_ptr + self.size
         @payload_length = @length - self.size
@@ -61,14 +65,16 @@ module FFI
       #   # => [255, 255, 25]
       #
       def [](index_or_range)
-        if index_or_range.kind_of?(Range)
+        if index_or_range.kind_of?(Symbol)
+          return super(index_or_range)
+        elsif index_or_range.kind_of?(Range)
           start = index_or_range.begin
           stop = index_or_range.end
 
           return @payload.get_array_of_uint8(start,stop - start)
+        else
+          return @payload.get_uint8(index_or_range)
         end
-
-        return @payload.get_uint8(index_or_range)
       end
 
       #
