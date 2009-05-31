@@ -6,6 +6,7 @@ examples/print_bytes.rb
 lib/pcap.rb
 lib/pcap/exceptions.rb
 lib/pcap/exceptions/read_error.rb
+lib/pcap/exceptions/unsupported_datalink.rb
 lib/pcap/extensions.rb
 lib/pcap/extensions/ffi.rb
 lib/pcap/extensions/ffi/exceptions.rb
