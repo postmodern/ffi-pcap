@@ -106,10 +106,12 @@ module FFI
 
       def next
         header = PacketHeader.new
-        data = PCap.pcap_next(@pcap,header)
+        bytes = PCap.pcap_next(@pcap,header)
 
         return [nil, nil] if data.null?
-        return [header, data]
+
+        raw = Packets::Raw.new(bytes,header.captured,@datalink)
+        return [header, raw]
       end
 
       def next_extra
@@ -123,7 +125,10 @@ module FFI
           raise(ReadError,"the 'savefile' contains no more packets",caller)
         end
 
-        return [header_ptr.get_pointer(0), data_ptr.get_pointer(0)]
+        header = header_ptr.get_pointer(0)
+        raw = Packets::Raw.new(data_ptr.get_pointer(0),header.captured,@datalink)
+
+        return [header, raw]
       end
 
       def open_dump(path)
