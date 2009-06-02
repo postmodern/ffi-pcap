@@ -50,7 +50,8 @@ module FFI
 
         callback(&block)
 
-        trap('SIGINT') { self.close }
+        trap('SIGINT',&method(:close))
+        trap('SIGTERM',&method(:close))
       end
 
       def callback(&block)
