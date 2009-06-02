@@ -1,4 +1,4 @@
-require 'pcap/error_buffer'
+require 'pcap_ffi/error_buffer'
 
 require 'spec_helper'
 

@@ -1,7 +1,7 @@
 # -*- ruby -*-
 
 require 'rubygems'
-require './lib/pcap/version.rb'
+require './lib/pcap_ffi/version.rb'
 require './tasks/spec.rb'
 
 # Generate a gem using jeweler

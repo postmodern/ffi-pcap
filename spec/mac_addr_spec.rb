@@ -1,4 +1,4 @@
-require 'pcap/mac_addr'
+require 'pcap_ffi/mac_addr'
 
 require 'spec_helper'
 

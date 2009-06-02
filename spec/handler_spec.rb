@@ -1,4 +1,4 @@
-require 'pcap/handler'
+require 'pcap_ffi/handler'
 
 require 'spec_helper'
 require 'helpers/dumps'
