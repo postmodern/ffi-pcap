@@ -44,6 +44,14 @@ module FFI
 
     def PCap.open_live(options={},&block)
       device = options[:device]
+      errbuf = ErrorBuffer.new
+
+      unless device
+        unless (device = PCap.pcap_lookupdev(errbuf))
+          raise(RuntimeError,errbuf.to_s,caller)
+        end
+      end
+
       promisc = if options[:promisc]
                   1
                 else
@@ -51,7 +59,6 @@ module FFI
                 end
       snaplen = (options[:snaplen] || Handler::SNAPLEN)
       to_ms = (options[:timeout] || 0)
-      errbuf = ErrorBuffer.new
 
       ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,errbuf)
 
