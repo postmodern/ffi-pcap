@@ -53,7 +53,7 @@ module FFI
       to_ms = (options[:timeout] || 0)
       errbuf = ErrorBuffer.new
 
-      ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,nil)
+      ptr = PCap.pcap_open_live(device,snaplen,promisc,to_ms,errbuf)
 
       if ptr.null?
         raise(StandardError,errbuf.to_s,caller)
