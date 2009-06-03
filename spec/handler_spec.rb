@@ -39,9 +39,40 @@ describe PCap::Handler do
     end
   end
 
-  describe "live" do
+  describe "live non-promisc" do
     before(:each) do
-      @pcap = PCap.open_live(:count => 2)
+      @pcap = PCap.open_live(
+        :device => PCAP_DEV,
+        :count => 2
+      )
+    end
+
+    after(:each) do
+      @pcap.close
+    end
+
+    it_should_behave_like "Handler"
+
+    it "should support non-blocking mode" do
+      @pcap.non_blocking = true
+      @pcap.should be_non_blocking
+    end
+
+    it "should provide statistics about packets received/dropped" do
+      @pcap.loop
+
+      stats = @pcap.stats
+      stats.received.should > 0
+    end
+  end
+
+  describe "live promisc" do
+    before(:each) do
+      @pcap = PCap.open_live(
+        :device => PCAP_DEV,
+        :count => 2,
+        :promisc => true
+      )
     end
 
     after(:each) do
