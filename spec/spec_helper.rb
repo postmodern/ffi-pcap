@@ -6,3 +6,5 @@ require 'pcap_ffi/version'
 
 include FFI
 include FFI::PCap
+
+PCAP_DEV = ENV['PCAP_DEV']
