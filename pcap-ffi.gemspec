@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Postmodern, Dakrone"]
-  s.date = %q{2009-06-02}
+  s.date = %q{2009-06-04}
   s.description = %q{Bindings to sniff packets using the FFI interface in Ruby.}
   s.email = %q{postmodern.mod3@gmail.com}
   s.extra_rdoc_files = [
@@ -44,6 +44,7 @@ Gem::Specification.new do |s|
      "lib/pcap_ffi/packet.rb",
      "lib/pcap_ffi/packet_header.rb",
      "lib/pcap_ffi/packets.rb",
+     "lib/pcap_ffi/packets/arp.rb",
      "lib/pcap_ffi/packets/ethernet.rb",
      "lib/pcap_ffi/packets/fddi.rb",
      "lib/pcap_ffi/packets/icmp.rb",
@@ -79,29 +80,28 @@ Gem::Specification.new do |s|
      "spec/spec_helper.rb",
      "tasks/spec.rb"
   ]
-  s.has_rdoc = true
   s.homepage = %q{http://github.com/postmodern/pcap-ffi}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{pcap-ffi}
-  s.rubygems_version = %q{1.3.1}
+  s.rubygems_version = %q{1.3.4}
   s.summary = %q{FFI bindings for libpcap}
   s.test_files = [
-    "spec/pcap_spec.rb",
-     "spec/mac_addr_spec.rb",
-     "spec/data_link_spec.rb",
-     "spec/packets/ethernet_spec.rb",
+    "spec/spec_helper.rb",
+     "spec/pcap_spec.rb",
      "spec/error_buffer.rb",
-     "spec/spec_helper.rb",
-     "spec/handler_spec.rb",
-     "spec/handler_examples.rb",
      "spec/helpers/dumps.rb",
+     "spec/handler_spec.rb",
+     "spec/data_link_spec.rb",
+     "spec/handler_examples.rb",
+     "spec/mac_addr_spec.rb",
+     "spec/packets/ethernet_spec.rb",
      "examples/print_bytes.rb"
   ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 2
+    s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
     else
