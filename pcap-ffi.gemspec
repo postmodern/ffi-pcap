@@ -72,6 +72,7 @@ Gem::Specification.new do |s|
      "spec/dumps/simple_tcp.pcap",
      "spec/error_buffer.rb",
      "spec/handler_examples.rb",
+     "spec/handler_live_examples.rb",
      "spec/handler_spec.rb",
      "spec/helpers/dumps.rb",
      "spec/mac_addr_spec.rb",
@@ -96,6 +97,7 @@ Gem::Specification.new do |s|
      "spec/handler_examples.rb",
      "spec/mac_addr_spec.rb",
      "spec/packets/ethernet_spec.rb",
+     "spec/handler_live_examples.rb",
      "examples/print_bytes.rb"
   ]
 

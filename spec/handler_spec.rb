@@ -3,6 +3,7 @@ require 'pcap_ffi/handler'
 require 'spec_helper'
 require 'helpers/dumps'
 require 'handler_examples'
+require 'handler_live_examples'
 
 describe PCap::Handler do
   describe "offline" do
@@ -52,18 +53,7 @@ describe PCap::Handler do
     end
 
     it_should_behave_like "Handler"
-
-    it "should support non-blocking mode" do
-      @pcap.non_blocking = true
-      @pcap.should be_non_blocking
-    end
-
-    it "should provide statistics about packets received/dropped" do
-      @pcap.loop
-
-      stats = @pcap.stats
-      stats.received.should > 0
-    end
+    it_should_behave_like "Handler live"
   end
 
   describe "live promisc" do
@@ -80,18 +70,7 @@ describe PCap::Handler do
     end
 
     it_should_behave_like "Handler"
-
-    it "should support non-blocking mode" do
-      @pcap.non_blocking = true
-      @pcap.should be_non_blocking
-    end
-
-    it "should provide statistics about packets received/dropped" do
-      @pcap.loop
-
-      stats = @pcap.stats
-      stats.received.should > 0
-    end
+    it_should_behave_like "Handler live"
   end
 
   describe "dead" do

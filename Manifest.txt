@@ -56,5 +56,6 @@ spec/data_link_spec.rb
 spec/mac_addr_spec.rb
 spec/packets/ethernet_spec.rb
 spec/handler_examples.rb
+spec/handler_live_examples.rb
 spec/handler_spec.rb
 spec/pcap_spec.rb
