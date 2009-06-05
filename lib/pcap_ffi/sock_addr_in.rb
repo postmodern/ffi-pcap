@@ -8,7 +8,7 @@ module FFI
     class SockAddrIn < FFI::Struct
 
       layout :sin_family, :sa_family_t,
-             :sin_port, :in_port_t,
+             :sin_port, [NativeType::UINT8, 2]
              :sin_addr, InAddr,
              :sin_zero, [:char, ]
 
