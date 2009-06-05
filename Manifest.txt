@@ -31,6 +31,7 @@ lib/pcap_ffi/packets/raw.rb
 lib/pcap_ffi/packets/fddi.rb
 lib/pcap_ffi/packets/ethernet.rb
 lib/pcap_ffi/packets/token_ring.rb
+lib/pcap_ffi/packets/arp.rb
 lib/pcap_ffi/packets/ip.rb
 lib/pcap_ffi/packets/icmp.rb
 lib/pcap_ffi/packets/icmp/data.rb
