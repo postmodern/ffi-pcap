@@ -18,11 +18,11 @@ module FFI
         OP_REQUEST = 0x0001
         OP_REPLY   = 0x0002
 
-        layout :h_type,     :uint16,
-               :p_type,     :uint16,
+        layout :h_type,     [NativeType::UINT8, 2],
+               :p_type,     [NativeType::UINT8, 2],
                :h_len,      :uint8,
                :p_len,      :uint8,
-               :operation,  :uint16,
+               :operation,  [NativeType::UINT8, 2],
                :sender_mac, MACAddr,
                :sender_ip,  InAddr,
                :dest_mac,   MACAddr,
