@@ -17,7 +17,7 @@ module FFI
       end
 
       def addr
-        InAddr.new(self[:sin_addr])
+        self[:sin_addr]
       end
 
     end
