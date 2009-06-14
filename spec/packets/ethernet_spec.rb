@@ -1,5 +1,5 @@
-require 'pcap_ffi/handler'
-require 'pcap_ffi/packets/ethernet'
+require 'pcap-ffi/handler'
+require 'pcap-ffi/packets/ethernet'
 
 require 'spec_helper'
 require 'helpers/dumps'

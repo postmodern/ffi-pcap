@@ -1,5 +1,5 @@
-require 'pcap_ffi/pcap'
-require 'pcap_ffi/version'
+require 'pcap-ffi/pcap'
+require 'pcap-ffi/version'
 
 require 'spec_helper'
 require 'helpers/dumps'

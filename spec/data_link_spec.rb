@@ -1,4 +1,4 @@
-require 'pcap_ffi/data_link'
+require 'pcap-ffi/data_link'
 
 require 'spec_helper'
 

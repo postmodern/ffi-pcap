@@ -2,7 +2,7 @@ require 'rubygems'
 gem 'rspec', '>=1.1.12'
 require 'spec'
 
-require 'pcap_ffi/version'
+require 'pcap-ffi/version'
 
 include FFI
 include FFI::PCap
