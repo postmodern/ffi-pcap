@@ -1,6 +1,7 @@
 doc
 pkg
 tmp/*
+.yardoc
 .DS_Store
 *.swp
 *~
