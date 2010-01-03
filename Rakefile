@@ -14,7 +14,7 @@ Hoe.spec('ffi-pcap') do
   self.remote_rdoc_dir = ''
 
   self.extra_deps = [
-    ['ffi', '>=0.6.0']
+    ['ffi', '>=0.5.3']
   ]
 
   self.extra_dev_deps = [
