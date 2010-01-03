@@ -8,6 +8,9 @@ require './tasks/yard.rb'
 Hoe.spec('ffi-pcap') do
   self.rubyforge_name = 'ffi-pcap'
   self.developer('Postmodern','postmodern.mod3@gmail.com')
+
+  self.readme_file = 'README.rdoc'
+  self.history_file = 'History.rdoc'
   self.remote_rdoc_dir = ''
 
   self.extra_deps = [

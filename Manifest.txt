@@ -1,7 +1,7 @@
-History.txt
+History.rdoc
 Manifest.txt
+README.rdoc
 Rakefile
-README.txt
 examples/print_bytes.rb
 lib/pcap-ffi.rb
 lib/pcap-ffi/exceptions.rb
