@@ -1,3 +1,12 @@
+begin
+  require 'rubygems'
+  gem 'ffi_dry'
+rescue LoadError
+end
+
+require 'ffi/dry'
+require 'ffi/packets'
+
 require 'pcap-ffi/if'
 require 'pcap-ffi/addr'
 require 'pcap-ffi/file_header'
