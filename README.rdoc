@@ -11,6 +11,11 @@ Ruby FFI bindings for libpcap.
 
 == EXAMPLES:
 
+== REQUIREMENTS:
+
+* {libpcap}[http://www.tcpdump.org/]
+* {ffi}[http://github.com/ffi/ffi] >= 0.5.3
+
 == INSTALL:
 
   $ sudo gem install ffi-pcap
