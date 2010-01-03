@@ -1,6 +1,6 @@
-= pcap-ffi
+= ffi-pcap
 
-* http://github.com/postmodern/pcap-ffi/
+* http://github.com/sophsec/ffi-pcap/
 * Postmodern (postmodern.mod3 at gmail.com)
 
 == DESCRIPTION:
@@ -13,13 +13,13 @@ Ruby FFI bindings for libpcap.
 
 == INSTALL:
 
-  $ sudo gem install pcap-ffi
+  $ sudo gem install ffi-pcap
 
 == LICENSE:
 
 The MIT License
 
-Copyright (c) 2009 Hal Brodigan
+Copyright (c) 2009-2010 Hal Brodigan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
