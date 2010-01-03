@@ -11,6 +11,7 @@ module FFI
     typedef :int, :bpf_int32
     typedef :uint, :bpf_uint32
     typedef :ushort, :sa_family_t
+    typedef :long, :suseconds_t
 
     typedef :pointer, :pcap_t
     typedef :pointer, :pcap_dumper_t
