@@ -1,28 +1,24 @@
 # -*- ruby -*-
 
 require 'rubygems'
-require 'hoe'
-require './tasks/spec.rb'
-require './tasks/yard.rb'
+Dir["tasks/*.rb"].each {|rt| require rt }
+require 'rake/clean'
+require './lib/pcap-ffi/version.rb'
 
-Hoe.spec('ffi-pcap') do
-  self.rubyforge_name = 'ffi-pcap'
-  self.developer('Postmodern','postmodern.mod3@gmail.com')
-
-  self.readme_file = 'README.rdoc'
-  self.history_file = 'History.rdoc'
-  self.remote_rdoc_dir = ''
-
-  self.extra_deps = [
-    ['ffi', '>=0.5.3']
-  ]
-
-  self.extra_dev_deps = [
-    ['rspec', '>=1.2.9'],
-    ['yard', '>=0.5.2']
-  ]
-
-  self.spec_extras = {:has_rdoc => 'yard'}
+# Generate a gem using jeweler
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.rubyforge_project = 'pcap-ffi'
+    gemspec.name = "pcap-ffi"
+    gemspec.summary = "FFI bindings for libpcap"
+    gemspec.email = "postmodern.mod3@gmail.com"
+    gemspec.homepage = "http://github.com/postmodern/pcap-ffi"
+    gemspec.description = "Bindings to sniff packets using the FFI interface in Ruby."
+    gemspec.authors = ["Postmodern, Dakrone", "Eric Monti"]
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
 # vim: syntax=Ruby
