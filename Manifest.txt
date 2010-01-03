@@ -47,6 +47,7 @@ lib/pcap-ffi/version.rb
 lib/pcap-ffi/ffi.rb
 lib/pcap-ffi/pcap.rb
 tasks/spec.rb
+tasks/yard.rb
 spec/spec_helper.rb
 spec/helpers/dumps.rb
 spec/dumps/simple_tcp.pcap
