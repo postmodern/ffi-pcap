@@ -1,26 +1,20 @@
-require 'pcap-ffi/typedefs'
 require 'pcap-ffi/time_val'
-
-require 'ffi/struct'
 
 module FFI
   module PCap
     class PacketHeader < FFI::Struct
-      layout :ts, TimeVal,
-             :caplen, :bpf_uint32,
-             :len, :bpf_uint32
+      include FFI::DRY::StructHelper
 
-      def timestamp
-        self[:ts]
+      dsl_layout do
+        struct :ts,      TimeVal
+        field  :caplen,  :bpf_uint32
+        field  :len,     :bpf_uint32
       end
 
-      def captured
-        self[:caplen]
-      end
+      alias timestamp ts
+      alias captured caplen
+      alias length len
 
-      def length
-        self[:len]
-      end
     end
   end
 end
