@@ -1,5 +1,5 @@
 require 'rubygems'
-gem 'rspec', '>=1.1.12'
+gem 'rspec', '>=1.2.9'
 require 'spec'
 
 require 'pcap-ffi/version'
