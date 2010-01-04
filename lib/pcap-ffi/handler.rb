@@ -5,6 +5,7 @@ require 'pcap-ffi/data_link'
 require 'pcap-ffi/packet_header'
 require 'pcap-ffi/stat'
 require 'pcap-ffi/packets/raw'
+require 'pcap-ffi/dumper'
 
 require 'ffi'
 
@@ -55,14 +56,18 @@ module FFI
       end
 
       def callback(&block)
-        @callback = block
+        @callback = block if block
         return @callback
       end
 
       def direction=(dir)
-        directions = PCap.enum_type(:pcap_direction)
-
-        return PCap.pcap_setdirection(@pcap,directions[:"pcap_d_#{dir}"])
+        dirs = PCap.enum_type(:pcap_direction_t)
+        ret = PCap.pcap_setdirection(@pcap, dirs[:"pcap_d_#{dir}"]) == 0
+        if ret == 0
+          return true
+        else
+          raise(StandardError, self.error())
+        end
       end
 
       def non_blocking=(mode)
@@ -107,7 +112,7 @@ module FFI
 
       def next
         header = PacketHeader.new
-        bytes = PCap.pcap_next(@pcap,header)
+        bytes = PCap.pcap_next(@pcap, header)
 
         return [nil, nil] if bytes.null?
 
