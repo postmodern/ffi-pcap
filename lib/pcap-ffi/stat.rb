@@ -3,21 +3,14 @@ require 'ffi/struct'
 module FFI
   module PCap
     class Stat < FFI::Struct
-      layout :ps_recv, :uint,
-             :ps_drop, :uint,
-             :ps_ifdrop, :uint
+      include FFI::DRY::StructHelper
 
-      def received
-        self[:ps_recv]
+      dsl_layout do
+        field :ps_recv,   :uint
+        field :ps_drop,   :uint
+        field :ps_ifdrop, :uint
       end
 
-      def dropped
-        self[:ps_drop]
-      end
-
-      def interface_dropped
-        self[:ps_ifdrop]
-      end
     end
   end
 end
