@@ -6,7 +6,8 @@ module FFI
     #
     # A pcap_dumper, or PCap::Dumper is handled opaquely so that it can
     # be implemented differently on different platforms. In FFI::PCap, we
-    # simply handle this as an opaque memory pointer.
+    # simply handle this as an opaque FFI::MemoryPointer with added 
+    # helper methods.
     class Dumper < FFI::MemoryPointer
 
       def initialize(dumper)

@@ -1,3 +1,4 @@
+
 module FFI
   module PCap
 
@@ -66,7 +67,7 @@ module FFI
     attach_function :bpf_dump, [BPFProgram, :int], :void
 
 
-    # lazily bind the UNIX/WIN32/MSDOS #ifdefs
+    # Lazily bind the UNIX/WIN32/MSDOS #ifdefs
 
     # Unix Only:
     begin
@@ -97,3 +98,4 @@ module FFI
 
   end
 end
+
