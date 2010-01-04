@@ -5,13 +5,14 @@ require 'ffi'
 module FFI
   module PCap
     class SockAddr < FFI::Struct
-      layout :sa_family, :sa_family_t,
-             :sa_data, [:char, 14]
+      include FFI::DRY::StructHelper
 
-      def family
-        self[:sa_family]
+      dsl_layout do
+        field :sa_family, :sa_family_t
+        array :sa_data,   [:char, 14]
       end
 
+      alias family sa_family
     end
   end
 end
