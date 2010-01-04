@@ -1,8 +1,3 @@
-require 'pcap-ffi/ffi'
-require 'pcap-ffi/data_link'
-require 'pcap-ffi/if'
-require 'pcap-ffi/handler'
-require 'pcap-ffi/error_buffer'
 
 module FFI
   module PCap
@@ -43,8 +38,8 @@ module FFI
     #
     # @yield [dev]
     #
-    # @yieldparam [IF] dev
-    #   An IF structure for the device.
+    # @yieldparam [Interface] dev
+    #   An Interface structure for the device.
     #
     # @return [nil]
     #
@@ -62,7 +57,7 @@ module FFI
         raise(StandardError, errbuf.to_s, caller)
       end
 
-      device = IF.new(node)
+      device = Interface.new(node)
 
       while device
         yield(device)
