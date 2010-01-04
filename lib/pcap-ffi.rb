@@ -23,6 +23,8 @@ require 'pcap-ffi/time_val'
 require 'pcap-ffi/packet_header'
 require 'pcap-ffi/stat'
 require 'pcap-ffi/data_link'
+require 'pcap-ffi/bpf'
+
 require 'pcap-ffi/dumper'
 require 'pcap-ffi/handler'
 require 'pcap-ffi/pcap'
