@@ -27,4 +27,4 @@ require 'pcap-ffi/dumper'
 require 'pcap-ffi/handler'
 require 'pcap-ffi/pcap'
 
-require 'pcap-ffi/ffi'
+require 'pcap-ffi/functions'
