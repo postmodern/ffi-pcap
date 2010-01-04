@@ -4,6 +4,8 @@ module FFI
   module PCap
 
     # Generic per-packet information, as supplied by libpcap
+    #
+    # See pcap_pkthdr struct in pcap.h
     class PacketHeader < FFI::Struct
       include FFI::DRY::StructHelper
 
