@@ -5,6 +5,8 @@ require 'ffi/struct'
 
 module FFI
   module PCap
+
+    # Item in a list of interfaces.
     class IF < FFI::Struct
       include FFI::DRY::StructHelper
 
@@ -12,10 +14,15 @@ module FFI
       LOOPBACK = 0x00000001
 
       dsl_layout do
-        p_struct  :next,      IF
-        field     :name,      :string
-        p_struct  :addresses, Addr
-        field     :flags,     :bpf_uint32
+        p_struct  :next, IF
+        field     :name, :string,         :desc => 'name used by pcap_open_live()'
+        field     :description, :string,  :desc => 'textual description of interface, or NULL'
+        p_struct  :addresses,   Addr,     :desc => 'address linked list'
+        field     :flags,       :bpf_uint32, :desc => 'PCAP_IF_ interface flags'
+      end
+
+      def loopback?
+        self.flags & LOOPBACK == LOOPBACK
       end
 
 #      def to_s
@@ -23,5 +30,6 @@ module FFI
 #      end
 
     end
+
   end
 end
