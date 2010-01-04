@@ -1,4 +1,3 @@
-require 'ffi'
 
 module FFI
   module PCap

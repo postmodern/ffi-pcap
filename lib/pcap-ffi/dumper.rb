@@ -1,6 +1,3 @@
-require 'pcap-ffi/ffi'
-
-require 'ffi'
 
 module FFI
   module PCap

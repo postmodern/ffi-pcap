@@ -1,9 +1,16 @@
-require 'pcap-ffi/extensions/ffi/types'
-
 module FFI
-  alias_type :long, :time_t
-  alias_type :long, :suseconds_t
-  alias_type :ushort, :sa_family_t
-  alias_type :int, :bpf_int32
-  alias_type :uint, :bpf_uint32
+  module PCap
+    typedef :int,  :bpf_int32
+    typedef :uint, :bpf_uint32
+
+    enum :pcap_direction_t, [
+      :pcap_d_inout,
+      :pcap_d_in,
+      :pcap_d_out
+    ]
+ 
+    typedef :pointer, :pcap_t
+    typedef :pointer, :pcap_dumper_t
+    typedef :pointer, :pcap_addr_t
+  end
 end

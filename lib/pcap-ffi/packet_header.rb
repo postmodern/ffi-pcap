@@ -1,5 +1,3 @@
-require 'pcap-ffi/time_val'
-
 module FFI
   module PCap
 

@@ -1,5 +1,3 @@
-require 'ffi/struct'
-
 module FFI
   module PCap
     class Stat < FFI::Struct

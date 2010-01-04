@@ -1,11 +1,3 @@
-require 'pcap-ffi/exceptions/read_error'
-require 'pcap-ffi/ffi'
-require 'pcap-ffi/error_buffer'
-require 'pcap-ffi/data_link'
-require 'pcap-ffi/packet_header'
-require 'pcap-ffi/stat'
-require 'pcap-ffi/packets/raw'
-require 'pcap-ffi/dumper'
 
 require 'ffi'
 

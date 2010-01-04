@@ -1,5 +1,3 @@
-require 'pcap-ffi/bsd'
-
 module FFI
   module PCap
 

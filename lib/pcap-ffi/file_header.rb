@@ -1,6 +1,3 @@
-require 'pcap-ffi/typedefs'
-
-require 'ffi/struct'
 
 module FFI
   module PCap

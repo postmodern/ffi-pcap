@@ -1,7 +1,3 @@
-require 'pcap-ffi/typedefs'
-
-require 'ffi/struct'
-
 module FFI
   module PCap
     class TimeVal < FFI::Struct

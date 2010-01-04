@@ -1,7 +1,3 @@
-require 'pcap-ffi/typedefs'
-
-require 'ffi'
-
 module FFI
   module PCap
     class InAddr < FFI::Struct
