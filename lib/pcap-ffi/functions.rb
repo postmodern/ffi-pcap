@@ -20,7 +20,7 @@ module FFI
     attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
     attach_function :pcap_breakloop, [:pcap_t], :void
     attach_function :pcap_stats, [:pcap_t, Stat], :int
-    attach_function :pcap_setfilter, [:pcap_t, :pointer], :int
+    attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
     attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
     attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
     attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
@@ -29,9 +29,9 @@ module FFI
     attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
     attach_function :pcap_strerror, [:int], :string
     attach_function :pcap_geterr, [:pcap_t], :string
-    attach_function :pcap_compile, [:pcap_t, :pointer, :string, :int, :bpf_uint32], :int
-    attach_function :pcap_compile_nopcap, [:int, :int, :pointer, :string, :int, :bpf_uint32], :int
-    attach_function :pcap_freecode, [:pointer], :void
+    attach_function :pcap_compile, [:pcap_t, BPFProgram, :string, :int, :bpf_uint32], :int
+    attach_function :pcap_compile_nopcap, [:int, :int, BPFProgram, :string, :int, :bpf_uint32], :int
+    attach_function :pcap_freecode, [BPFProgram], :void
     attach_function :pcap_datalink, [:pcap_t], :int
     attach_function :pcap_list_datalinks, [:pcap_t, :pointer], :int
     attach_function :pcap_set_datalink, [:pcap_t, :int], :int
@@ -60,10 +60,10 @@ module FFI
 
     attach_function :pcap_lib_version, [], :string
 
-    attach_function :bpf_filter, [:pointer, :pointer, :uint, :uint], :uint
-    attach_function :bpf_validate, [:pointer, :int], :int
-    attach_function :bpf_image, [:pointer, :int], :string
-    attach_function :bpf_dump, [:pointer, :int], :void
+    attach_function :bpf_filter, [BPFInstruction, :pointer, :uint, :uint], :uint
+    attach_function :bpf_validate, [BPFInstruction, :int], :int
+    attach_function :bpf_image, [BPFInstruction, :int], :string
+    attach_function :bpf_dump, [BPFProgram, :int], :void
 
 
     # lazily bind the UNIX/WIN32/MSDOS #ifdefs
