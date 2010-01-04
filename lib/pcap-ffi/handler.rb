@@ -82,10 +82,10 @@ module FFI
 
       def non_blocking?
         errbuf = ErrorBuffer.new
-        mode = PCap.pcap_getnonblock(@pcap,errbuf)
+        mode = PCap.pcap_getnonblock(@pcap, errbuf)
 
         if mode == -1
-          raise(RuntimeError,errbuf.to_s,caller)
+          raise(RuntimeError, errbuf.to_s, caller)
         end
 
         return mode == 1
