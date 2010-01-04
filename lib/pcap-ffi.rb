@@ -7,6 +7,7 @@ require 'ffi/dry'
 require 'ffi/packets'
 
 require 'pcap-ffi/ffi'
+require 'pcap-ffi/bsd'
 require 'pcap-ffi/if'
 require 'pcap-ffi/addr'
 require 'pcap-ffi/file_header'

@@ -1,5 +1,4 @@
 require 'pcap-ffi/typedefs'
-require 'pcap-ffi/sock_addr'
 
 require 'ffi/struct'
 
