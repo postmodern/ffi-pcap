@@ -25,33 +25,33 @@ module FFI
     class StatEx < FFI::Struct
       include FFI::DRY::StructHelper
 
-      ds_layout do
-        field :ulong, :rx_packets,  :desc => "total packets received"
-        field :ulong, :tx_packets,  :desc => "total packets transmitted"
-        field :ulong, :rx_bytes,    :desc => "total bytes received"
-        field :ulong, :tx_bytes,    :desc => "total bytes transmitted"
-        field :ulong, :tx_bytes,    :desc => "total bytes transmitted"
-        field :ulong, :rx_errors,   :desc => "bad packets received"
-        field :ulong, :tx_errors,   :desc => "packet transmit problems"
-        field :ulong, :rx_dropped,  :desc => "no space in Rx buffers"
-        field :ulong, :tx_dropped,  :desc => "no space available for Tx"
-        field :ulong, :multicast,   :desc => "multicast packets received"
-        field :ulong, :collisions
+      dsl_layout do
+        field :rx_packets,  :ulong, :desc => "total packets received"
+        field :tx_packets,  :ulong, :desc => "total packets transmitted"
+        field :rx_bytes,    :ulong, :desc => "total bytes received"
+        field :tx_bytes,    :ulong, :desc => "total bytes transmitted"
+        field :tx_bytes,    :ulong, :desc => "total bytes transmitted"
+        field :rx_errors,   :ulong, :desc => "bad packets received"
+        field :tx_errors,   :ulong, :desc => "packet transmit problems"
+        field :rx_dropped,  :ulong, :desc => "no space in Rx buffers"
+        field :tx_dropped,  :ulong, :desc => "no space available for Tx"
+        field :multicast,   :ulong, :desc => "multicast packets received"
+        field :collisions,  :ulong
 
         # detailed rx errors
-        field :ulong, :rx_length_errors
-        field :ulong, :rx_over_errors,  :desc => "receiver ring buff overflow"
-        field :ulong, :rx_crc_errors,   :desc => "recv'd pkt with crc error"
-        field :ulong, :rx_frame_errors, :desc => "recv'd frame alignment errors"
-        field :ulong, :rx_fifo_errors,  :desc => "recv'r fifo overrun"
-        field :ulong, :rx_missed_errors, :desc => "recv'r missed packet"
+        field :rx_length_errors, :ulong
+        field :rx_over_errors,   :ulong, :desc => "ring buff overflow"
+        field :rx_crc_errors,    :ulong, :desc => "pkt with crc error"
+        field :rx_frame_errors,  :ulong, :desc => "frame alignment errors"
+        field :rx_fifo_errors,   :ulong, :desc => "fifo overrun"
+        field :rx_missed_errors, :ulong, :desc => "missed packet"
 
         # detailed tx_errors
-        field :ulong, :tx_aborted_errors
-        field :ulong, :tx_carrier_errors
-        field :ulong, :tx_fifo_errors
-        field :ulong, :tx_heartbeat_errors
-        field :ulong, :tx_window_errors
+        field :tx_aborted_errors,   :ulong
+        field :tx_carrier_errors,   :ulong
+        field :tx_fifo_errors,      :ulong
+        field :tx_heartbeat_errors, :ulong
+        field :tx_window_errors,    :ulong
       end
     end
   end
