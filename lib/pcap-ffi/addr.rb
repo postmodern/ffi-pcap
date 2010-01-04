@@ -6,30 +6,14 @@ require 'ffi/struct'
 module FFI
   module PCap
     class Addr < FFI::Struct
-      layout :next, :pointer,
-             :addr, :pointer,
-             :netmask, :pointer,
-             :broadaddr, :pointer,
-             :dstaddr, :pointer
+      include FFI::DRY::StructHelper
 
-      def next
-        Addr.new(self[:next])
-      end
-
-      def addr
-        SockAddr.new(self[:addr])
-      end
-
-      def netmask
-        SockAddr.new(self[:netmask])
-      end
-
-      def broadcast
-        SockAddr.new(self[:broadaddr])
-      end
-
-      def dest_addr
-        SockAddr.new(self[:destaddr])
+      dsl_layout do
+        p_struct :next,       Addr
+        p_struct :addr,       SockAddr
+        p_struct :netmask,    SockAddr
+        p_struct :broadcast,  SockAddr
+        p_struct :dest_addr,  SockAddr
       end
 
     end
