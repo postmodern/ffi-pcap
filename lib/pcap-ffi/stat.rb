@@ -11,6 +11,10 @@ module FFI
         field :ps_ifdrop, :uint
       end
 
+      alias received ps_recv
+      alias dropped ps_drop
+      alias interface_dropped ps_ifdrop
+
     end
   end
 end
