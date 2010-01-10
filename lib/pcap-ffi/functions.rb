@@ -67,8 +67,6 @@ module FFI
     attach_function :bpf_dump, [BPFProgram, :int], :void
 
 
-    # Lazily bind the UNIX/WIN32/MSDOS #ifdefs
-
     # Unix Only:
     begin
       attach_function :pcap_get_selectable_fd, [:pcap_t], :int
@@ -79,11 +77,8 @@ module FFI
     # Win32 only:
     begin
       attach_function :pcap_setbuff, [:pcap_t, :int], :int
-      attach_function :pcap_setmode, [:pcap_t, :int], :int
+      attach_function :pcap_setmode, [:pcap_t, :pcap_w32_modes_enum], :int
       attach_function :pcap_setmintocopy, [:pcap_t, :int], :int
-      MODE_CAPT = 0
-      MODE_STAT = 1
-      MODE_MON  = 2
     rescue FFI::NotFoundError
       $pcap_not_win32=true
     end if $pcap_not_unix

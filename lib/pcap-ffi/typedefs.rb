@@ -9,6 +9,9 @@ module FFI
       :pcap_d_out
     ]
  
+    # For Win32-only pcap_setmode()
+    enum :pcap_w32_modes_enum, [ :capt, :stat, :mon ] 
+
     typedef :pointer, :pcap_t
     typedef :pointer, :pcap_dumper_t
     typedef :pointer, :pcap_addr_t
