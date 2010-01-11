@@ -1,5 +1,6 @@
 module FFI
   module PCap
+
     class DataLink
 
       # Several DLT names harvested out of the pcap-bpf.h header file. These
@@ -108,12 +109,12 @@ module FFI
       def initialize(arg)
         if arg.kind_of? String or arg.kind_of? Symbol
           unless @value = self.class.name_to_val(arg.to_s)
-            raise(ArgumentError, "Invalid DataLink: #{arg.to_s}")
+            raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.to_s}")
           end
         elsif arg.kind_of? Numeric
           @value = arg
         else
-          raise(ArgumentError, "Invalid DataLink: #{arg.inspect}")
+          raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.inspect}")
         end
       end
 
