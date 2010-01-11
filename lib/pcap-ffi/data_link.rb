@@ -3,7 +3,8 @@ module FFI
     class DataLink
 
       # Several DLT names harvested out of the pcap-bpf.h header file. These
-      # are in alphabetical order and the index does not match their value.
+      # are in alphabetical order. Their Array index _does_ _not_ match their 
+      # pcap DLT value.
       #
       # Don't use this Array for anything except quick reference.  Use the 
       # 'lookup' class methods for actually resolving name to value 
@@ -43,12 +44,12 @@ module FFI
 
         case l
         when String
-          if v=lookup_name(l)
-            name = lookup_value(v)  # get the canonical name
+          if v=name_to_val(l)
+            name = val_to_name(v)  # get the canonical name
             val = v
           end
         when Integer
-          name = lookup_value(l)
+          name = val_to_name(l)
           val = l
         else
           raise(ArgumentError, "lookup takes either a String or Integer")
@@ -59,12 +60,13 @@ module FFI
       # Translates a data link type name, which is a DLT_ name with the DLT_ 
       # removed, to the corresponding data link type numeric value.
       #
-      # @param [String] n
+      # @param [String or Symbol] n
       # The name to lookup. Names are case-insensitive.
       #
       # @return [Integer or nil] 
       #   The numeric value for the datalink name or nil on failure.
-      def self.lookup_name(n)
+      def self.name_to_val(n)
+        n = n.to_s if n.kind_of?(Symbol)
         if (v=PCap.pcap_datalink_name_to_val(n)) >= 0
           return v
         end
@@ -76,7 +78,7 @@ module FFI
       # @return [String or nil]
       #   The string name of the data-link or nil on failure.
       # 
-      def self.lookup_value(v)
+      def self.val_to_name(v)
         PCap.pcap_datalink_val_to_name(v)
       end
 
@@ -84,17 +86,11 @@ module FFI
       #   The name or value to lookup. A Symbol is converted to String. Names 
       #   are case-insensitive.
       def self.describe(l)
-        l = l.to_s.upcase if l.kind_of?(Symbol)
+        l = l.to_s if l.kind_of?(Symbol)
         l = PCap.pcap_datalink_name_to_val(l) if l.kind_of?(String) 
         PCap.pcap_datalink_val_to_description(l)
       end
       
-      def self.[](name)
-        unless lookup_name(name)
-          raise(ArgumentError, "Invalid DataLink: #{name.inspect}")
-        end
-      end
-
       # PCap datalink numeric value
       attr_reader :value
 
@@ -111,7 +107,7 @@ module FFI
       #
       def initialize(arg)
         if arg.kind_of? String or arg.kind_of? Symbol
-          unless @value = self.class.lookup_name(arg.to_s)
+          unless @value = self.class.name_to_val(arg.to_s)
             raise(ArgumentError, "Invalid DataLink: #{arg.to_s}")
           end
         elsif arg.kind_of? Numeric
@@ -126,9 +122,9 @@ module FFI
         when Integer
           return (self.value == other)
         when Symbol
-          return (@value == self.class.lookup_name(other.to_s))
+          return (@value == self.class.name_to_val(other.to_s))
         when String
-          return (@value == self.class.lookup_name(other))
+          return (@value == self.class.name_to_val(other))
         when other.kind_of?(DataLink)
           return (self.value == other.value)
         else
@@ -145,19 +141,16 @@ module FFI
         @desc ||= self.class.describe(@value)
       end
 
+      alias desc description
+
       alias describe description
 
       # Returns the canonical String name of the DataLink object
       def name
-        @name ||= self.class.lookup_name(@value)
+        @name ||= self.class.val_to_name(@value)
       end
-
 
       alias to_i value
-
-      def inspect
-        "#<#{self.class}: value=#{@value}>"
-      end
     end
   end
 end
