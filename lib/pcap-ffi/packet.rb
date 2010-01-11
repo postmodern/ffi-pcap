@@ -75,7 +75,13 @@ module FFI
       #   Returns the data as supplied per attr_writer convention.
       #
       def set_body(data, caplen=nil, len=nil)
-        @header.caplen = caplen || data.size
+        @header.caplen = 
+          if caplen.nil? or caplen > data.size
+            data.size
+          else
+            caplen
+          end
+
         @header.len = len || @header.caplen
         @body_ptr = FFI::MemoryPointer.from_string(data)
         return data
@@ -85,6 +91,14 @@ module FFI
 
       def body
         @body_ptr.read_string(@header.caplen)
+      end
+
+      def time
+        @header.ts.time
+      end
+
+      def time=(t)
+        @header.ts.time=(t)
       end
     end
 
