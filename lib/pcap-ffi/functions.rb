@@ -203,6 +203,16 @@ module FFI
       PCap.pcap_lib_version
     end
 
+    # Extract just the version number from the lib_version string.
+    #
+    # @return [String]
+    #  Version number.
+    #   
+    def PCap.lib_version_number
+      if lib_version() =~ /libpcap version (\d+\.\d+.\d+)/
+        return $1
+      end
+    end
     attach_function :pcap_strerror, [:int], :string
 
     attach_function :pcap_major_version, [:pcap_t], :int
