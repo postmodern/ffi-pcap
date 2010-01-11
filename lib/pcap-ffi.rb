@@ -6,10 +6,12 @@ end
 require 'ffi/dry'
 require 'ffi/packets'
 
-module FFI::PCap
-  extend FFI::Library
+module FFI
+  module PCap
+    extend FFI::Library
 
-  ffi_lib 'libpcap'
+    ffi_lib 'libpcap'
+  end
 end
 
 require 'pcap-ffi/version'
@@ -30,5 +32,6 @@ require 'pcap-ffi/error_buffer'
 require 'pcap-ffi/functions'
 
 require 'pcap-ffi/data_link'
+require 'pcap-ffi/packet'
 require 'pcap-ffi/handler'
 
