@@ -14,8 +14,20 @@ module FFI
         @dumper = dumper
       end
 
-      def write(header, bytes)
+      def _write(header, bytes)
         PCap.pcap_dump(@dumper, header, bytes)
+      end
+
+      def write(*args)
+        if args.size == 1 and args.first.is_a? Packet
+          write_pkt(*args)
+        else
+          _write(*args)
+        end
+      end
+
+      def write_pkt(pkt)
+        _write(pkt.header, pkt.body_ptr)
       end
 
       def tell
@@ -40,7 +52,9 @@ module FFI
 
     end
 
-    attach_function :pcap_dump_file, [:pcap_dumper_t], :FILE
+    # XXX not sure if we even want file FILE IO stuff yet
+    #attach_function :pcap_dump_file, [:pcap_dumper_t], :FILE
+
     attach_function :pcap_dump_ftell, [:pcap_dumper_t], :long
     attach_function :pcap_dump_flush, [:pcap_dumper_t], :int
     attach_function :pcap_dump_close, [:pcap_dumper_t], :void
