@@ -1,5 +1,7 @@
 module FFI
   module PCap
+    typedef :pointer, :FILE
+
     typedef :int,  :bpf_int32
     typedef :uint, :bpf_uint32
 

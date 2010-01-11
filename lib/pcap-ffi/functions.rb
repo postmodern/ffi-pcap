@@ -2,8 +2,6 @@
 module FFI
   module PCap
 
-    callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
-
     attach_function :pcap_lookupdev, [:pointer], :string
 
     # Find the default device on which to capture.
@@ -16,9 +14,9 @@ module FFI
     #   from libpcap. The raising of this exception may indicate that you 
     #   need higher privileges.
     #
-    def self.lookupdev
+    def PCap.lookupdev
       e = ErrorBuffer.new
-      unless name=pcap_lookupdev(e)
+      unless name = PCap.pcap_lookupdev(e)
         raise(StandardError, e.to_s)
       end
       return name
@@ -40,16 +38,17 @@ module FFI
     #   On failure, an exception is raised with the associated error message 
     #   from libpcap. 
     #
-    def self.lookupnet(device)
+    def PCap.lookupnet(device)
       netp  = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       errbuf = ErrorBuffer.new
-      unless pcap_lookupnet(device, netp, maskp, errbuf) == 0
+      unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
         raise(StandardError, errbuf.to_s)
       end
       return netp.get_array_of_uchar(0,4).join('.') + "/" + 
              maskp.get_array_of_uchar(0,4).join('.')
     end
+
 
     attach_function :pcap_open_live, [:string, :int, :int, :int, :pointer], :pcap_t
     
@@ -86,7 +85,7 @@ module FFI
 
       promisc = (options[:promisc])? 1 : 0
       snaplen = (options[:snaplen] || Handler::SNAPLEN)
-      to_ms = (options[:timeout] || 0)
+      to_ms = (options[:timeout] || -1)
 
       ptr = PCap.pcap_open_live(device, snaplen, promisc, to_ms, errbuf)
 
@@ -152,52 +151,6 @@ module FFI
     end
 
 
-    attach_function :pcap_close, [:pcap_t], :void
-
-    attach_function :pcap_loop, [:pcap_t, :int, :pcap_handler, :pointer], :int
-    attach_function :pcap_dispatch, [:pcap_t, :int, :pcap_handler, :pointer], :int
-
-    attach_function :pcap_next, [:pcap_t, PacketHeader], :pointer
-    attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
-    attach_function :pcap_breakloop, [:pcap_t], :void
-    attach_function :pcap_stats, [:pcap_t, Stat], :int
-    attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
-    attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
-    attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
-    attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
-    attach_function :pcap_perror, [:pcap_t, :string], :void
-    attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
-    attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
-    attach_function :pcap_strerror, [:int], :string
-    attach_function :pcap_geterr, [:pcap_t], :string
-    attach_function :pcap_compile, [:pcap_t, BPFProgram, :string, :int, :bpf_uint32], :int
-    attach_function :pcap_compile_nopcap, [:int, :int, BPFProgram, :string, :int, :bpf_uint32], :int
-    attach_function :pcap_freecode, [BPFProgram], :void
-    attach_function :pcap_datalink, [:pcap_t], :int
-    attach_function :pcap_list_datalinks, [:pcap_t, :pointer], :int
-    attach_function :pcap_set_datalink, [:pcap_t, :int], :int
-    attach_function :pcap_datalink_name_to_val, [:string], :int
-    attach_function :pcap_datalink_val_to_name, [:int], :string
-    attach_function :pcap_datalink_val_to_description, [:int], :string
-    attach_function :pcap_snapshot, [:pcap_t], :int
-    attach_function :pcap_is_swapped, [:pcap_t], :int
-
-
-    attach_function :pcap_major_version, [:pcap_t], :int
-    attach_function :pcap_minor_version, [:pcap_t], :int
-
-
-    attach_function :pcap_file, [:pcap_t], :pointer
-    attach_function :pcap_fileno, [:pcap_t], :int
-
-    attach_function :pcap_dump_open, [:pcap_t, :string], :pcap_dumper_t
-    attach_function :pcap_dump_fopen, [:pcap_t, :pointer], :pcap_dumper_t
-    attach_function :pcap_dump_file, [:pcap_dumper_t], :pointer
-    attach_function :pcap_dump_ftell, [:pcap_dumper_t], :long
-    attach_function :pcap_dump_flush, [:pcap_dumper_t], :int
-    attach_function :pcap_dump_close, [:pcap_dumper_t], :void
-    attach_function :pcap_dump, [:pointer, PacketHeader, :pointer], :void
-
     attach_function :pcap_findalldevs, [:pointer, :pointer], :int
     attach_function :pcap_freealldevs, [Interface], :void
 
@@ -250,6 +203,10 @@ module FFI
       PCap.pcap_lib_version
     end
 
+    attach_function :pcap_strerror, [:int], :string
+
+    attach_function :pcap_major_version, [:pcap_t], :int
+    attach_function :pcap_minor_version, [:pcap_t], :int
 
 
     attach_function :bpf_filter, [BPFInstruction, :pointer, :uint, :uint], :uint
@@ -284,4 +241,3 @@ module FFI
 
   end
 end
-

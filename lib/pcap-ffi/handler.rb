@@ -1,6 +1,4 @@
 
-require 'ffi'
-
 module FFI
   module PCap
     class Handler
@@ -13,14 +11,12 @@ module FFI
       # Pointer to the pcap opaque type
       attr_reader :pcap
 
-      # DataLink for the pcap descriptor
-      attr_reader :datalink
-
       def initialize(pcap, options={})
         @pcap = pcap
-        @datalink = DataLink.new(PCap.pcap_datalink(@pcap))
 
         @closed = false
+
+        @errbuf = ErrorBuffer.new
 
         if options[:direction]
           self.direction = options[:direction]
@@ -28,8 +24,15 @@ module FFI
 
         trap('SIGINT', &method(:close))
         trap('SIGTERM', &method(:close))
+
+        yield self if block_given?
       end
 
+      # Get the format version of an opened pcap savefile. 
+      # XXX If this is a live capture, the values returned are not meaningful.
+      def cap_version
+        "#{PCap.pcap_major_version(@pcap)}.#{PCap.pcap_minor_version(@pcap)}"
+      end
 
       def direction=(dir)
         dirs = PCap.enum_type(:pcap_direction_t)
@@ -42,46 +45,83 @@ module FFI
       end
 
 
+      def datalink
+        @datalink ||= DataLink.new(PCap.pcap_datalink(pcap))
+      end
+
       def non_blocking=(mode)
-        errbuf = ErrorBuffer.new
         mode = if mode
           1
         else
           0
         end
 
-        if PCap.pcap_setnonblock(@pcap, mode, errbuf) == -1
-          raise(RuntimeError, errbuf.to_s, caller)
+        if PCap.pcap_setnonblock(@pcap, mode, @errbuf) == -1
+          raise(RuntimeError, @errbuf.to_s, caller)
         end
 
         return mode == 1
       end
 
       def non_blocking?
-        errbuf = ErrorBuffer.new
-        mode = PCap.pcap_getnonblock(@pcap, errbuf)
+        mode = PCap.pcap_getnonblock(@pcap, @errbuf)
 
         if mode == -1
-          raise(RuntimeError, errbuf.to_s, caller)
+          raise(RuntimeError, @errbuf.to_s, caller)
         end
 
         return mode == 1
       end
 
-      def wrap_callback(&block)
-        lambda {|u, h, b| block.call(u, Packet.new(h, b)) }
-      end
 
+      # @yield [this, pkt, tag] 
+      # @yieldparam [self] this
+      #   A reference to self is passed to the block.
+      #
+      # @yieldparam [Packet] pkt
+      #   A packet object is yielded which references the header and bytes.
+      #
+      # @yieldparam [tag, nil] 
+      #   A reference to the tag is passed if one was supplied with opts[:tag].
+      #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_loop(@pcap, cnt, wrap_callback(&block), opts[:tag])
+        ret = PCap.pcap_loop(@pcap, cnt, _wrap_callback(&block), opts[:tag])
+        if ret == -1
+          raise(ReadError, geterr(), caller)
+        elsif ret -2
+          return nil
+        elsif ret > -1
+          return ret
+        else
+          raise(StandardError, "unexpected return value #{ret}")
+        end
       end
 
       alias each loop
 
+
+      # @yield [this, pkt, tag] 
+      # @yieldparam [self] this
+      #   A reference to self is passed to the block.
+      #
+      # @yieldparam [Packet] pkt
+      #   A packet object is yielded which references the header and bytes.
+      #
+      # @yieldparam [tag, nil] 
+      #   A reference to the tag is passed if one was supplied with opts[:tag].
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_dispatch(@pcap, cnt, wrap_callback(&block), o[:tag])
+        ret = PCap.pcap_dispatch(@pcap, cnt, _wrap_callback(&block), o[:tag])
+        if ret == -1
+          raise(ReadError, geterr(), caller)
+        elsif ret -2
+          return nil
+        elsif ret > -1
+          return ret
+        else
+          raise(StandardError, "unexpected return value #{ret}")
+        end
       end
 
       def next
@@ -105,12 +145,11 @@ module FFI
         when -1
           raise(ReadError, geterr(), caller)
         when -2
-          raise(ReadError, "the 'savefile' contains no more packets", caller)
+          return nil
         when 1
           hdr = PacketHeader.new( hdr_p.get_pointer(0) )
           return Packet.new(hdr, buf_p)
         end
-
       end
 
       def open_dump(path)
@@ -159,6 +198,55 @@ module FFI
         "#<#{self.class}: 0x#{@pcap.address.to_s(16)}>"
       end
 
+      private
+        def _wrap_callback(&block)
+          lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
+        end
+
+
     end
+
+    callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
+
+    attach_function :pcap_close, [:pcap_t], :void
+
+    attach_function :pcap_loop, [:pcap_t, :int, :pcap_handler, :pointer], :int
+    attach_function :pcap_dispatch, [:pcap_t, :int, :pcap_handler, :pointer], :int
+
+    attach_function :pcap_next, [:pcap_t, PacketHeader], :pointer
+    attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
+    attach_function :pcap_breakloop, [:pcap_t], :void
+    attach_function :pcap_stats, [:pcap_t, Stat], :int
+    attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
+    attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
+    attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
+    attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
+    attach_function :pcap_perror, [:pcap_t, :string], :void
+    attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
+    attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
+    attach_function :pcap_geterr, [:pcap_t], :string
+    attach_function :pcap_compile, [:pcap_t, BPFProgram, :string, :int, :bpf_uint32], :int
+    attach_function :pcap_compile_nopcap, [:int, :int, BPFProgram, :string, :int, :bpf_uint32], :int
+    attach_function :pcap_freecode, [BPFProgram], :void
+    attach_function :pcap_datalink, [:pcap_t], :int
+    attach_function :pcap_list_datalinks, [:pcap_t, :pointer], :int
+    attach_function :pcap_set_datalink, [:pcap_t, :int], :int
+
+    attach_function :pcap_snapshot, [:pcap_t], :int
+    attach_function :pcap_is_swapped, [:pcap_t], :int
+
+    attach_function :pcap_dump_open, [:pcap_t, :string], :pcap_dumper_t
+
+    attach_function :pcap_major_version, [:pcap_t], :int
+    attach_function :pcap_minor_version, [:pcap_t], :int
+
+
+    # XXX not sure if we even want FILE io stuff yet (or ever).
+
+    #attach_function :pcap_fopen_offline, [:FILE, :pointer], :pcap_t
+    #attach_function :pcap_file, [:pcap_t], :FILE
+    #attach_function :pcap_dump_fopen, [:pcap_t, :FILE], :pcap_dumper_t
+    #attach_function :pcap_fileno, [:pcap_t], :int
+
   end
 end

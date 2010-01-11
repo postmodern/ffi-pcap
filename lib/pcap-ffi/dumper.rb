@@ -14,8 +14,8 @@ module FFI
         @dumper = dumper
       end
 
-      def write(header,bytes)
-        PCap.pcap_dump(@dumper,header,bytes)
+      def write(header, bytes)
+        PCap.pcap_dump(@dumper, header, bytes)
       end
 
       def tell
@@ -39,5 +39,12 @@ module FFI
       end
 
     end
+
+    attach_function :pcap_dump_file, [:pcap_dumper_t], :FILE
+    attach_function :pcap_dump_ftell, [:pcap_dumper_t], :long
+    attach_function :pcap_dump_flush, [:pcap_dumper_t], :int
+    attach_function :pcap_dump_close, [:pcap_dumper_t], :void
+    attach_function :pcap_dump, [:pointer, PacketHeader, :pointer], :void
+
   end
 end
