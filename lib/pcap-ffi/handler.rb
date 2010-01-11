@@ -16,41 +16,20 @@ module FFI
       # DataLink for the pcap descriptor
       attr_reader :datalink
 
-      # Number of packets to sniff
-      attr_accessor :count
-
-      def initialize(pcap,options={},&block)
+      def initialize(pcap, options={})
         @pcap = pcap
         @datalink = DataLink.new(PCap.pcap_datalink(@pcap))
 
         @closed = false
 
-        # Default is to infinitely loop over packets.
-        @count = (options[:count] || -1)
-
         if options[:direction]
           self.direction = options[:direction]
         end
 
-        @callback_wrapper = Proc.new do |user,pkthdr,bytes|
-          if @callback
-            header = PacketHeader.new(pkthdr)
-            raw = Packets::Raw.new(bytes,header.captured,@datalink)
-
-            @callback.call(user,header,raw)
-          end
-        end
-
-        callback(&block)
-
-        trap('SIGINT',&method(:close))
-        trap('SIGTERM',&method(:close))
+        trap('SIGINT', &method(:close))
+        trap('SIGTERM', &method(:close))
       end
 
-      def callback(&block)
-        @callback = block if block
-        return @callback
-      end
 
       def direction=(dir)
         dirs = PCap.enum_type(:pcap_direction_t)
@@ -58,9 +37,10 @@ module FFI
         if ret == 0
           return true
         else
-          raise(StandardError, self.error())
+          raise(StandardError, geterr(), caller)
         end
       end
+
 
       def non_blocking=(mode)
         errbuf = ErrorBuffer.new
@@ -70,8 +50,8 @@ module FFI
           0
         end
 
-        if PCap.pcap_setnonblock(@pcap,mode,errbuf) == -1
-          raise(RuntimeError,errbuf.to_s,caller)
+        if PCap.pcap_setnonblock(@pcap, mode, errbuf) == -1
+          raise(RuntimeError, errbuf.to_s, caller)
         end
 
         return mode == 1
@@ -88,52 +68,56 @@ module FFI
         return mode == 1
       end
 
-      def loop(data=nil,&block)
-        callback(&block) if block
+      def wrap_callback(&block)
+        lambda {|u, h, b| block.call(u, Packet.new(h, b)) }
+      end
 
-        PCap.pcap_loop(@pcap,@count,@callback_wrapper,data)
+      def loop(opts={}, &block)
+        cnt = opts[:count] || -1 # default to infinite loop
+        ret = PCap.pcap_loop(@pcap, cnt, wrap_callback(&block), opts[:tag])
       end
 
       alias each loop
 
-      def dispatch(data=nil,&block)
-        callback(&block) if block
-
-        return PCap.pcap_dispatch(@pcap,@count,@callback_wrapper,data)
+      def dispatch(opts={}, &block)
+        cnt = opts[:count] || -1 # default to infinite loop
+        ret = PCap.pcap_dispatch(@pcap, cnt, wrap_callback(&block), o[:tag])
       end
 
       def next
         header = PacketHeader.new
         bytes = PCap.pcap_next(@pcap, header)
 
-        return [nil, nil] if bytes.null?
-
-        raw = Packets::Raw.new(bytes,header.captured,@datalink)
-        return [header, raw]
+        if bytes.null?
+          return nil # or raise an exception?
+        else
+          return Packet.new(header, bytes)
+        end
       end
 
       def next_extra
-        header_ptr = MemoryPointer.new(:pointer)
-        bytes_ptr = MemoryPointer.new(:pointer)
+        hdr_p = MemoryPointer.new(:pointer)
+        buf_p = MemoryPointer.new(:pointer)
 
-        case PCap.pcap_next_ex(@pcap,header_ptr,bytes_ptr)
+        case PCap.pcap_next_ex(@pcap, hdr_p, buf_p)
+        when 0
+          raise(ReadError, "the timeout expired", caller)
         when -1
-          raise(ReadError,"an error occurred while reading the packet",caller)
+          raise(ReadError, geterr(), caller)
         when -2
-          raise(ReadError,"the 'savefile' contains no more packets",caller)
+          raise(ReadError, "the 'savefile' contains no more packets", caller)
+        when 1
+          hdr = PacketHeader.new( hdr_p.get_pointer(0) )
+          return Packet.new(hdr, buf_p)
         end
 
-        header = header_ptr.get_pointer(0)
-        raw = Packets::Raw.new(bytes_ptr.get_pointer(0),header.captured,@datalink)
-
-        return [header, raw]
       end
 
       def open_dump(path)
-        dump_ptr = PCap.pcap_dump_open(@pcap,File.expand_path(path))
+        dump_ptr = PCap.pcap_dump_open(@pcap, File.expand_path(path))
 
         if dump_ptr.null?
-          raise(RuntimeError,error,caller)
+          raise(RuntimeError, geterr(), caller)
         end
 
         return Dumper.new(dump_ptr)
@@ -142,13 +126,15 @@ module FFI
       def stats
         stats = Stat.new
 
-        PCap.pcap_stats(@pcap,stats)
+        PCap.pcap_stats(@pcap, stats)
         return stats
       end
 
-      def error
+      def geterr
         PCap.pcap_geterr(@pcap)
       end
+
+      alias error geterr
 
       def stop
         PCap.pcap_breakloop(@pcap)
