@@ -16,7 +16,7 @@ module FFI
       # Returns the error message within the error buffer.
       #
       def to_s
-        get_string(SIZE)
+        get_string(0)
       end
 
     end
