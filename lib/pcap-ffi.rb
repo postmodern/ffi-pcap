@@ -31,7 +31,7 @@ require 'pcap-ffi/dumper'
 
 # Ruby FFI function bindings, sugar, and misc wrappers
 require 'pcap-ffi/error_buffer'
-require 'pcap-ffi/functions'
+require 'pcap-ffi/pcap'
 require 'pcap-ffi/data_link'
 require 'pcap-ffi/packet'
 require 'pcap-ffi/handler'
