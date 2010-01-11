@@ -10,7 +10,7 @@ module FFI
   module PCap
     extend FFI::Library
 
-    ffi_lib 'libpcap'
+    ffi_lib "libpcap"
   end
 end
 
