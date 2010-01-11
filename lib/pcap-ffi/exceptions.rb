@@ -15,7 +15,6 @@ module FFI
     class ReadError < LibError
     end
 
-
   end
 end
 
