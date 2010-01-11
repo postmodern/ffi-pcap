@@ -61,14 +61,17 @@ module FFI::PCap
     # @return [String]
     #   Returns the data as supplied per attr_writer convention.
     #
-    def body=(data, caplen=nil, len=nil)
+    def set_body(data, caplen=nil, len=nil)
       @header.caplen = caplen || data.size
       @header.len = len || @header.caplen
       @body_ptr = FFI::MemoryPointer.from_string(data)
       return data
     end
 
-    alias set_body body=
+    alias body= set_body
 
+    def body
+      @body_ptr.read_string(@hdr.caplen)
+    end
   end
 end
