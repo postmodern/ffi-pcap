@@ -9,15 +9,14 @@ module FFI
     # @return [String]
     #   Name of default device
     #
-    # @raise [StandardErrror]
-    #   On failure, an exception is raised with the associated error message 
-    #   from libpcap. The raising of this exception may indicate that you 
-    #   need higher privileges.
+    # @raise [LibError]
+    #   On failure, an exception may be raised with the associated error 
+    #   message from libpcap.
     #
     def PCap.lookupdev
       e = ErrorBuffer.new
       unless name = PCap.pcap_lookupdev(e)
-        raise(StandardError, e.to_s)
+        raise(LibError, "pcap_lookupdev(): #{e.to_s}")
       end
       return name
     end
@@ -34,8 +33,8 @@ module FFI
     # @return [String] 
     #   The IPv4 network number and mask presented as "n.n.n.n/m.m.m.m"
     #
-    # @raise [StandardErrror]
-    #   On failure, an exception is raised with the associated error message 
+    # @raise [LibError]
+    #   On failure, an exception is raised with the relevant error message 
     #   from libpcap. 
     #
     def PCap.lookupnet(device)
@@ -43,10 +42,10 @@ module FFI
       maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       errbuf = ErrorBuffer.new
       unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
-        raise(StandardError, errbuf.to_s)
+        raise(LibError, "pcap_lookupnet(): #{errbuf.to_s}")
       end
-      return netp.get_array_of_uchar(0,4).join('.') + "/" + 
-             maskp.get_array_of_uchar(0,4).join('.')
+      return( netp.get_array_of_uchar(0,4).join('.') + "/" + 
+              maskp.get_array_of_uchar(0,4).join('.') )
     end
 
 
@@ -73,13 +72,17 @@ module FFI
     # @return [Handler]
     #   A FFI::PCap::Handler
     #
+    # @raise [LibError]
+    #   On failure, an exception may be raised with the associated error 
+    #   message from libpcap.
+    #
     def PCap.open_live(options={},&block)
       device = options[:device]
       errbuf = ErrorBuffer.new
 
       unless device
         unless (device = PCap.pcap_lookupdev(errbuf))
-          raise(StandardError, errbuf.to_s, caller)
+          raise(LibError, "pcap_lookupdev(): #{errbuf.to_s}")
         end
       end
 
@@ -90,7 +93,7 @@ module FFI
       ptr = PCap.pcap_open_live(device, snaplen, promisc, to_ms, errbuf)
 
       if ptr.null?
-        raise(StandardError, errbuf.to_s, caller)
+        raise(LibError, "pcap_open_live(): #{errbuf.to_s}")
       end
 
       return Handler.new(ptr, options, &block)
@@ -135,16 +138,16 @@ module FFI
     # @return [Handler]
     #   A FFI::PCap::Handler
     #
-    # @raise [StandardErrror]
-    #   On failure, an exception is raised with the associated error message 
-    #   from libpcap.
+    # @raise [LibError]
+    #   On failure, an exception may be raised with the associated error 
+    #   message from libpcap.
     #
     def PCap.open_offline(path, options={})
       errbuf = ErrorBuffer.new
       ptr = PCap.pcap_open_offline(File.expand_path(path), errbuf)
 
       if ptr.null?
-        raise(StandardError, errbuf.to_s, caller)
+        raise(LibError, "pcap_open_offline(): #{errbuf.to_s}")
       end
 
       return Handler.new(ptr, options)
@@ -163,10 +166,9 @@ module FFI
     #
     # @return [nil]
     #
-    # @raise [StandardErrror]
-    #   On failure, an exception is raised with the associated error message 
-    #   from libpcap. The raising of this exception may indicate you need 
-    #   higher privileges.
+    # @raise [LibError]
+    #   On failure, an exception may be raised with the associated error 
+    #   message from libpcap.
     #
     def PCap.each_device
       devices = ::FFI::MemoryPointer.new(:pointer)
@@ -176,7 +178,7 @@ module FFI
       node = devices.get_pointer(0)
 
       if node.null?
-        raise(StandardError, errbuf.to_s, caller)
+        raise(LibError, "pcap_findalldevs() #{errbuf.to_s}")
       end
 
       device = Interface.new(node)

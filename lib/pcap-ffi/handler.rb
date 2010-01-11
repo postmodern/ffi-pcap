@@ -40,7 +40,7 @@ module FFI
         if ret == 0
           return true
         else
-          raise(StandardError, geterr(), caller)
+          raise(LibError, geterr(), caller)
         end
       end
 
@@ -57,7 +57,7 @@ module FFI
         end
 
         if PCap.pcap_setnonblock(@pcap, mode, @errbuf) == -1
-          raise(RuntimeError, @errbuf.to_s, caller)
+          raise(LibError, @errbuf.to_s, caller)
         end
 
         return mode == 1
@@ -67,7 +67,7 @@ module FFI
         mode = PCap.pcap_getnonblock(@pcap, @errbuf)
 
         if mode == -1
-          raise(RuntimeError, @errbuf.to_s, caller)
+          raise(LibError, @errbuf.to_s, caller)
         end
 
         return mode == 1
@@ -94,7 +94,7 @@ module FFI
         elsif ret > -1
           return ret
         else
-          raise(StandardError, "unexpected return value #{ret}")
+          raise(ReadError, "unexpected return from pcap_loop(): #{ret}")
         end
       end
 
@@ -120,7 +120,7 @@ module FFI
         elsif ret > -1
           return ret
         else
-          raise(StandardError, "unexpected return value #{ret}")
+          raise(ReadError, "unexpected return from pcap_dispatch(): #{ret}")
         end
       end
 
@@ -156,7 +156,7 @@ module FFI
         dump_ptr = PCap.pcap_dump_open(@pcap, File.expand_path(path))
 
         if dump_ptr.null?
-          raise(RuntimeError, geterr(), caller)
+          raise(LibError, geterr(), caller)
         end
 
         return Dumper.new(dump_ptr)
