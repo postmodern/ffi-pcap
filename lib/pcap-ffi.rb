@@ -31,5 +31,4 @@ require 'pcap-ffi/functions'
 
 require 'pcap-ffi/data_link'
 require 'pcap-ffi/handler'
-require 'pcap-ffi/pcap'
 
