@@ -88,7 +88,7 @@ module FFI
 
       promisc = (options[:promisc])? 1 : 0
       snaplen = (options[:snaplen] || Handler::SNAPLEN)
-      to_ms = (options[:timeout] || -1)
+      to_ms = (options[:timeout] || 0)
 
       ptr = PCap.pcap_open_live(device, snaplen, promisc, to_ms, errbuf)
 
