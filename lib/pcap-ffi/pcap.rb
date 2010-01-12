@@ -274,13 +274,12 @@ module FFI
       def PCap.drop_sudo_privs
         if( ENV["SUDO_USER"] and 
             (uid=`id -u "$SUDO_USER"`) =~ /^\d+$/ and
-            (gid=`id -g "$SUDO_USER"`) =~ /^\d+$/ and
-            PCap.setgid(gid.to_i) == 0 and
-            PCap.setuid(uid.to_i) == 0 )
-          return true
-        else
-          raise(StandardError, "Unable to drop privileges")
+            (gid=`id -g "$SUDO_USER"`) =~ /^\d+$/ )
+          g = PCap.setgid(gid.to_i) 
+          u = PCap.setuid(uid.to_i)
+          return true if (u==0 and g==0)
         end
+        raise(StandardError, "Unable to drop privileges")
       end
 
     rescue FFI::NotFoundError
