@@ -5,9 +5,6 @@ module FFI
 
       include Enumerable
 
-      # Default snaplen
-      SNAPLEN = 65535
-
       # Pointer to the pcap opaque type
       attr_reader :pcap
 
@@ -22,8 +19,8 @@ module FFI
           self.direction = options[:direction]
         end
 
-        trap('SIGINT', &method(:close))
-        trap('SIGTERM', &method(:close))
+        trap('INT') {|s| stop(); close(); raise(SignalException, s)}
+        trap('TERM') {|s| stop(); close(); raise(SignalException, s)}
 
         yield self if block_given?
       end
@@ -141,7 +138,7 @@ module FFI
 
         case PCap.pcap_next_ex(@pcap, hdr_p, buf_p)
         when 0
-          raise(ReadError, "the timeout expired", caller)
+          raise(TimeoutError, "the timeout expired", caller)
         when -1
           raise(ReadError, geterr(), caller)
         when -2
@@ -198,11 +195,28 @@ module FFI
         "#<#{self.class}: 0x#{@pcap.address.to_s(16)}>"
       end
 
+      def set_filter(expression, opts={})
+        optimize = opts[:optimize] || 1
+        netmask = 0 # XXX need flag?
+        code = BPFProgram.new
+        if PCap.pcap_compile(@pcap, code, expression, optimize, netmask) < 0
+          raise(LibError, "pcap_compile(): #{geterr()}")
+        end
+
+        if PCap.pcap_setfilter(@pcap, code) < 0
+          raise(LibError, "pcap_setfilter(): #{geterr()}")
+        end
+
+        return expression
+      end
+
+      alias setfilter set_filter
+      alias filter= set_filter
+
       private
         def _wrap_callback(&block)
           lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
         end
-
 
     end
 
@@ -240,8 +254,7 @@ module FFI
     attach_function :pcap_major_version, [:pcap_t], :int
     attach_function :pcap_minor_version, [:pcap_t], :int
 
-
-    # XXX not sure if we even want FILE io stuff yet (or ever).
+    #### XXX not sure if we even want FILE io stuff yet (or ever).
 
     #attach_function :pcap_fopen_offline, [:FILE, :pointer], :pcap_t
     #attach_function :pcap_file, [:pcap_t], :FILE
