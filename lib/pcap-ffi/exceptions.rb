@@ -15,6 +15,8 @@ module FFI
     class ReadError < LibError
     end
 
+    class TimeoutError < LibError
+    end
   end
 end
 
