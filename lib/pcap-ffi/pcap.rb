@@ -1,6 +1,9 @@
+require 'enumerator'
 
 module FFI
   module PCap
+    DEFAULT_TO_MS = 1000     # Default timeout for pcap_open_live()
+    DEFAULT_SNAPLEN = 65535  # Default snapshot length for packets
 
     attach_function :pcap_lookupdev, [:pointer], :string
 
@@ -44,7 +47,7 @@ module FFI
       unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
         raise(LibError, "pcap_lookupnet(): #{errbuf.to_s}")
       end
-      return( netp.get_array_of_uchar(0,4).join('.') + "/" + 
+      return( netp.get_array_of_uchar(0,4).join('.') << "/" <<
               maskp.get_array_of_uchar(0,4).join('.') )
     end
 
@@ -53,21 +56,22 @@ module FFI
     
     # Opens a device for capturing from the network.
     #
-    # @option options [String, nil] :device
-    #   The device to capture from. A device of "any" or nil can be used
-    #   to capture packets from all interfaces.
-    #
-    # @param [Hash] options
+    # @param [Hash] opts
     #   Options are ignored and passed to Handler.new except those below.
     #
-    # @option options [Integer] :snaplen
-    #   The snapshot length for the pcap object. Defaults to SNAPLEN
+    # @option opts [optional, String, nil] :device
+    #   The device to open. On linux, this can be "any". If nil or unspecified
+    #   lookupdev() is called to obtain a default device. 
     #
-    # @option options [Boolean] :promisc
-    #   Specifies if the interface is to be put into promiscuous mode.
+    # @option opts [optional, Integer] :snaplen
+    #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
     #
-    # @option options [Integer] :timeout
-    #   Specifies the read timeout in milliseconds.
+    # @option opts [optional, Boolean] :promisc
+    #   Specifies if the interface is to be put into promiscuous mode. Defaults
+    #   to false.
+    #
+    # @option opts [optional, Integer] :timeout
+    #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
     #
     # @return [Handler]
     #   A FFI::PCap::Handler
@@ -76,27 +80,16 @@ module FFI
     #   On failure, an exception may be raised with the associated error 
     #   message from libpcap.
     #
-    def PCap.open_live(options={},&block)
-      device = options[:device]
+    def PCap.open_live(opts={},&block)
       errbuf = ErrorBuffer.new
 
-      unless device
-        unless (device = PCap.pcap_lookupdev(errbuf))
-          raise(LibError, "pcap_lookupdev(): #{errbuf.to_s}")
-        end
-      end
+      o = opts.merge(:snaplen => DEFAULT_SNAPLEN, :timeout => DEFAULT_TO_MS)
+      o[:device] ||= lookupdev()
+      o[:promisc] = (opts[:promisc])? 1 : 0
 
-      promisc = (options[:promisc])? 1 : 0
-      snaplen = (options[:snaplen] || Handler::SNAPLEN)
-      to_ms = (options[:timeout] || 0)
-
-      ptr = PCap.pcap_open_live(device, snaplen, promisc, to_ms, errbuf)
-
-      if ptr.null?
-        raise(LibError, "pcap_open_live(): #{errbuf.to_s}")
-      end
-
-      return Handler.new(ptr, options, &block)
+      ptr = PCap.pcap_open_live(o[:device], o[:snaplen], o[:promisc], o[:timeout], errbuf)
+      raise(LibError, "pcap_open_live(): #{errbuf.to_s}") if ptr.null?
+      return Handler.new(ptr, o, &block)
     end
 
 
@@ -108,20 +101,21 @@ module FFI
     # @param [String, Symbol, Integer] datalink
     #   The link-layer type for pcap.
     #
-    # @param [Hash] options
+    # @param [Hash] opts
     #   Options are ignored and passed to Handler.new except those below.
     #
-    # @option options [Integer] :snaplen
+    # @option opts [optional, Integer] :snaplen
     #   The snapshot length for the pcap object. Defaults to SNAPLEN
     #
     # @return [Handler]
     #   A FFI::PCap::Handler
     #
-    def PCap.open_dead(datalink, options={})
+    def PCap.open_dead(datalink, opts={})
       dl = datalink.kind_of?(Integer) ? dl : DataLink.name_to_value(datalink.to_s)
-      snaplen = (options[:snaplen] || Handler::SNAPLEN)
-
-      return Handler.new(PCap.pcap_open_dead(dl, snaplen), options)
+      o = opts.merge(:snaplen => DEFAULT_SNAPLEN)
+      ptr = PCap.pcap_open_dead(dl, o[:snaplen])
+      raise(LibError, "pcap_open_dead(): #{errbuf.to_s}") if ptr.null?
+      return Handler.new(ptr, o)
     end
 
 
@@ -132,8 +126,12 @@ module FFI
     # @param [String] path
     #   The path to the file to open.
     #
-    # @param [Hash] options
+    # @param [Hash] opts
     #   Options are ignored and passed to Handler.new
+    #
+    # @option opts [ignored] :path
+    #   The :path option will be overridden with the value of the path 
+    #   argument.  If specified in opts, its value will be ignored.
     #
     # @return [Handler]
     #   A FFI::PCap::Handler
@@ -142,15 +140,11 @@ module FFI
     #   On failure, an exception may be raised with the associated error 
     #   message from libpcap.
     #
-    def PCap.open_offline(path, options={})
+    def PCap.open_offline(path, opts={})
       errbuf = ErrorBuffer.new
       ptr = PCap.pcap_open_offline(File.expand_path(path), errbuf)
-
-      if ptr.null?
-        raise(LibError, "pcap_open_offline(): #{errbuf.to_s}")
-      end
-
-      return Handler.new(ptr, options)
+      raise(LibError, "pcap_open_offline(): #{errbuf.to_s}") if ptr.null?
+      return Handler.new(ptr, {:path => path}.merge(opts))
     end
 
 
@@ -178,7 +172,7 @@ module FFI
       node = devices.get_pointer(0)
 
       if node.null?
-        raise(LibError, "pcap_findalldevs() #{errbuf.to_s}")
+        raise(LibError, "pcap_findalldevs(): #{errbuf.to_s}")
       end
 
       device = Interface.new(node)
@@ -192,6 +186,17 @@ module FFI
       return nil
     end
 
+    # Returns an array of device name and network/netmask pairs for
+    # each interface found on the system.
+    #
+    # If an interface does not have an address assigned, its network/netmask
+    # value is returned as a nil value.
+    def PCap.dump_devices
+      PCap.enum_for(:each_device).map do |dev| 
+        net = begin; PCap.lookupnet(dev.name); rescue LibError; end
+        [dev.name, net]
+      end
+    end
 
     attach_function :pcap_lib_version, [], :string
 
@@ -215,11 +220,8 @@ module FFI
         return $1
       end
     end
+
     attach_function :pcap_strerror, [:int], :string
-
-    attach_function :pcap_major_version, [:pcap_t], :int
-    attach_function :pcap_minor_version, [:pcap_t], :int
-
 
     attach_function :bpf_filter, [BPFInstruction, :pointer, :uint, :uint], :uint
     attach_function :bpf_validate, [BPFInstruction, :int], :int
@@ -230,6 +232,57 @@ module FFI
     # Unix Only:
     begin
       attach_function :pcap_get_selectable_fd, [:pcap_t], :int
+
+      # Bind set user and group ID functions to our namespace as a convenience
+      # for dropping root privileges. This can generally be done right after 
+      # a call to pcap_open_live() has finished.
+
+      attach_function :setuid, [:uid_t], :int
+      attach_function :seteuid, [:uid_t], :int
+      attach_function :setgid, [:gid_t], :int
+      attach_function :setegid, [:gid_t], :int
+      attach_function :getuid, [], :uid_t
+      attach_function :geteuid, [], :uid_t
+      attach_function :getgid, [], :gid_t
+      attach_function :getegid, [], :gid_t
+      attach_function :setreuid, [:uid_t, :uid_t], :int
+
+      # Drops privileges back to the uid of the SUDO_USER environment 
+      # variable.
+      #
+      # Only available on Unix.
+      #
+      # This is useful for the paranoid when sudo is used to run a 
+      # ruby pcap program as root. This can be done in order to drop 
+      # privileges back to a less privileged user to slightly lessen 
+      # the impact of any potential vulnerabilities that my be lurking. 
+      #
+      # This method can generally be called right after a call to 
+      # open_live() has returned a pcap handle or another privileged
+      # call has completed. Note, however, that once privileges are 
+      # dropped, pcap functions that a require higher privilege will 
+      # no longer work.
+      #
+      # @raise [StandardError]
+      #   An error is raised if privileges cannot be dropped for 
+      #   some reason. This may be because the SUDO_USER environment 
+      #   variable is not set, because we already have a lower
+      #   privilige and the SUDO_USER id is not the current uid,
+      #   or because the SUDO_USER environment variable is not
+      #   a valid user.
+      #
+      def PCap.drop_sudo_privs
+        if( ENV["SUDO_USER"] and 
+            (uid=`id -u "$SUDO_USER"`) =~ /^\d+$/ and
+            (gid=`id -g "$SUDO_USER"`) =~ /^\d+$/ and
+            PCap.setgid(gid.to_i) == 0 and
+            PCap.setuid(uid.to_i) == 0 )
+          return true
+        else
+          raise(StandardError, "Unable to drop privileges")
+        end
+      end
+
     rescue FFI::NotFoundError
       $pcap_not_unix=true
     end
@@ -239,6 +292,7 @@ module FFI
       attach_function :pcap_setbuff, [:pcap_t, :int], :int
       attach_function :pcap_setmode, [:pcap_t, :pcap_w32_modes_enum], :int
       attach_function :pcap_setmintocopy, [:pcap_t, :int], :int
+
     rescue FFI::NotFoundError
       $pcap_not_win32=true
     end if $pcap_not_unix
