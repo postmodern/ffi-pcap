@@ -6,9 +6,9 @@ module FFI
     #
     # A pcap_dumper, or PCap::Dumper is handled opaquely so that it can
     # be implemented differently on different platforms. In FFI::PCap, we
-    # simply handle this as an opaque FFI::MemoryPointer with added 
+    # simply wrap the pcap_dumper_t pointer with a ruby interface.
     # helper methods.
-    class Dumper < FFI::MemoryPointer
+    class Dumper
 
       def initialize(dumper)
         @dumper = dumper
@@ -19,7 +19,7 @@ module FFI
       end
 
       def write(*args)
-        if args.size == 1 and args.first.is_a? Packet
+        if args.first.is_a? Packet
           write_pkt(*args)
         else
           _write(*args)
@@ -40,14 +40,6 @@ module FFI
 
       def close
         PCap.pcap_dump_close(@dumper)
-      end
-
-      def to_ptr
-        @dumper
-      end
-
-      def inspect
-        "#<#{self.class}: 0x#{@dumper.address.to_s(16)}>"
       end
 
     end
