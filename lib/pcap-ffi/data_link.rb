@@ -119,6 +119,8 @@ module FFI
         end
       end
 
+      # Overrides the equality operator so that quick comparisons can be
+      # made against other DataLinks, name by String, or value by Integer.
       def ==(other)
         case other
         when Integer
@@ -134,6 +136,7 @@ module FFI
         end
       end
 
+      # Overrides the sort comparison operator to sort by DLT value.
       def <=>(other)
         self.value <=> other.value
       end
@@ -144,7 +147,6 @@ module FFI
       end
 
       alias desc description
-
       alias describe description
 
       # Returns the canonical String name of the DataLink object
@@ -153,6 +155,12 @@ module FFI
       end
 
       alias to_i value
+
+      # Override 'inspect' we'll to always provide the name for irb, 
+      # pretty_print, etc.
+      def inspect
+        "<#{self.class}:#{"0x%0.8x" % self.object_id} @value=#{@value}, @name=#{name().inspect}>"
+      end
     end
 
     attach_function :pcap_datalink_name_to_val, [:string], :int
