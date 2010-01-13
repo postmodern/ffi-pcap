@@ -96,7 +96,8 @@ module FFI
       attr_reader :value
 
       # Creates a new DataLink object with the specified value or name.
-      # The canonical name and value are looked up automatically. 
+      # The canonical name, value, and description are can be looked up on 
+      # demand. 
       #
       # @param [String or Integer] arg
       #   Arg can be a string or number which will be used to look up the
