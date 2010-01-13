@@ -1,11 +1,14 @@
 module FFI
   module PCap
+
     # An abstract base wrapper class with features common to all pcap
     # device types. Do not use this directly, but use the corresponding
     # LiveWrapper, DeadWrapper, or FileWrapper class if you use
     # open_live, open_dead, or open_file respectively.
     class CommonWrapper
       include Enumerable
+
+      attr_reader :pcap # exposes the raw pointer
 
       def initialize(pcap, opts={})
         @pcap = pcap
@@ -18,8 +21,24 @@ module FFI
         yield self if block_given?
       end
 
+
+      # Returns the DataLink for the pcap device.
       def datalink
         @datalink ||= DataLink.new(PCap.pcap_datalink(@pcap))
+      end
+
+
+      # Returns an array of supported DataLinks for the pcap device.
+      def supported_datalinks
+        dlt_lst = FFI::MemoryPointer.new(:pointer)
+        if (cnt=PCap.pcap_list_datalinks(@pcap, dlt_lst)) < 0
+          raise(LibError, "pcap_list_datalinks(): #{geterr()}")
+        end
+        # extract datalink values 
+        p = dlt_lst.get_pointer(0)
+        ret = p.get_array_of_int(0, cnt).map {|dlt| DataLink.new(dlt) }
+        PCap.free(p)
+        return ret
       end
 
 
@@ -75,6 +94,7 @@ module FFI
 
       alias each loop
 
+
       # Processes packets from a live capture or savefile until cnt packets
       # are processed, the end of the current bufferful of packets is reached
       # when doing a live capture, the end of the savefile is reached (when
@@ -129,7 +149,7 @@ module FFI
         end
       end
 
-      # @return [Packet, nil]
+
       # This method uses the older pcap_next() function which has been
       # deprecated in favor of pcap_next_ex(). It is included only for
       # backward compatability purposes.
@@ -138,7 +158,7 @@ module FFI
       #
       # Unfortunately, there is no way to determine whether an error 
       # occured or not when using pcap_next().
-      # 
+      #
       def old_next
         header = PacketHeader.new
         bytes = PCap.pcap_next(@pcap, header)
@@ -148,6 +168,7 @@ module FFI
           return Packet.new(header, bytes)
         end
       end
+
 
       # @return [Packet, nil]
       #
@@ -178,6 +199,7 @@ module FFI
       alias next_extra next
       alias next_ex next
 
+
       # Used to specify a pcap filter for the pcap interface. This method 
       # compiles a filter expression and applies it on the wrapped pcap 
       # interface.
@@ -194,16 +216,15 @@ module FFI
       #
       def set_filter(expression, opts={})
         code = compile(expression, opts)
-
-        if PCap.pcap_setfilter(@pcap, code) < 0
-          raise(LibError, "pcap_setfilter(): #{geterr()}")
-        end
-
+        ret = PCap.pcap_setfilter(@pcap, code)
+        code.free!  # done with this, we can free it
+        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
         return expression
       end
 
       alias setfilter set_filter
       alias filter= set_filter
+
 
       # Compiles a pcap filter but does not apply it to the pcap interface.
       #
@@ -223,6 +244,7 @@ module FFI
       #   netmask)
       #
       # @return [BPFProgram]
+      #   A FFI::PCap::BPFProgram structure for the compiled filter.
       #
       # @raise [LibError]
       #   On failure, an exception is raised with the relevant error message 
@@ -257,6 +279,7 @@ module FFI
 
       # @return [String]
       #   The error text pertaining to the last pcap library error.
+      #
       def geterr
         PCap.pcap_geterr(@pcap)
       end
@@ -277,10 +300,12 @@ module FFI
 
       alias stop breakloop
 
+      # Indicates whether the pcap interface is already closed.
       def closed?
         @closed == true
       end
 
+      # Closes the pcap interface using libpcap.
       def close
         unless @closed
           @closed = true
@@ -292,6 +317,11 @@ module FFI
         @pcap
       end
 
+      # Returns the snapshot length for the pcap interface.
+      def snaplen
+        PCap.pcap_snapshot(@pcap)
+      end
+
       private
         def _wrap_callback(&block)
           lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
@@ -299,19 +329,29 @@ module FFI
 
     end # CommonWrapper
 
+    # A wrapper class for pcap devices opened with open_dead()
     class DeadWrapper < CommonWrapper
-      attr_reader :snaplen, :datalink
+      attr_reader :datalink
 
-      def initialize(pcap, opts={})
+      def initialize(pcap, opts={}, &block)
         @datalink = opts[:datalink]
-        @snaplen  = opts[:snaplen]
+
+        super(pcap, opts, &block)
       end
 
     end
 
+    # A wrapper class for pcap devices opened with open_offline()
+    class FileWrapper < CommonWrapper
+
+      def swapped?
+        PCap.pcap_is_swapped(@pcap) == 1 ? true : false
+      end
+    end
+
     # A wrapper class for pcap devices opened with open_live()
     class LiveWrapper < CommonWrapper
-      attr_reader :device, :promisc, :snaplen, :timeout, :direction
+      attr_reader :device, :promisc, :timeout, :direction
 
       def initialize(pcap, opts={}, &block)
         unless @device=(opts[:device] || opts[:dev])
@@ -319,7 +359,6 @@ module FFI
         end
 
         @promisc   = opts[:promisc]
-        @snaplen   = opts[:snaplen]
         @timeout   = opts[:timeout]
         @direction = (opts[:direction] || opts[:dir])
 
@@ -370,6 +409,8 @@ module FFI
         PCap.ntohl(@maskp.get_uint32(0))
       end
 
+      # Sets the direction for which packets will be captured.
+      #
       def set_direction(dir)
         dirs = PCap.enum_type(:pcap_direction_t)
         if PCap.pcap_setdirection(@pcap, dirs[:"pcap_d_#{dir}"]) == 0
@@ -381,6 +422,9 @@ module FFI
 
       alias direction= set_direction
 
+      # set the state of non-blocking mode on a capture device
+      #
+      # @param [Boolean] mode
       def set_non_blocking(mode)
         mode =  mode ? 1 : 0
         if PCap.pcap_setnonblock(@pcap, mode, @errbuf) == 0
@@ -392,7 +436,12 @@ module FFI
 
       alias non_blocking= set_non_blocking
 
-      def non_blocking?
+      # get the state of non-blocking mode on a capture device
+      #
+      # @return [Boolean]
+      #   non-blocking state
+      #
+      def non_blocking
         if (mode=PCap.pcap_getnonblock(@pcap, @errbuf)) == -1
           raise(LibError, "pcap_getnonblock(): #{@errbuf.to_s}", caller)
         else
@@ -400,15 +449,22 @@ module FFI
         end
       end
 
+      alias non_blocking? non_blocking
+
+      # get capture statistics
+      #
+      # @return [Stats]
       def stats
         stats = Stat.new
-
-        PCap.pcap_stats(@pcap, stats)
+        unless PCap.pcap_stats(@pcap, stats) == 0
+          raise(LibError, "pcap_stats(): #{geterr()}")
+        end
         return stats
       end
     end
 
     attach_function :ntohl, [:uint32], :uint32
+    attach_function :free, [:pointer], :void
 
     callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
 
@@ -423,18 +479,19 @@ module FFI
     attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
     attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
     attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
-    attach_function :pcap_perror, [:pcap_t, :string], :void
     attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
     attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
     attach_function :pcap_geterr, [:pcap_t], :string
     attach_function :pcap_compile, [:pcap_t, BPFProgram, :string, :int, :bpf_uint32], :int
-    attach_function :pcap_freecode, [BPFProgram], :void
+
     attach_function :pcap_datalink, [:pcap_t], :int
     attach_function :pcap_list_datalinks, [:pcap_t, :pointer], :int
+
     attach_function :pcap_set_datalink, [:pcap_t, :int], :int
     attach_function :pcap_snapshot, [:pcap_t], :int
     attach_function :pcap_is_swapped, [:pcap_t], :int
     attach_function :pcap_dump_open, [:pcap_t, :string], :pcap_dumper_t
+
     attach_function :pcap_major_version, [:pcap_t], :int
     attach_function :pcap_minor_version, [:pcap_t], :int
 
@@ -444,7 +501,6 @@ module FFI
     #attach_function :pcap_file, [:pcap_t], :FILE
     #attach_function :pcap_dump_fopen, [:pcap_t, :FILE], :pcap_dumper_t
     #attach_function :pcap_fileno, [:pcap_t], :int
-
 
   end
 end
