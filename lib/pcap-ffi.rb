@@ -34,5 +34,5 @@ require 'pcap-ffi/error_buffer'
 require 'pcap-ffi/pcap'
 require 'pcap-ffi/data_link'
 require 'pcap-ffi/packet'
-require 'pcap-ffi/handler'
+require 'pcap-ffi/wrappers'
 
