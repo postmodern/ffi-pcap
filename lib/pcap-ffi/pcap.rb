@@ -199,6 +199,7 @@ module FFI
       return nil
     end
 
+
     # Returns an array of device name and network/netmask pairs for
     # each interface found on the system.
     #
@@ -210,6 +211,7 @@ module FFI
         [dev.name, net]
       end
     end
+
 
     # Returns an array of device names for each interface found on the system.
     def PCap.device_names
@@ -229,6 +231,7 @@ module FFI
       PCap.pcap_lib_version
     end
 
+
     # Extract just the version number from the lib_version string.
     #
     # @return [String]
@@ -240,7 +243,6 @@ module FFI
       end
     end
 
-    attach_function :pcap_strerror, [:int], :string
 
 
     # Unix Only:
@@ -295,7 +297,6 @@ module FFI
       attach_function :pcap_setbuff, [:pcap_t, :int], :int
       attach_function :pcap_setmode, [:pcap_t, :pcap_w32_modes_enum], :int
       attach_function :pcap_setmintocopy, [:pcap_t, :int], :int
-
     rescue FFI::NotFoundError
       $pcap_not_win32=true
     end if $pcap_not_unix
