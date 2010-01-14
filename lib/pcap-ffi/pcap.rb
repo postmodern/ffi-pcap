@@ -87,7 +87,7 @@ module FFI
     #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
     #
     # @return [Live]
-    #   A FFI::PCap::Live
+    #   A FFI::PCap::Live wrapper.
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error 
@@ -121,7 +121,7 @@ module FFI
     #   The snapshot length for the pcap object. Defaults to SNAPLEN
     #
     # @return [Dead]
-    #   A FFI::PCap::Dead
+    #   A FFI::PCap::Dead wrapper.
     #
     def PCap.open_dead(datalink=0, opts={})
       dl = datalink.kind_of?(DataLink) ? datalink : DataLink.new(datalink)
@@ -147,7 +147,7 @@ module FFI
     #   argument.  If specified in opts, its value will be ignored.
     #
     # @return [Offline]
-    #   A FFI::PCap::Offline
+    #   A FFI::PCap::Offline wrapper.
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error 

@@ -1,8 +1,9 @@
 module FFI
-  # As returned by pcap_stats()
-  #
-  # See pcap_stat struct in pcap.h.
   module PCap
+
+    # As returned by pcap_stats()
+    #
+    # See pcap_stat struct in pcap.h.
     class Stat < FFI::Struct
       include FFI::DRY::StructHelper
 

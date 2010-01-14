@@ -35,7 +35,7 @@ module FFI
       #   The name or value to lookup. A Symbol is converted to String. Names 
       #   are case-insensitive.
       #
-      # @return Array
+      # @return [Array]
       #   A 2-element array containing [value, name]. Both elements are nil
       #   if the lookup failed.
       #
@@ -103,7 +103,7 @@ module FFI
       #   Arg can be a string or number which will be used to look up the
       #   datalink.
       #
-      # @raises ArgumentError
+      # @raise [UnsupportedDataLinkError]
       #   An exception is raised if a name is supplied and a lookup for its
       #   value fails or if the arg parameter is an invalid type.
       #
