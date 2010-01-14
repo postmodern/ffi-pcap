@@ -2,8 +2,8 @@ module FFI
   module PCap
 
     # An abstract base wrapper class with features common to all pcap
-    # wrapper types. Do not use this directly. Instead refer to LiveWrapper, 
-    # DeadWrapper, or FileWrapper class for open_live, open_dead, or open_file 
+    # wrapper types. Do not use this directly. Instead refer to Live, 
+    # Dead, or Offline class for open_live, open_dead, or open_file 
     # respectively.
     class CommonWrapper
 

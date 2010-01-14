@@ -53,7 +53,7 @@ module FFI
 
       # Compiles a bpf filter without a pcap device being open. Downside is
       # no error messages are available, whereas they are when you use 
-      # open_dead() and use compile() on the resulting DeadWrapper.
+      # open_dead() and use compile() on the resulting Dead.
       #
       # @options [Hash] opts
       #   Additional options for compile

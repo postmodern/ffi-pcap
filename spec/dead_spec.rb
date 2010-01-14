@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'wrapper_behaviors'
 
-describe DeadWrapper do
+describe Dead do
   before(:each) do
     @pcap = PCap.open_dead
   end

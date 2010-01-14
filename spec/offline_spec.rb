@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'wrapper_behaviors'
 
-describe FileWrapper do
+describe Offline do
   before(:each) do
     @pcap = PCap.open_offline(PCAP_TESTFILE)
   end

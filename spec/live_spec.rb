@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'wrapper_behaviors'
 
-describe LiveWrapper do
+describe Live do
   before(:each) do
     @pcap = PCap.open_live(
       :device => PCAP_DEV,
