@@ -1,7 +1,7 @@
 require 'pcap-ffi/wrappers/common_wrapper'
 require 'pcap-ffi/wrappers/capture_wrapper'
 require 'pcap-ffi/wrappers/dead_wrapper'
-require 'pcap-ffi/wrappers/file_wrapper'
+require 'pcap-ffi/wrappers/offline_wrapper'
 require 'pcap-ffi/wrappers/live_wrapper'
 
 module FFI
