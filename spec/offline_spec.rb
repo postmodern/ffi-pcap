@@ -15,8 +15,17 @@ describe Offline do
   it "should return a nil from next() at the end of the dump file" do
     i = 0
     @pcap.loop { i+=1 }
-    i.should_not be_nil
+    i.should > 0
     @pcap.next.should be_nil
   end
+
+  it "should supply a file version" do
+    @pcap.file_version.should =~ /^\d+\.\d+$/
+  end
+
+  it "should indicate whether it is endian swapped" do
+    [true,false].include?(@pcap.swapped?).should == true
+  end
+
 end
 
