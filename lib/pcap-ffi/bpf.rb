@@ -55,7 +55,7 @@ module FFI
       # no error messages are available, whereas they are when you use 
       # open_dead() and use compile() on the resulting Dead.
       #
-      # @options [Hash] opts
+      # @param [Hash] opts
       #   Additional options for compile
       #
       # @option opts [optional, DataLink, Integer, String, Symbol] :datalink
