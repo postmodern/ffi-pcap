@@ -1,48 +1,43 @@
-require 'pcap-ffi/handler'
-
 require 'spec_helper'
 
-shared_examples_for "Handler" do
+shared_examples_for "FFI::PCap::CommonWrapper" do
   it "must have a datalink" do
     datalink = @pcap.datalink
-
     datalink.value.should_not be_nil
+    datalink.value.should === Numeric
     datalink.name.should_not be_empty
   end
 
-  it "should pass packets to a callback" do
-    @pcap.callback do |user,header,bytes|
-      header.captured.should_not == 0
-      header.length.should_not == 0
-
-      bytes.should_not be_null
+  it "should pass packets to a block using each()" do
+    @pcap.each do |this, pkt, tag|
+      this.should == @pcap
+      pkt.header.should_not be_nil
+      pkt.header.captured.should_not == 0
+      pkt.header.length.should_not == 0
+      pkt.body_ptr.should_not be_nil
+      pkt.body_ptr.should_not be_null
+      pkt.body.should_not be_nil
+      pkt.body.should_not be_empty
+      # tag is an arbitrary identifier. unused for now.
     end
-
-    @pcap.loop
   end
 
   it "should be able to get the next packet" do
-    header, data = @pcap.next
-
-    header.should_not be_nil
-    header.captured.should_not == 0
-    header.length.should_not == 0
-
-    data.should_not be_nil
-    data.should_not be_null
+    pkt = @pcap.next
+    pkt.should_behave_like "Packet populated"
   end
 
   it "should be able to open a dump file" do
     lambda {
       dumper = @pcap.open_dump(Tempfile.new.path)
       dumper.close
-    }.should_not raise_error(RuntimeError)
+    }.should_not raise_error(Exception)
   end
 
   it "should raise an exception when opening a bad dump file" do
     lambda {
       @pcap.open_dump(File.join('','obviously','not','there'))
-    }.should raise_error(RuntimeError)
+    }.should raise_error(Exception)
   end
 
   it "should return an empty String when an error has not occurred" do
@@ -52,9 +47,9 @@ shared_examples_for "Handler" do
   it "should be able to break out of the Handler#loop" do
     stopped = false
 
-    @pcap.loop do |user,pkthdr,bytes|
+    @pcap.loop do |this, pkt, tag|
       stopped = true
-      @pcap.stop
+      this.stop
     end
 
     stopped.should == true
@@ -66,6 +61,6 @@ shared_examples_for "Handler" do
 
     lambda {
       @pcap.close
-    }.should_not raise_error(StandardError)
+    }.should_not raise_error(Exception)
   end
 end
