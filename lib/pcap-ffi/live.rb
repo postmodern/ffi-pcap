@@ -159,6 +159,9 @@ module FFI
         end
         return sent
       end
+
+      alias sendpacket inject
+      alias send_packet inject
     end
 
     attach_function :ntohl, [:uint32], :uint32
