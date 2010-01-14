@@ -80,7 +80,7 @@ module FFI
       # @param [String] expression
       #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
       #
-      # @options [Hash] opts
+      # @param [Hash] opts
       #   Compile options. See compile()
       #
       # @raise [LibError]
@@ -104,7 +104,7 @@ module FFI
       # @param [String] expression
       #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
       #
-      # @options [Hash] opts
+      # @param [Hash] opts
       #   Additional options for compile
       #
       # @option opts [optional, Integer] :optimize
