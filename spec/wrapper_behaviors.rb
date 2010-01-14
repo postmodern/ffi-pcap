@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'tempfile'
 
 shared_examples_for "PCap::CommonWrapper" do
-  it "must have a datalink" do
+  it "should have a datalink" do
     datalink = @pcap.datalink
     datalink.value.should_not be_nil
     Numeric.should === datalink.value
