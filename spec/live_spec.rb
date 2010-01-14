@@ -26,6 +26,7 @@ describe Live do
     @pcap.loop {|*x| @pcap.stop if (i += 1) == 10 }
     i.should_not == 0
     stats = @pcap.stats
+    Stats.should === stats
     stats.received.should > 0
     stats.received.should == 10
   end
