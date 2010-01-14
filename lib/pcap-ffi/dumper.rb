@@ -7,7 +7,6 @@ module FFI
     # A pcap_dumper, or PCap::Dumper is handled opaquely so that it can
     # be implemented differently on different platforms. In FFI::PCap, we
     # simply wrap the pcap_dumper_t pointer with a ruby interface.
-    # helper methods.
     class Dumper
 
       def initialize(dumper)
