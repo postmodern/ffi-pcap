@@ -14,6 +14,13 @@ module FFI
         field :linktype,      :bpf_uint32
       end
 
+      def datalink
+        DataLink.new(self.linktype)
+      end
+
+      def version
+        "#{self.version_major}.#{self.version_minor}"
+      end
     end
   end
 end

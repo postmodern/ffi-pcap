@@ -6,7 +6,6 @@ module FFI
     # LiveWrapper, DeadWrapper, or FileWrapper class if you use
     # open_live, open_dead, or open_file respectively.
     class CommonWrapper
-      include Enumerable
 
       attr_accessor :pcap
 
@@ -18,7 +17,10 @@ module FFI
         trap('INT') {|s| stop(); close(); raise(SignalException, s)}
         trap('TERM') {|s| stop(); close(); raise(SignalException, s)}
 
-        yield self if block_given?
+        if block_given?
+          yield self
+          self.close()
+        end
       end
 
 
@@ -41,6 +43,165 @@ module FFI
         return ret
       end
 
+      # Indicates whether the pcap interface is already closed.
+      def closed?
+        @closed == true
+      end
+
+      # Closes the pcap interface using libpcap.
+      def close
+        unless @closed
+          @closed = true
+          PCap.pcap_close(_pcap)
+        end
+      end
+
+      # Returns the pcap interface pointer.
+      #
+      # @return [FFI::Pointer]
+      #   Internal pointer to a pcap_t handle.
+      #
+      def to_ptr
+        _check_pcap()
+      end
+      
+      # Gets the snapshot length.
+      #
+      # @return [Integer]
+      #  Snapshot length for the pcap interface.
+      def snaplen
+        PCap.pcap_snapshot(_pcap)
+      end
+
+      # Used to specify a pcap filter for the pcap interface. This method 
+      # compiles a filter expression and applies it on the wrapped pcap 
+      # interface.
+      #
+      # @param [String] expression
+      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
+      #
+      # @options [Hash] opts
+      #   Compile options. See compile()
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
+      #
+      def set_filter(expression, opts={})
+        code = compile(expression, opts)
+        ret = PCap.pcap_setfilter(_pcap, code)
+        code.free!  # done with this, we can free it
+        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
+        return expression
+      end
+
+      alias setfilter set_filter
+      alias filter= set_filter
+
+
+      # Compiles a pcap filter but does not apply it to the pcap interface.
+      #
+      # @param [String] expression
+      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
+      #
+      # @options [Hash] opts
+      #   Additional options for compile
+      #
+      # @option opts [optional, Integer] :optimize
+      #   Optimization flag. 0 means don't optimize. Defaults to 1.
+      #
+      # @option opts [optional, Integer] :netmask
+      #   A 32-bit number representing the IPv4 netmask of the network on which
+      #   packets are being captured. It is only used when checking for IPv4
+      #   broadcast addresses in the filter program. Default: 0 (unspecified 
+      #   netmask)
+      #
+      # @return [BPFProgram]
+      #   A FFI::PCap::BPFProgram structure for the compiled filter.
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
+      #
+      def compile(expression, opts={})
+        optimize = opts[:optimize] || 1
+        netmask  = opts[:netmask] || 0 
+        code = BPFProgram.new
+        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) < 0
+          raise(LibError, "pcap_compile(): #{geterr()}")
+        end
+        return code
+      end
+
+
+      # @return [Dumper]
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error
+      #   message from libpcap.
+      #
+      def open_dump(path)
+        dp = PCap.pcap_dump_open(_pcap, File.expand_path(path))
+        raise(LibError, "pcap_dump_open(): #{geterr()}", caller) if dp.null?
+        return Dumper.new(dp)
+      end
+
+
+      # @return [String]
+      #   The error text pertaining to the last pcap library error.
+      #
+      def geterr
+        PCap.pcap_geterr(_pcap)
+      end
+
+      alias error geterr
+
+
+      private
+        # Raises an exception if @pcap is not set.
+        #
+        # Internal sanity check to confirm the pcap instance
+        # variable has been set. Otherwise very bad things can 
+        # ensue by passing a null pointer to various libpcap 
+        # functions.
+        def _check_pcap
+          if @pcap.nil?
+            raise(StandardError, "#{self.class} - nil pcap device")
+          end
+          @pcap
+        end
+
+        # Raises an exception if @pcap is not set or is a null pointer.
+        #
+        # Internal sanity check to confirm the pcap pointer
+        # variable has been set and is not a null pointer. 
+        # Otherwise very bad things can ensue by passing a null 
+        # pointer to various libpcap functions.
+        def _pcap
+          if (p = _check_pcap()).null?
+            raise(StandardError, "#{self.class} - null pointer to pcap device")
+          end
+          p
+        end
+
+    end
+
+    # A wrapper class for pcap devices opened with open_dead()
+    class DeadWrapper < CommonWrapper
+      attr_reader :datalink
+
+      def initialize(pcap, opts={}, &block)
+        @datalink = opts[:datalink]
+
+        super(pcap, opts, &block)
+      end
+
+    end
+
+    # A superclass for both offline and live interfaces, but not dead interfaces
+    # This class provides all the features necessary for working with packets.
+    class CaptureWrapper < CommonWrapper
+      include Enumerable
 
       # Processes packets from a live capture or savefile until cnt packets 
       # are processed, the end of the savefile is reached (when reading from a
@@ -200,88 +361,6 @@ module FFI
       alias next_ex next
 
 
-      # Used to specify a pcap filter for the pcap interface. This method 
-      # compiles a filter expression and applies it on the wrapped pcap 
-      # interface.
-      #
-      # @param [String] expression
-      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
-      #
-      # @options [Hash] opts
-      #   Compile options. See compile()
-      #
-      # @raise [LibError]
-      #   On failure, an exception is raised with the relevant error message 
-      #   from libpcap.
-      #
-      def set_filter(expression, opts={})
-        code = compile(expression, opts)
-        ret = PCap.pcap_setfilter(_pcap, code)
-        code.free!  # done with this, we can free it
-        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
-        return expression
-      end
-
-      alias setfilter set_filter
-      alias filter= set_filter
-
-
-      # Compiles a pcap filter but does not apply it to the pcap interface.
-      #
-      # @param [String] expression
-      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
-      #
-      # @options [Hash] opts
-      #   Additional options for compile
-      #
-      # @option opts [optional, Integer] :optimize
-      #   Optimization flag. 0 means don't optimize. Defaults to 1.
-      #
-      # @option opts [optional, Integer] :netmask
-      #   A 32-bit number representing the IPv4 netmask of the network on which
-      #   packets are being captured. It is only used when checking for IPv4
-      #   broadcast addresses in the filter program. Default: 0 (unspecified 
-      #   netmask)
-      #
-      # @return [BPFProgram]
-      #   A FFI::PCap::BPFProgram structure for the compiled filter.
-      #
-      # @raise [LibError]
-      #   On failure, an exception is raised with the relevant error message 
-      #   from libpcap.
-      #
-      def compile(expression, opts={})
-        optimize = opts[:optimize] || 1
-        netmask  = opts[:netmask] || 0 
-        code = BPFProgram.new
-        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) < 0
-          raise(LibError, "pcap_compile(): #{geterr()}")
-        end
-        return code
-      end
-
-
-      # @return [Dumper]
-      #
-      # @raise [LibError]
-      #   On failure, an exception is raised with the relevant error
-      #   message from libpcap.
-      #
-      def open_dump(path)
-        dp = PCap.pcap_dump_open(_pcap, File.expand_path(path))
-        raise(LibError, "pcap_dump_open(): #{geterr()}", caller) if dp.null?
-        return Dumper.new(dp)
-      end
-
-      # @return [String]
-      #   The error text pertaining to the last pcap library error.
-      #
-      def geterr
-        PCap.pcap_geterr(_pcap)
-      end
-
-      alias error geterr
-
       # Sets a flag that will force dispatch() or loop() to return rather 
       # than looping; they will return the number of packets that have been 
       # processed so far, or nil if no packets have been processed so far.
@@ -296,91 +375,30 @@ module FFI
 
       alias stop breakloop
 
-      # Indicates whether the pcap interface is already closed.
-      def closed?
-        @closed == true
-      end
-
-      # Closes the pcap interface using libpcap.
-      def close
-        unless @closed
-          @closed = true
-          PCap.pcap_close(_pcap)
-        end
-      end
-
-      # Returns the pcap interface pointer.
-      #
-      # @return [FFI::Pointer]
-      #   Internal pointer to a pcap_t handle.
-      #
-      def to_ptr
-        _check_pcap()
-      end
-      
-      # Gets the snapshot length.
-      #
-      # @return [Integer]
-      #  Snapshot length for the pcap interface.
-      def snaplen
-        PCap.pcap_snapshot(_pcap)
-      end
-
       private
         def _wrap_callback(&block)
           lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
         end
 
-        # Raises an exception if @pcap is not set.
-        #
-        # Internal sanity check to confirm the pcap instance
-        # variable has been set. Otherwise very bad things can 
-        # ensue by passing a null pointer to various libpcap 
-        # functions.
-        def _check_pcap
-          if @pcap.nil?
-            raise(StandardError, "#{self.class} - nil pcap device")
-          end
-          @pcap
-        end
-
-        # Raises an exception if @pcap is not set or is a null pointer.
-        #
-        # Internal sanity check to confirm the pcap pointer
-        # variable has been set and is not a null pointer. 
-        # Otherwise very bad things can ensue by passing a null 
-        # pointer to various libpcap functions.
-        def _pcap
-          if (p = _check_pcap()).null?
-            raise(StandardError, "#{self.class} - null pointer to pcap device")
-          end
-          p
-        end
-
     end # CommonWrapper
 
-    # A wrapper class for pcap devices opened with open_dead()
-    class DeadWrapper < CommonWrapper
-      attr_reader :datalink
+    # A wrapper class for pcap devices opened with open_offline()
+    class FileWrapper < CaptureWrapper
+      attr_accessor :path
 
       def initialize(pcap, opts={}, &block)
-        @datalink = opts[:datalink]
-
+        @path = opts[:path]
         super(pcap, opts, &block)
       end
-
-    end
-
-    # A wrapper class for pcap devices opened with open_offline()
-    class FileWrapper < CommonWrapper
 
       def swapped?
         PCap.pcap_is_swapped(_pcap) == 1 ? true : false
       end
     end
 
+
     # A wrapper class for pcap devices opened with open_live()
-    class LiveWrapper < CommonWrapper
+    class LiveWrapper < CaptureWrapper
       attr_reader :device, :promisc, :timeout, :direction
 
       def initialize(pcap, opts={}, &block)
@@ -406,36 +424,36 @@ module FFI
             @maskp = maskp
           end
         rescue LibError
-          STDERR.puts $!
+          warn "Warning: #{$!}"
         end
 
       end
 
       # Returns the dotted notation string for the IPv4 network address for 
-      # the device used by this pcap interface. If a device of 'any' is 
-      # specified, this will most likely be zero.
+      # the device used by this pcap interface.
       def network
+        return nil unless @netp
         @network ||= @netp.get_array_of_uchar(0,4).join('.')
       end
 
       # Returns the dotted notation string for the IPv4 netmask for the device
-      # used by this pcap interface. If a device of 'any' is specified, this 
-      # will most likely be zero.
+      # used by this pcap interface.
       def netmask
+        return nil unless @maskp
         @netmask ||= @maskp.get_array_of_uchar(0,4).join('.')
       end
 
       # Returns the 32-bit numeric representation of the IPv4 network address
-      # for this device. If a device of 'any' is specified, this will most
-      # likely be zero.
+      # for this device.
       def network_n32
+        return nil unless @netp
         PCap.ntohl(@netp.get_uint32(0))
       end
 
       # Returns the 32-bit numeric representation of the IPv4 network address
-      # for this device. If a device of 'any' is specified, this will most
-      # likely be zero.
+      # for this device.
       def netmask_n32
+        return nil unless @maskp
         PCap.ntohl(@maskp.get_uint32(0))
       end
 
@@ -455,6 +473,11 @@ module FFI
       # set the state of non-blocking mode on a capture device
       #
       # @param [Boolean] mode
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
+      #
       def set_non_blocking(mode)
         mode =  mode ? 1 : 0
         if PCap.pcap_setnonblock(_pcap, mode, @errbuf) == 0
@@ -469,7 +492,11 @@ module FFI
       # get the state of non-blocking mode on a capture device
       #
       # @return [Boolean]
-      #   non-blocking state
+      #   non-blocking mode
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
       #
       def non_blocking
         if (mode=PCap.pcap_getnonblock(_pcap, @errbuf)) == -1
@@ -484,6 +511,11 @@ module FFI
       # get capture statistics
       #
       # @return [Stats]
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
+      #
       def stats
         stats = Stat.new
         unless PCap.pcap_stats(_pcap, stats) == 0

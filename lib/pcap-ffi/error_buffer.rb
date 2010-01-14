@@ -1,6 +1,6 @@
 module FFI
   module PCap
-    class ErrorBuffer < FFI::Buffer
+    class ErrorBuffer < FFI::MemoryPointer
 
       # Size of the error buffers
       SIZE = 256
