@@ -126,7 +126,7 @@ module FFI
         case other
         when DataLink
           return (self.value == other.value)
-        when Integer
+        when Numeric
           return (self.value == other)
         when Symbol
           return (@value == self.class.name_to_val(other.to_s))
@@ -155,13 +155,14 @@ module FFI
         @name
       end
 
-      alias to_i value
-
       # Override 'inspect' we'll to always provide the name for irb, 
       # pretty_print, etc.
       def inspect
         "<#{self.class}:#{"0x%0.8x" % self.object_id} @value=#{@value}, @name=#{name().inspect}>"
       end
+
+      alias to_s name
+      alias to_i value
     end
 
     attach_function :pcap_datalink_name_to_val, [:string], :int
