@@ -3,7 +3,6 @@ gem 'rspec', '>=1.2.9'
 require 'spec'
 
 require 'pcap-ffi'
-require 'pcap-ffi/version'
 
 include FFI
 include FFI::PCap
