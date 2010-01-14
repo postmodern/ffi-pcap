@@ -21,14 +21,49 @@ describe PCap do
     dev.should_not be_empty
   end
 
-  it "should enumerate over all usable devices" do
+  it "should enumerate over all usable devices with each_device()" do
     i = 0
     PCap.each_device do |dev|
       dev.should_not be_nil
+      [true,false].include?(dev.loopback?).should == true
       i+=1
     end
     i.should_not == 0
   end
+
+  it "should return name/network pairs for all devices with dump_devices()" do
+    i = 0
+    dump = PCap.dump_devices
+    Array.should === dump
+
+    dump.each do |y|
+      y.size.should == 2
+      dev, net = y
+      String.should === dev
+      dev.should_not be_nil
+      dev.should_not be_empty
+      i+=1
+    end
+    i.should_not == 0
+
+    dump.select{|dev,net| not net.nil? }.should_not be_empty
+
+  end
+
+  it "should return names for all devices with device_names()" do
+    i = 0
+    dump = PCap.device_names
+    Array.should === dump
+
+    dump.each do |dev|
+      String.should === dev
+      dev.should_not be_nil
+      dev.should_not be_empty
+      i+=1
+    end
+    i.should_not == 0
+  end
+
 
   it "should be able to open a live pcap handler using a chosen device" do
     lambda {
