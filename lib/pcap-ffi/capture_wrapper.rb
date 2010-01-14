@@ -183,6 +183,32 @@ module FFI
 
       alias stop breakloop
 
+
+      # Used to specify a pcap filter for the pcap interface. This method 
+      # compiles a filter expression and applies it on the wrapped pcap 
+      # interface.
+      #
+      # @param [String] expression
+      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
+      #
+      # @param [Hash] opts
+      #   Compile options. See compile()
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant error message 
+      #   from libpcap.
+      #
+      def set_filter(expression, opts={})
+        code = compile(expression, opts)
+        ret = PCap.pcap_setfilter(_pcap, code)
+        code.free!  # done with this, we can free it
+        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
+        return expression
+      end
+
+      alias setfilter set_filter
+      alias filter= set_filter
+
       private
         def _wrap_callback(&block)
           lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
@@ -197,6 +223,8 @@ module FFI
     attach_function :pcap_next, [:pcap_t, PacketHeader], :pointer
     attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
     attach_function :pcap_breakloop, [:pcap_t], :void
+    attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
+
 
   end
 end

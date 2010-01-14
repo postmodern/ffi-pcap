@@ -73,31 +73,6 @@ module FFI
         PCap.pcap_snapshot(_pcap)
       end
 
-      # Used to specify a pcap filter for the pcap interface. This method 
-      # compiles a filter expression and applies it on the wrapped pcap 
-      # interface.
-      #
-      # @param [String] expression
-      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
-      #
-      # @param [Hash] opts
-      #   Compile options. See compile()
-      #
-      # @raise [LibError]
-      #   On failure, an exception is raised with the relevant error message 
-      #   from libpcap.
-      #
-      def set_filter(expression, opts={})
-        code = compile(expression, opts)
-        ret = PCap.pcap_setfilter(_pcap, code)
-        code.free!  # done with this, we can free it
-        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
-        return expression
-      end
-
-      alias setfilter set_filter
-      alias filter= set_filter
-
 
       # Compiles a pcap filter but does not apply it to the pcap interface.
       #
@@ -127,7 +102,7 @@ module FFI
         optimize = opts[:optimize] || 1
         netmask  = opts[:netmask] || 0 
         code = BPFProgram.new
-        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) < 0
+        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) != 0
           raise(LibError, "pcap_compile(): #{geterr()}")
         end
         return code
@@ -184,12 +159,12 @@ module FFI
           p
         end
 
+
     end
 
     attach_function :free, [:pointer], :void
 
     attach_function :pcap_close, [:pcap_t], :void
-    attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
     attach_function :pcap_geterr, [:pcap_t], :string
     attach_function :pcap_compile, [:pcap_t, BPFProgram, :string, :int, :bpf_uint32], :int
     attach_function :pcap_datalink, [:pcap_t], :int
