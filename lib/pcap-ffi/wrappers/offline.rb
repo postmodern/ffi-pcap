@@ -1,7 +1,7 @@
 module FFI
   module PCap
     # A wrapper class for pcap devices opened with open_offline()
-    class FileWrapper < CaptureWrapper
+    class Offline < CaptureWrapper
       attr_accessor :path
 
       def initialize(pcap, opts={}, &block)

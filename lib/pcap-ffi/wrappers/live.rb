@@ -2,7 +2,7 @@
 module FFI
   module PCap
     # A wrapper class for pcap devices opened with open_live()
-    class LiveWrapper < CaptureWrapper
+    class Live < CaptureWrapper
       attr_reader :device, :promisc, :timeout, :direction
 
       def initialize(pcap, opts={}, &block)

@@ -86,8 +86,8 @@ module FFI
     # @option opts [optional, Integer] :timeout
     #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
     #
-    # @return [LiveWrapper]
-    #   A FFI::PCap::LiveWrapper
+    # @return [Live]
+    #   A FFI::PCap::Live
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error 
@@ -102,7 +102,7 @@ module FFI
 
       ptr = PCap.pcap_open_live(o[:device], o[:snaplen], o[:promisc], o[:timeout], errbuf)
       raise(LibError, "pcap_open_live(): #{errbuf.to_s}") if ptr.null?
-      return LiveWrapper.new(ptr, o, &block)
+      return Live.new(ptr, o, &block)
     end
 
 
@@ -115,20 +115,20 @@ module FFI
     #   The link-layer type for pcap. Defaults to NULL DLT
     #
     # @param [Hash] opts
-    #   Options are ignored and passed to DeadWrapper.new except those below.
+    #   Options are ignored and passed to Dead.new except those below.
     #
     # @option opts [optional, Integer] :snaplen
     #   The snapshot length for the pcap object. Defaults to SNAPLEN
     #
-    # @return [DeadWrapper]
-    #   A FFI::PCap::DeadWrapper
+    # @return [Dead]
+    #   A FFI::PCap::Dead
     #
     def PCap.open_dead(datalink=0, opts={})
       dl = datalink.kind_of?(DataLink) ? datalink : DataLink.new(datalink)
       o = opts.merge(:snaplen => DEFAULT_SNAPLEN)
       ptr = PCap.pcap_open_dead(dl.value, o[:snaplen])
       raise(LibError, "pcap_open_dead(): returned a null pointer") if ptr.null?
-      return DeadWrapper.new(ptr, {:datalink => dl}.merge(o))
+      return Dead.new(ptr, {:datalink => dl}.merge(o))
     end
 
 
@@ -140,14 +140,14 @@ module FFI
     #   The path to the file to open.
     #
     # @param [Hash] opts
-    #   Options are ignored and passed to FileWrapper.new
+    #   Options are ignored and passed to Offline.new except for those below.
     #
     # @option opts [ignored] :path
     #   The :path option will be overridden with the value of the path 
     #   argument.  If specified in opts, its value will be ignored.
     #
-    # @return [FileWrapper]
-    #   A FFI::PCap::FileWrapper
+    # @return [Offline]
+    #   A FFI::PCap::Offline
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error 
@@ -157,7 +157,7 @@ module FFI
       errbuf = ErrorBuffer.create()
       ptr = PCap.pcap_open_offline(File.expand_path(path), errbuf)
       raise(LibError, "pcap_open_offline(): #{errbuf.to_s}") if ptr.null?
-      return FileWrapper.new(ptr, {:path => path}.merge(opts))
+      return Offline.new(ptr, {:path => path}.merge(opts))
     end
 
 

@@ -1,8 +1,8 @@
 require 'pcap-ffi/wrappers/common_wrapper'
 require 'pcap-ffi/wrappers/capture_wrapper'
-require 'pcap-ffi/wrappers/dead_wrapper'
-require 'pcap-ffi/wrappers/offline_wrapper'
-require 'pcap-ffi/wrappers/live_wrapper'
+require 'pcap-ffi/wrappers/dead'
+require 'pcap-ffi/wrappers/offline'
+require 'pcap-ffi/wrappers/live'
 
 module FFI
   module PCap
