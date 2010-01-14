@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'tempfile'
-require 'packet_behaviors'
 
 shared_examples_for "PCap::CommonWrapper" do
   it "must have a datalink" do
