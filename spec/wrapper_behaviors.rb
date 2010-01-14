@@ -12,6 +12,7 @@ shared_examples_for "PCap::CommonWrapper" do
   it "should be able to open a dump file" do
     lambda {
       dumper = @pcap.open_dump(Tempfile.new(rand(0xffff).to_s).path)
+      Dumper.should === dumper
       dumper.close
     }.should_not raise_error(Exception)
   end
@@ -34,6 +35,20 @@ shared_examples_for "PCap::CommonWrapper" do
       @pcap.close
     }.should_not raise_error(Exception)
   end
+
+  it "should be able to compile a filter" do
+    filter = @pcap.compile("ip")
+    filter.should_not be_nil
+    BPFProgram.should === filter
+    filter.bf_len.should > 0
+  end
+
+  it "should detect invalid filter syntax when compiling" do
+    lambda {
+      @pcap.compile("ip and totally bogus")
+    }.should raise_error(LibError)
+  end
+
 end
 
 shared_examples_for "PCap::CaptureWrapper" do
@@ -70,6 +85,18 @@ shared_examples_for "PCap::CaptureWrapper" do
     stopped.should == true
   end
 
-end
+  it "should be able to set a filter" do
+    lambda {
+      @pcap.set_filter("ip")
+    }.should_not raise_error(Exception)
+  end
 
+  it "should detect invalid filter syntax in set_filter" do
+    lambda {
+      @pcap.set_filter("ip and totally bogus")
+    }.should raise_error(LibError)
+  end
+
+
+end
 
