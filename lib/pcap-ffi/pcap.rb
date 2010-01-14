@@ -309,5 +309,12 @@ module FFI
     rescue FFI::NotFoundError
     end if $pcap_not_win32
 
+
+    #### XXX not sure if we even want FILE io stuff yet (or ever).
+
+    #attach_function :pcap_fopen_offline, [:FILE, :pointer], :pcap_t
+    #attach_function :pcap_file, [:pcap_t], :FILE
+    #attach_function :pcap_dump_fopen, [:pcap_t, :FILE], :pcap_dumper_t
+    #attach_function :pcap_fileno, [:pcap_t], :int
   end
 end
