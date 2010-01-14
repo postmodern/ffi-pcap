@@ -8,7 +8,7 @@ module FFI
     class CommonWrapper
       include Enumerable
 
-      attr_reader :pcap # exposes the raw pointer
+      attr_accessor :pcap
 
       def initialize(pcap, opts={})
         @pcap = pcap
@@ -24,14 +24,14 @@ module FFI
 
       # Returns the DataLink for the pcap device.
       def datalink
-        @datalink ||= DataLink.new(PCap.pcap_datalink(@pcap))
+        @datalink ||= DataLink.new(PCap.pcap_datalink(_pcap))
       end
 
 
       # Returns an array of supported DataLinks for the pcap device.
       def supported_datalinks
         dlt_lst = FFI::MemoryPointer.new(:pointer)
-        if (cnt=PCap.pcap_list_datalinks(@pcap, dlt_lst)) < 0
+        if (cnt=PCap.pcap_list_datalinks(_pcap, dlt_lst)) < 0
           raise(LibError, "pcap_list_datalinks(): #{geterr()}")
         end
         # extract datalink values 
@@ -80,7 +80,7 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_loop(@pcap, cnt, _wrap_callback(&block), opts[:tag])
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(&block), opts[:tag])
         if ret == -1
           raise(ReadError, geterr(), caller)
         elsif ret -2
@@ -137,7 +137,7 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_dispatch(@pcap, cnt, _wrap_callback(&block), o[:tag])
+        ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(&block), o[:tag])
         if ret == -1
           raise(ReadError, "pcap_dispatch(): #{geterr()}", caller)
         elsif ret -2
@@ -161,7 +161,7 @@ module FFI
       #
       def old_next
         header = PacketHeader.new
-        bytes = PCap.pcap_next(@pcap, header)
+        bytes = PCap.pcap_next(_pcap, header)
         if bytes.null?
           return nil # or raise an exception?
         else
@@ -183,7 +183,7 @@ module FFI
         hdr_p = MemoryPointer.new(:pointer)
         buf_p = MemoryPointer.new(:pointer)
 
-        case PCap.pcap_next_ex(@pcap, hdr_p, buf_p)
+        case PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
         when -1 # error
           raise(ReadError, geterr(), caller)
         when 0  # live capture read timeout expired
@@ -192,7 +192,7 @@ module FFI
           return nil
         when 1
           hdr = PacketHeader.new( hdr_p.get_pointer(0) )
-          return Packet.new(hdr, buf_p)
+          return Packet.new(hdr, buf_p.get_pointer(0))
         end
       end
 
@@ -216,7 +216,7 @@ module FFI
       #
       def set_filter(expression, opts={})
         code = compile(expression, opts)
-        ret = PCap.pcap_setfilter(@pcap, code)
+        ret = PCap.pcap_setfilter(_pcap, code)
         code.free!  # done with this, we can free it
         raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
         return expression
@@ -254,7 +254,7 @@ module FFI
         optimize = opts[:optimize] || 1
         netmask  = opts[:netmask] || 0 
         code = BPFProgram.new
-        if PCap.pcap_compile(@pcap, code, expression, optimize, netmask) < 0
+        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) < 0
           raise(LibError, "pcap_compile(): #{geterr()}")
         end
         return code
@@ -268,20 +268,16 @@ module FFI
       #   message from libpcap.
       #
       def open_dump(path)
-        dump_ptr = PCap.pcap_dump_open(@pcap, File.expand_path(path))
-
-        if dump_ptr.null?
-          raise(LibError, "pcap_dump_open(): #{geterr()}", caller)
-        end
-
-        return Dumper.new(dump_ptr)
+        dp = PCap.pcap_dump_open(_pcap, File.expand_path(path))
+        raise(LibError, "pcap_dump_open(): #{geterr()}", caller) if dp.null?
+        return Dumper.new(dp)
       end
 
       # @return [String]
       #   The error text pertaining to the last pcap library error.
       #
       def geterr
-        PCap.pcap_geterr(@pcap)
+        PCap.pcap_geterr(_pcap)
       end
 
       alias error geterr
@@ -295,7 +291,7 @@ module FFI
       # one more packet may be processed.
       #
       def breakloop
-        PCap.pcap_breakloop(@pcap)
+        PCap.pcap_breakloop(_pcap)
       end
 
       alias stop breakloop
@@ -309,22 +305,56 @@ module FFI
       def close
         unless @closed
           @closed = true
-          PCap.pcap_close(@pcap)
+          PCap.pcap_close(_pcap)
         end
       end
 
+      # Returns the pcap interface pointer.
+      #
+      # @return [FFI::Pointer]
+      #   Internal pointer to a pcap_t handle.
+      #
       def to_ptr
-        @pcap
+        _check_pcap()
       end
-
-      # Returns the snapshot length for the pcap interface.
+      
+      # Gets the snapshot length.
+      #
+      # @return [Integer]
+      #  Snapshot length for the pcap interface.
       def snaplen
-        PCap.pcap_snapshot(@pcap)
+        PCap.pcap_snapshot(_pcap)
       end
 
       private
         def _wrap_callback(&block)
           lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
+        end
+
+        # Raises an exception if @pcap is not set.
+        #
+        # Internal sanity check to confirm the pcap instance
+        # variable has been set. Otherwise very bad things can 
+        # ensue by passing a null pointer to various libpcap 
+        # functions.
+        def _check_pcap
+          if @pcap.nil?
+            raise(StandardError, "#{self.class} - nil pcap device")
+          end
+          @pcap
+        end
+
+        # Raises an exception if @pcap is not set or is a null pointer.
+        #
+        # Internal sanity check to confirm the pcap pointer
+        # variable has been set and is not a null pointer. 
+        # Otherwise very bad things can ensue by passing a null 
+        # pointer to various libpcap functions.
+        def _pcap
+          if (p = _check_pcap()).null?
+            raise(StandardError, "#{self.class} - null pointer to pcap device")
+          end
+          p
         end
 
     end # CommonWrapper
@@ -345,7 +375,7 @@ module FFI
     class FileWrapper < CommonWrapper
 
       def swapped?
-        PCap.pcap_is_swapped(@pcap) == 1 ? true : false
+        PCap.pcap_is_swapped(_pcap) == 1 ? true : false
       end
     end
 
@@ -413,7 +443,7 @@ module FFI
       #
       def set_direction(dir)
         dirs = PCap.enum_type(:pcap_direction_t)
-        if PCap.pcap_setdirection(@pcap, dirs[:"pcap_d_#{dir}"]) == 0
+        if PCap.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
           return true
         else
           raise(LibError, "pcap_setdirection(): #{geterr()}", caller)
@@ -427,7 +457,7 @@ module FFI
       # @param [Boolean] mode
       def set_non_blocking(mode)
         mode =  mode ? 1 : 0
-        if PCap.pcap_setnonblock(@pcap, mode, @errbuf) == 0
+        if PCap.pcap_setnonblock(_pcap, mode, @errbuf) == 0
           return mode == 1
         else
           raise(LibError, "pcap_setnonblock(): #{@errbuf.to_s}", caller)
@@ -442,7 +472,7 @@ module FFI
       #   non-blocking state
       #
       def non_blocking
-        if (mode=PCap.pcap_getnonblock(@pcap, @errbuf)) == -1
+        if (mode=PCap.pcap_getnonblock(_pcap, @errbuf)) == -1
           raise(LibError, "pcap_getnonblock(): #{@errbuf.to_s}", caller)
         else
           return mode == 1
@@ -456,7 +486,7 @@ module FFI
       # @return [Stats]
       def stats
         stats = Stat.new
-        unless PCap.pcap_stats(@pcap, stats) == 0
+        unless PCap.pcap_stats(_pcap, stats) == 0
           raise(LibError, "pcap_stats(): #{geterr()}")
         end
         return stats
