@@ -20,7 +20,11 @@ module FFI
       # code that must work with older versions of libpcap should use -1, nor
       # 0, as the value of cnt.)
       #
-      # @options [Hash] opts
+      # @param [Hash] opts
+      #   Receive options.
+      #
+      # @option [optional, Integer] :count
+      #   Limit to :count number of packets. Default is infinite.
       #
       # @yield [this, pkt, tag] 
       #
