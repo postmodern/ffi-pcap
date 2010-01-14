@@ -34,7 +34,7 @@ module FFI
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
       #
-      # @yieldparam [id, nil] 
+      # @yieldparam [Object, nil] id
       #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
@@ -91,7 +91,7 @@ module FFI
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
       #
-      # @yieldparam [id, nil] 
+      # @yieldparam [Object, nil] id
       #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
@@ -139,7 +139,13 @@ module FFI
       end
 
 
+      # Reads the next packet from a pcap device and returns a success/failure
+      # indication.
+      #
       # @return [Packet, nil]
+      #   A packet is returned on success or a nil if the timeout expired or
+      #   all packets in a dump file have been exhausted when reading from
+      #   a savefile.
       #
       # @raise [ReadError]
       #   This exception is raised if there was an error calling
