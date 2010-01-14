@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'wrapper_behaviors'
+require 'packet_behaviors'
 
 describe Live do
   before(:each) do
@@ -29,6 +30,21 @@ describe Live do
     stats.received.should == 10
   end
 
-end
+  describe "live packets" do
+    before(:each) do
+      @pcap = PCap.open_live(
+        :device => PCAP_DEV,
+        :promisc => true
+      )
+      @pkt = @pcap.next()
+    end
 
+    after(:each) do
+      @pcap.close
+    end
+    
+    it_should_behave_like "PCap::Packet populated"
+
+  end
+end
 
