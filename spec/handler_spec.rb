@@ -1,5 +1,3 @@
-require 'pcap-ffi/handler'
-
 require 'spec_helper'
 require 'helpers/dumps'
 require 'handler_examples'
@@ -8,7 +6,7 @@ require 'handler_live_examples'
 describe PCap::Handler do
   describe "offline" do
     before(:each) do
-      @pcap = PCap.open_offline(dump_path('simple_tcp'))
+      @pcap = PCap.open_offline(dump_path('simple_tcp.pcap'))
     end
 
     after(:each) do

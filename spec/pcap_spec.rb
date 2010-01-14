@@ -1,6 +1,3 @@
-require 'pcap-ffi/pcap'
-require 'pcap-ffi/version'
-
 require 'spec_helper'
 require 'helpers/dumps'
 
@@ -43,7 +40,7 @@ describe PCap do
 
   it "should be able to open a pcap dump file" do
     lambda {
-      pcap = PCap.open_offline(dump_path('simple_tcp'))
+      pcap = PCap.open_offline(dump_path('simple_tcp.pcap'))
       pcap.close
     }.should_not raise_error(StandardError)
   end
