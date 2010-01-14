@@ -32,7 +32,7 @@ describe Live do
   end
 
   describe "live packets" do
-    before(:each) do
+    before(:all) do
       @pcap = PCap.open_live(
         :device => PCAP_DEV,
         :promisc => true
@@ -40,7 +40,7 @@ describe Live do
       @pkt = @pcap.next()
     end
 
-    after(:each) do
+    after(:all) do
       @pcap.close
     end
     

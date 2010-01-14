@@ -26,7 +26,7 @@ module FFI
       # @option [optional, Integer] :count
       #   Limit to :count number of packets. Default is infinite.
       #
-      # @yield [this, pkt, tag] 
+      # @yield [this, pkt, id] 
       #
       # @yieldparam [self] this
       #   A reference to self is passed to the block.
@@ -34,8 +34,8 @@ module FFI
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
       #
-      # @yieldparam [tag, nil] 
-      #   A reference to the tag is passed if one was supplied with opts[:tag].
+      # @yieldparam [id, nil] 
+      #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
       #   returns 0 if cnt is exhausted, or nil if the loop terminated due to
@@ -49,7 +49,7 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(&block), opts[:tag])
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(&block), opts[:id])
         if ret == -1
           raise(ReadError, "pcap_loop(): #{geterr()}")
         elsif ret -2
@@ -83,7 +83,7 @@ module FFI
       # code that must work with older versions of libpcap should use -1, nor
       # 0, as the value of cnt.
       # 
-      # @yield [this, pkt, tag] 
+      # @yield [this, pkt, id] 
       #
       # @yieldparam [self] this
       #   A reference to self is passed to the block.
@@ -91,8 +91,8 @@ module FFI
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
       #
-      # @yieldparam [tag, nil] 
-      #   A reference to the tag is passed if one was supplied with opts[:tag].
+      # @yieldparam [id, nil] 
+      #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
       #   Returns the number of packets processed on success; this can be 0 if
@@ -106,7 +106,7 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(&block), o[:tag])
+        ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(&block), o[:id])
         if ret == -1
           raise(ReadError, "pcap_dispatch(): #{geterr()}", caller)
         elsif ret -2
