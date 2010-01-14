@@ -1,3 +1,4 @@
+require 'pcap-ffi/common_wrapper'
 
 module FFI
   module PCap

@@ -1,3 +1,5 @@
+require 'pcap-ffi/common_wrapper'
+
 module FFI
   module PCap
     # A wrapper class for pcap devices opened with open_dead()

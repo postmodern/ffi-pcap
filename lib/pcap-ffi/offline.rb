@@ -1,3 +1,5 @@
+require 'pcap-ffi/capture_wrapper'
+
 module FFI
   module PCap
     # A wrapper class for pcap devices opened with open_offline()

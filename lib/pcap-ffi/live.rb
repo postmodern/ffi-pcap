@@ -1,3 +1,4 @@
+require 'pcap-ffi/capture_wrapper'
 
 module FFI
   module PCap
