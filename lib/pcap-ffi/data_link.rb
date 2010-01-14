@@ -62,7 +62,7 @@ module FFI
       # removed, to the corresponding data link type numeric value.
       #
       # @param [String or Symbol] n
-      # The name to lookup. Names are case-insensitive.
+      #   The name to lookup. Names are case-insensitive.
       #
       # @return [Integer or nil] 
       #   The numeric value for the datalink name or nil on failure.
@@ -117,20 +117,21 @@ module FFI
         else
           raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.inspect}")
         end
+        @name = self.class.val_to_name(@value)
       end
 
       # Overrides the equality operator so that quick comparisons can be
       # made against other DataLinks, name by String, or value by Integer.
       def ==(other)
         case other
+        when DataLink
+          return (self.value == other.value)
         when Integer
           return (self.value == other)
         when Symbol
           return (@value == self.class.name_to_val(other.to_s))
         when String
           return (@value == self.class.name_to_val(other))
-        when other.kind_of?(DataLink)
-          return (self.value == other.value)
         else
           return false
         end
@@ -151,7 +152,7 @@ module FFI
 
       # Returns the canonical String name of the DataLink object
       def name
-        @name ||= self.class.val_to_name(@value)
+        @name
       end
 
       alias to_i value
