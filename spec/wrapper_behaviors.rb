@@ -1,35 +1,18 @@
 require 'spec_helper'
+require 'tempfile'
+require 'packet_behaviors'
 
-shared_examples_for "FFI::PCap::CommonWrapper" do
+shared_examples_for "PCap::CommonWrapper" do
   it "must have a datalink" do
     datalink = @pcap.datalink
     datalink.value.should_not be_nil
-    datalink.value.should === Numeric
+    Numeric.should === datalink.value
     datalink.name.should_not be_empty
-  end
-
-  it "should pass packets to a block using each()" do
-    @pcap.each do |this, pkt, tag|
-      this.should == @pcap
-      pkt.header.should_not be_nil
-      pkt.header.captured.should_not == 0
-      pkt.header.length.should_not == 0
-      pkt.body_ptr.should_not be_nil
-      pkt.body_ptr.should_not be_null
-      pkt.body.should_not be_nil
-      pkt.body.should_not be_empty
-      # tag is an arbitrary identifier. unused for now.
-    end
-  end
-
-  it "should be able to get the next packet" do
-    pkt = @pcap.next
-    pkt.should_behave_like "Packet populated"
   end
 
   it "should be able to open a dump file" do
     lambda {
-      dumper = @pcap.open_dump(Tempfile.new.path)
+      dumper = @pcap.open_dump(Tempfile.new(rand(0xffff).to_s).path)
       dumper.close
     }.should_not raise_error(Exception)
   end
@@ -44,17 +27,6 @@ shared_examples_for "FFI::PCap::CommonWrapper" do
     @pcap.error.should be_empty
   end
 
-  it "should be able to break out of the Handler#loop" do
-    stopped = false
-
-    @pcap.loop do |this, pkt, tag|
-      stopped = true
-      this.stop
-    end
-
-    stopped.should == true
-  end
-
   it "should prevent double closes" do
     @pcap.close
     @pcap.should be_closed
@@ -64,3 +36,41 @@ shared_examples_for "FFI::PCap::CommonWrapper" do
     }.should_not raise_error(Exception)
   end
 end
+
+shared_examples_for "PCap::CaptureWrapper" do
+  it_should_behave_like "PCap::CommonWrapper"
+
+  it "should pass packets to a block using loop()" do
+    i = 0
+    @pkt = nil
+    @pcap.loop(:count => 2) do |this, pkt, tag|
+      this.should == @pcap
+      pkt.should_not be_nil
+      # tag is an arbitrary identifier. unused for now.
+      i+=1
+    end
+    i.should == 2
+  end
+
+  it "should be able to get the next packet" do
+    pkt = @pcap.next
+    pkt.should_not be_nil
+  end
+
+  it "should be able to break out of the Handler#loop" do
+    stopped = false
+    i = 0
+
+    @pcap.loop(:count => 3) do |this, pkt, tag|
+      stopped = true
+      i+=1
+      this.stop
+    end
+
+    i.should == 1
+    stopped.should == true
+  end
+
+end
+
+

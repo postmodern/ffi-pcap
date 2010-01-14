@@ -1,64 +1,31 @@
 require 'spec_helper'
-require 'helpers/dumps'
-require 'handler_examples'
-require 'handler_live_examples'
+require 'wrapper_behaviors'
 
-describe PCap::Handler do
+describe PCap do
   describe "offline" do
     before(:each) do
-      @pcap = PCap.open_offline(dump_path('simple_tcp.pcap'))
+      @pcap = PCap.open_offline(PCAP_TESTFILE)
     end
 
     after(:each) do
       @pcap.close
     end
 
-    it_should_behave_like "Handler"
+    it_should_behave_like "PCap::CaptureWrapper"
 
-    it "should not support non-blocking mode" do
-      @pcap.non_blocking = true
-      @pcap.should_not be_non_blocking
+    it "should return a nil from next() if there are no packets left in the dump file" do
+      i = 0
+      @pcap.loop { i+=1 }
+      i.should_not be_nil
+      @pcap.next.should be_nil
     end
 
-    it "should return a nil if there are no packets left in the dump file" do
-      @pcap.loop
-
-      header, data = @pcap.next
-
-      header.should be_nil
-      data.should be_nil
-    end
-
-    it "should raise a ReadError when reading past the end of a dump file" do
-      @pcap.loop
-
-      lambda {
-        @pcap.next_extra
-      }.should raise_error(ReadError)
-    end
   end
 
-  describe "live non-promisc" do
+  describe "live" do
     before(:each) do
       @pcap = PCap.open_live(
         :device => PCAP_DEV,
-        :count => 2
-      )
-    end
-
-    after(:each) do
-      @pcap.close
-    end
-
-    it_should_behave_like "Handler"
-    it_should_behave_like "Handler live"
-  end
-
-  describe "live promisc" do
-    before(:each) do
-      @pcap = PCap.open_live(
-        :device => PCAP_DEV,
-        :count => 2,
         :promisc => true
       )
     end
@@ -67,8 +34,22 @@ describe PCap::Handler do
       @pcap.close
     end
 
-    it_should_behave_like "Handler"
-    it_should_behave_like "Handler live"
+    it_should_behave_like "PCap::CaptureWrapper"
+
+    it "should support non-blocking mode" do
+      @pcap.non_blocking = true
+      @pcap.should be_non_blocking
+    end
+
+    it "should provide statistics about packets received/dropped" do
+      i = 0
+      @pcap.loop {|*x| @pcap.stop if (i += 1) == 10 }
+      i.should_not == 0
+      stats = @pcap.stats
+      stats.received.should > 0
+      stats.received.should == 10
+    end
+
   end
 
   describe "dead" do
@@ -80,9 +61,7 @@ describe PCap::Handler do
       @pcap.close
     end
 
-    it "should support non-blocking mode" do
-      @pcap.non_blocking = true
-      @pcap.should be_non_blocking
-    end
+    it_should_behave_like "PCap::CommonWrapper"
   end
 end
+

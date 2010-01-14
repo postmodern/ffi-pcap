@@ -13,7 +13,6 @@ describe DataLink do
     DataLink.val_to_name(1).should == "EN10MB"
   end
 
-
   it "should be initialized from a pcap datalink value" do
     @datalink.name.should == 'NULL'
   end
