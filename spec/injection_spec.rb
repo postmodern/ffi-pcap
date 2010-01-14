@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "packet injection" do
+describe "PCap::Live packet injection" do
   before(:all) do
     @pcap = PCap.open_live :device => PCAP_DEV, 
                            :promisc => false,
@@ -10,6 +10,17 @@ describe "packet injection" do
 
   after(:all) do
     @pcap.close
+  end
+
+  it "should detect when an invalid argument is supplied" do
+    lambda { @pcap.inject(Object.new)}.should raise_error(ArgumentError)
+    lambda { @pcap.inject(nil)}.should raise_error(ArgumentError)
+    lambda { @pcap.inject(1)}.should raise_error(ArgumentError)
+    lambda { @pcap.inject([])}.should raise_error(ArgumentError)
+    lambda { @pcap.inject(:foo => :bar)}.should raise_error(ArgumentError)
+    lambda { 
+      @pcap.inject(FFI::MemoryPointer.new(10))
+    }.should raise_error(ArgumentError)
   end
 
   it "should allow injection of a Strings using inject()" do
