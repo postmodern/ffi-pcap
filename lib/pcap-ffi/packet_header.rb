@@ -1,7 +1,9 @@
 module FFI
   module PCap
 
-    # Generic per-packet information, as supplied by libpcap
+    # Generic per-packet information, as supplied by libpcap. This structure
+    # is used to track only the libpcap header and just contains the timestamp
+    # and length information used by libpcap.
     #
     # See pcap_pkthdr struct in pcap.h
     class PacketHeader < FFI::Struct
