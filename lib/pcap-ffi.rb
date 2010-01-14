@@ -1,7 +1,6 @@
 begin; require 'rubygems'; rescue LoadError; end
 
 require 'ffi/dry'
-require 'ffi/packets'
 
 module FFI
   module PCap

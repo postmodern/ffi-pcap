@@ -16,6 +16,8 @@ begin
     gemspec.homepage = "http://github.com/postmodern/pcap-ffi"
     gemspec.description = "Bindings to sniff packets using the FFI interface in Ruby."
     gemspec.authors = ["Postmodern, Dakrone", "Eric Monti"]
+    gemspec.add_dependency "ffi"
+    gemspec.add_dependency "ffi_dry"
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
