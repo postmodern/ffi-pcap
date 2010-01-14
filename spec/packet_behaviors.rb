@@ -14,6 +14,18 @@ shared_examples_for "PCap::Packet" do
     String.should === @pkt.body
   end
 
+  it "should supply a timestamp as a Time object" do
+    @pkt.time.should_not be_nil
+    Time.should === @pkt.time
+  end
+
+  it "should allow time timestamp to be changed" do
+    t = Time.now
+    lambda {@pkt.time = t}.should_not raise_error(Exception)
+    @pkt.time.should == t
+  end
+
+
 end
 
 shared_examples_for "PCap::Packet populated" do
