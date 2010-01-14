@@ -113,7 +113,7 @@ module FFI
 
       alias non_blocking? non_blocking
 
-      # get capture statistics
+      # Get capture statistics
       #
       # @return [Stats]
       #
@@ -127,6 +127,37 @@ module FFI
           raise(LibError, "pcap_stats(): #{geterr()}")
         end
         return stats
+      end
+
+      # Transmit a packet (not supported on all platforms)
+      #
+      # @param [Packet, String] obj
+      #   The packet to send. This can be a Packet or String object.
+      #
+      # @raise [ArgumentError]
+      #   An exception is raised if the pkt object type is incorrect or
+      #   if it is a Packet and the body pointer is null. 
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant libpcap
+      #   error message.
+      #
+      def inject(pkt)
+        if pkt.kind_of? Packet
+          len = pkt.caplen
+          bufp = pkt.body_ptr
+          raise(ArgumentError, "packet data null pointer") if bufp.null?
+        elsif pkt.kind_of? String
+          len = pkt.size
+          bufp = FFI::MemoryPointer.from_string(pkt)
+        else
+          raise(ArgumentError, "Don't know how to inject #{pkt.class}")
+        end
+
+        if (sent=PCap.pcap_inject(_pcap, bufp, len)) < 0
+          raise(LibError, "pcap_inject(): #{geterr()}")
+        end
+        return sent
       end
     end
 
