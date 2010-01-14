@@ -1,7 +1,4 @@
-begin
-  require 'rubygems'
-rescue LoadError
-end
+begin; require 'rubygems'; rescue LoadError; end
 
 require 'ffi/dry'
 require 'ffi/packets'
@@ -35,4 +32,7 @@ require 'pcap-ffi/pcap'
 require 'pcap-ffi/data_link'
 require 'pcap-ffi/packet'
 require 'pcap-ffi/wrappers'
+require 'pcap-ffi/live'
+require 'pcap-ffi/offline'
+require 'pcap-ffi/dead'
 
