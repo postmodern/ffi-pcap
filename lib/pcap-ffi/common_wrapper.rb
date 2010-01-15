@@ -16,9 +16,7 @@ module FFI
         trap('INT') {stop(); close(); raise(SignalException, 'INT')}
         trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
 
-        if block_given?
-          yield(self)
-        end
+        yield(self) if block_given?
       end
 
 

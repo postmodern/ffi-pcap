@@ -71,10 +71,7 @@ module FFI
           warn "Warning: #{$!}"
         end
 
-        if block_given?
-          yield self
-          self.close()
-        end
+        yield self if block_given?
       end
 
       # Returns the dotted notation string for the IPv4 network address for 
