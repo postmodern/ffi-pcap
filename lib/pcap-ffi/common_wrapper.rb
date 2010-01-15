@@ -14,8 +14,8 @@ module FFI
         @closed = false
         @errbuf = ErrorBuffer.create
 
-        trap('INT') {|s| stop(); close(); raise(SignalException, s)}
-        trap('TERM') {|s| stop(); close(); raise(SignalException, s)}
+        trap('INT') {stop(); close(); raise(SignalException, 'INT')}
+        trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
 
         if block_given?
           yield(self)
@@ -51,8 +51,9 @@ module FFI
       # Closes the pcap interface using libpcap.
       def close
         unless @closed
-          @closed = true
           PCap.pcap_close(_pcap)
+          @closed = true
+          @pcap = nil
         end
       end
 
@@ -141,9 +142,10 @@ module FFI
         # functions.
         def _check_pcap
           if @pcap.nil?
-            raise(StandardError, "#{self.class} - nil pcap device")
+            raise(StandardError, "nil pcap device")
+          else
+            return @pcap
           end
-          @pcap
         end
 
         # Raises an exception if @pcap is not set or is a null pointer.
@@ -154,7 +156,7 @@ module FFI
         # pointer to various libpcap functions.
         def _pcap
           if (p = _check_pcap()).null?
-            raise(StandardError, "#{self.class} - null pointer to pcap device")
+            raise(StandardError, "null pointer to pcap device")
           end
           p
         end
