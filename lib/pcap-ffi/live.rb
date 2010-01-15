@@ -6,7 +6,7 @@ module FFI
     # Creates a pcap interface for capturing from the network.
     #
     # @param [Hash] opts
-    #   Options are ignored and passed to CaptureWrapper.new except those below.
+    #   Options are ignored and passed to the super-class except those below.
     #
     # @option opts [optional, String, nil] :device, :dev
     #   The device to open. On some platforms, this can be "any". If nil or 

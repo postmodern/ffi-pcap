@@ -10,7 +10,7 @@ module FFI
       # capture for output.
       #
       # @param [Hash] opts
-      #   Options are ignored and passed to CommonWrapper.new except those below.
+      #   Options are ignored and passed to the super-class except those below.
       #
       # @option opts [optional, String, Symbol, Integer] :datalink
       #   The link-layer type for pcap. nil is equivalent to 0 (aka DLT_NULL).

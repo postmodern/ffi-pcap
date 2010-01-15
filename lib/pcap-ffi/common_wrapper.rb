@@ -6,7 +6,6 @@ module FFI
     # Dead, or Offline class for open_live, open_dead, or open_file 
     # respectively.
     class CommonWrapper
-
       attr_accessor :pcap
 
       def initialize(pcap, opts={})
@@ -19,7 +18,6 @@ module FFI
 
         if block_given?
           yield(self)
-          self.close()
         end
       end
 
