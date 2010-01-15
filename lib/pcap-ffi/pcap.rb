@@ -71,29 +71,10 @@ module FFI
     end
 
 
-    attach_function :pcap_open_dead, [:int, :int], :pcap_t
-
-    # Creates a fake pcap interface for compiling filters or opening a
-    # capture for output.
-    #
-    # @param [optional, String, Symbol, Integer] datalink
-    #   The link-layer type for pcap. Defaults to NULL DLT
-    #
-    # @param [Hash] opts
-    #   Options are ignored and passed to Dead.new except those below.
-    #
-    # @option opts [optional, Integer] :snaplen
-    #   The snapshot length for the pcap object. Defaults to SNAPLEN
-    #
-    # @return [Dead]
-    #   A FFI::PCap::Dead wrapper.
-    #
-    def PCap.open_dead(datalink=0, opts={})
-      dl = datalink.kind_of?(DataLink) ? datalink : DataLink.new(datalink)
-      o = opts.merge(:snaplen => DEFAULT_SNAPLEN)
-      ptr = PCap.pcap_open_dead(dl.value, o[:snaplen])
-      raise(LibError, "pcap_open_dead(): returned a null pointer") if ptr.null?
-      return Dead.new(ptr, {:datalink => dl}.merge(o))
+    # Opens a new Dead pcap interface for compiling filters or opening
+    # a capture for output. See Dead.new() for arguments.
+    def PCap.open_dead(datalink, opts={})
+      return Dead.new(datalink, opts={})
     end
 
 
