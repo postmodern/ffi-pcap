@@ -73,8 +73,8 @@ module FFI
 
     # Opens a new Dead pcap interface for compiling filters or opening
     # a capture for output. See Dead.new() for arguments.
-    def PCap.open_dead(datalink, opts={})
-      return Dead.new(datalink, opts={})
+    def PCap.open_dead(opts={})
+      return Dead.new(opts)
     end
 
 

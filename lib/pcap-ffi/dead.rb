@@ -6,11 +6,32 @@ module FFI
     class Dead < CommonWrapper
       attr_reader :datalink
 
-      def initialize(pcap, opts={}, &block)
-        @datalink = opts[:datalink]
-
-        super(pcap, opts, &block)
+      # Creates a fake pcap interface for compiling filters or opening a
+      # capture for output.
+      #
+      # @param [Hash] opts
+      #   Options are ignored and passed to CommonWrapper.new except those below.
+      #
+      # @option opts [optional, String, Symbol, Integer] :datalink
+      #   The link-layer type for pcap. nil is equivalent to 0 (aka DLT_NULL).
+      #
+      # @option opts [optional, Integer] :snaplen
+      #   The snapshot length for the pcap object. Defaults to PCap::DEFAULT_SNAPLEN
+      #
+      # @return [Dead]
+      #   A FFI::PCap::Dead wrapper.
+      #
+      def initialize(opts={}, &block)
+        dl = opts[:datalink] || DataLink.new(0)
+        @datalink = dl.kind_of?(DataLink) ? dl : DataLink.new(dl)
+        @snaplen  = opts[:snaplen] || DEFAULT_SNAPLEN
+        @pcap = PCap.pcap_open_dead(@datalink.value, @snaplen)
+        raise (LibError, "pcap_open_dead(): returned a null pointer") if @pcap.null?
+        super(@pcap, opts, &block)
       end
     end
+
+    attach_function :pcap_open_dead, [:int, :int], :pcap_t
+
   end
 end
