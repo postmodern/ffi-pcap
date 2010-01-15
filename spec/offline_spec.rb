@@ -28,24 +28,21 @@ describe Offline do
   end
 
   describe "yielding to a block" do
-    # Note we also test all the behaviors here together instead of seperately.
-    before(:all) do
-      @pcap=nil
-      @ret = Offline.new(PCAP_TESTFILE) do |this|
-        this.should_not be_nil
-        this.should_not be_closed
-        Offline.should === this
-        @pcap = this
-      end
-      @ret.should == @pcap
-    end
 
-    after(:all) do
+    # Note we also test all the behaviors here together instead of seperately.
+    Offline.new(PCAP_TESTFILE) do |this|
+      @pcap = this
+
+      it "should be in a ready state in the block" do
+        @pcap.should be_ready
+        @pcap.should_not be_closed
+      end
+
+      it_should_behave_like "PCap::CaptureWrapper"
+
       @pcap.close
     end
 
-    it_should_behave_like "PCap::CaptureWrapper"
   end
-
 end
 

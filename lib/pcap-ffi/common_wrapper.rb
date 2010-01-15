@@ -44,6 +44,10 @@ module FFI
         @closed == true
       end
 
+      def ready?
+        @closed == false and not @pcap.nil? and not @pcap.null?
+      end
+
       # Closes the pcap interface using libpcap.
       def close
         unless @closed

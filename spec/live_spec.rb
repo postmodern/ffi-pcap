@@ -50,22 +50,18 @@ describe Live do
 
   describe "yielding to a block" do
     # Note we also test all the behaviors here together instead of seperately.
-    before(:all) do
-      @pcap=nil
-      @ret = Live.new(:device => PCAP_DEV, :promisc => true) do |this|
-        this.should_not be_nil
-        this.should_not be_closed
-        Live.should === this
-        @pcap = this
-      end
-      @ret.should == @pcap
-    end
+    Offline.new(PCAP_TESTFILE) do |this|
+      @pcap = this
 
-    after(:all) do
+      it "should be in a ready state in the block" do
+        @pcap.should be_ready
+        @pcap.should_not be_closed
+      end
+
+      it_should_behave_like "PCap::CaptureWrapper"
+
       @pcap.close
     end
-
-    it_should_behave_like "PCap::CaptureWrapper"
   end
 end
 

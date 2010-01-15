@@ -66,26 +66,32 @@ module FFI
 
     # Opens a new Live device for capturing from the network. See Live.new()
     # for arguments.
+    #
+    # If passed a block, the block is passed to Live.new() and the Live
+    # object is closed after completion of the block
     def PCap.open_live(opts={},&block)
-      return Live.new(opts, &block)
+      ret = Live.new(opts, &block)
+      return block_given? ? ret.close : ret
     end
 
 
     # Opens a new Dead pcap interface for compiling filters or opening
     # a capture for output. See Dead.new() for arguments.
     def PCap.open_dead(opts={}, &block)
-      return Dead.new(opts, &block)
+      ret = Dead.new(opts, &block)
+      return block_given? ? ret.close : ret
     end
 
 
     # Opens a saved capture file for reading. See Offline.new for arguments.
     def PCap.open_offline(path, opts={}, &block)
-      return Offline.new(path, opts={}, &block)
+      ret = Offline.new(path, opts={}, &block)
+      return block_given? ? ret.close : ret
     end
 
     # Same as open_offline
     def PCap.open_file(path, opts={}, &block)
-      return Offline.new(path, opts={}, &block)
+      open_offline(path, opts, &block)
     end
 
     attach_function :pcap_findalldevs, [:pointer, :pointer], :int

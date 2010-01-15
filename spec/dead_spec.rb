@@ -14,22 +14,20 @@ describe Dead do
 
   describe "yielding to a block" do
     # Note we also test all the behaviors here together instead of seperately.
-    before(:all) do
-      @pcap=nil
-      @ret = Dead.new do |this|
-        this.should_not be_nil
-        this.should_not be_closed
-        Dead.should === this
-        @pcap = this
-      end
-      @ret.should == @pcap
-    end
+    Dead.new() do |this|
+      @pcap = this
 
-    after(:all) do
+      it "should be in a ready state in the block" do
+        @pcap.should be_ready
+        @pcap.should_not be_closed
+      end
+
+      it_should_behave_like "PCap::CommonWrapper"
+
       @pcap.close
     end
 
-    it_should_behave_like "PCap::CommonWrapper"
+
   end
 
 end
