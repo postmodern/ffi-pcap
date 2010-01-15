@@ -73,39 +73,20 @@ module FFI
 
     # Opens a new Dead pcap interface for compiling filters or opening
     # a capture for output. See Dead.new() for arguments.
-    def PCap.open_dead(opts={})
-      return Dead.new(opts)
+    def PCap.open_dead(opts={}, &block)
+      return Dead.new(opts, &block)
     end
 
 
-    attach_function :pcap_open_offline, [:string, :pointer], :pcap_t
-
-    # Opens a saved capture file for reading.
-    # 
-    # @param [String] path
-    #   The path to the file to open.
-    #
-    # @param [Hash] opts
-    #   Options are ignored and passed to Offline.new except for those below.
-    #
-    # @option opts [ignored] :path
-    #   The :path option will be overridden with the value of the path 
-    #   argument.  If specified in opts, its value will be ignored.
-    #
-    # @return [Offline]
-    #   A FFI::PCap::Offline wrapper.
-    #
-    # @raise [LibError]
-    #   On failure, an exception is raised with the relevant error 
-    #   message from libpcap.
-    #
-    def PCap.open_offline(path, opts={})
-      errbuf = ErrorBuffer.create()
-      ptr = PCap.pcap_open_offline(File.expand_path(path), errbuf)
-      raise(LibError, "pcap_open_offline(): #{errbuf.to_s}") if ptr.null?
-      return Offline.new(ptr, {:path => path}.merge(opts))
+    # Opens a saved capture file for reading. See Offline.new for arguments.
+    def PCap.open_offline(path, opts={}, &block)
+      return Offline.new(path, opts={}, &block)
     end
 
+    # Same as open_offline
+    def PCap.open_file(path, opts={}), &block)
+      return Offline.new(path, opts={}, &block)
+    end
 
     attach_function :pcap_findalldevs, [:pointer, :pointer], :int
     attach_function :pcap_freealldevs, [Interface], :void
@@ -188,7 +169,6 @@ module FFI
         return $1
       end
     end
-
 
 
     # Unix Only:
