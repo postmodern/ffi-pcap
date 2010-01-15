@@ -8,9 +8,11 @@ describe Live do
       :device => PCAP_DEV,
       :promisc => true
     )
+    start_traffic_generator()
   end
 
   after(:each) do
+    stop_traffic_generator()
     @pcap.close
   end
 
@@ -28,7 +30,7 @@ describe Live do
     stats = @pcap.stats
     Stat.should === stats
     stats.received.should > 0
-    stats.received.should == 10
+    stats.received.should >= 10
   end
 
   describe "live packets" do
@@ -38,9 +40,11 @@ describe Live do
         :promisc => true
       )
       @pkt = @pcap.next()
+      start_traffic_generator()
     end
 
     after(:all) do
+      stop_traffic_generator()
       @pcap.close
     end
     
@@ -58,8 +62,9 @@ describe Live do
         @pcap.should_not be_closed
       end
 
+      start_traffic_generator()
       it_should_behave_like "PCap::CaptureWrapper"
-
+      stop_traffic_generator()
       @pcap.close
     end
   end
