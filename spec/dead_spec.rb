@@ -3,7 +3,7 @@ require 'wrapper_behaviors'
 
 describe Dead do
   before(:each) do
-    @pcap = PCap.open_dead
+    @pcap = PCap.open_dead()
   end
 
   after(:each) do
