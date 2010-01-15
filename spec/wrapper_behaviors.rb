@@ -2,6 +2,10 @@ require 'spec_helper'
 require 'tempfile'
 
 shared_examples_for "PCap::CommonWrapper" do
+  it "should indicate readiness" do
+    @pcap.ready?.should == true
+  end
+
   it "should have a datalink" do
     datalink = @pcap.datalink
     datalink.value.should_not be_nil
@@ -43,6 +47,7 @@ shared_examples_for "PCap::CommonWrapper" do
   it "should prevent double closes" do
     @pcap.close
     @pcap.should be_closed
+    @pcap.should_not be_ready
 
     lambda {
       @pcap.close
