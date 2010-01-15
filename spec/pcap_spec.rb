@@ -5,18 +5,19 @@ describe PCap do
     PCap.const_defined?('VERSION').should == true
   end
 
-  it "should have a library version" do
+  it "should expose the libpcap version banner" do
+    PCap.lib_version.should_not be_nil
     PCap.lib_version.should_not be_empty
   end
 
-  it "should have a library version number" do
+  it "should expose the libpcap version number" do
+    PCap.lib_version_number.should_not be_nil
     PCap.lib_version_number.should_not be_empty
     PCap.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
   end
 
   it "should return the name of a device suitable for open_live" do
     dev = PCap.lookupdev
-
     dev.should_not be_nil
     dev.should_not be_empty
   end
@@ -51,10 +52,10 @@ describe PCap do
   end
 
   it "should return names for all devices with device_names()" do
-    i = 0
     dump = PCap.device_names
     Array.should === dump
 
+    i = 0
     dump.each do |dev|
       String.should === dev
       dev.should_not be_nil
@@ -70,7 +71,7 @@ describe PCap do
       pcap = PCap.open_live(:device => PCAP_DEV)
       pcap.device.should == PCAP_DEV
       pcap.close
-    }.should_not raise_error(StandardError)
+    }.should_not raise_error(Exception)
   end
 
 
@@ -78,20 +79,20 @@ describe PCap do
     lambda {
       pcap = PCap.open_live()
       pcap.close
-    }.should_not raise_error(StandardError)
+    }.should_not raise_error(Exception)
   end
 
   it "should be able to open a dead pcap handler" do
     lambda {
       pcap = PCap.open_dead()
       pcap.close
-    }.should_not raise_error(StandardError)
+    }.should_not raise_error(Exception)
   end
 
   it "should be able to open a pcap dump file" do
     lambda {
       pcap = PCap.open_offline(PCAP_TESTFILE)
       pcap.close
-    }.should_not raise_error(StandardError)
+    }.should_not raise_error(Exception)
   end
 end
