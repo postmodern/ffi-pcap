@@ -94,15 +94,7 @@ module FFI
     #   message from libpcap.
     #
     def PCap.open_live(opts={},&block)
-      errbuf = ErrorBuffer.create()
-
-      o = opts.merge(:snaplen => DEFAULT_SNAPLEN, :timeout => DEFAULT_TO_MS)
-      o[:device] ||= lookupdev()
-      o[:promisc] = (opts[:promisc])? 1 : 0
-
-      ptr = PCap.pcap_open_live(o[:device], o[:snaplen], o[:promisc], o[:timeout], errbuf)
-      raise(LibError, "pcap_open_live(): #{errbuf.to_s}") if ptr.null?
-      return Live.new(ptr, o, &block)
+      return Live.new(opts, &block)
     end
 
 

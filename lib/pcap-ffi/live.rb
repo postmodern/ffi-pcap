@@ -6,21 +6,28 @@ module FFI
     class Live < CaptureWrapper
       attr_reader :device, :promisc, :timeout, :direction
 
-      def initialize(pcap, opts={}, &block)
-        unless @device=(opts[:device] || opts[:dev])
-          raise(ArgumentError, "A device name must be specified with :device")
+      def initialize(opts=nil)
+        opts ||= {}
+        @device = opts[:device] || opts[:dev] || PCap.lookupdev()
+        unless @device
+          raise(ArgumentError, "Couldn't detect a device. One must be specified.")
         end
 
-        @promisc   = opts[:promisc]
-        @timeout   = opts[:timeout]
+        @snaplen   = opts[:snaplen] || DEFAULT_SNAPLEN
+        @promisc   = opts[:promisc] ? 1 : 0
+        @timeout   = opts[:timeout] || DEFAULT_TO_MS
         @direction = (opts[:direction] || opts[:dir])
 
+        @errbuf = ErrorBuffer.create()
+        @pcap = PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
+        raise(LibError, "pcap_open_live(): #{errbuf.to_s}") if @pcap.null?
+
         # call super to get all our ducks in a row
-        super(pcap, opts={}, &block)
+        super(@pcap, opts)
 
         set_direction(@direction) if @direction
 
-        # Cache network and netmask from pcap_lookupdev
+        # Cache network and netmask from pcap_lookupdev.
         # These pointers may be used internally (and should get autoreleased)
         @netp, @maskp = nil
         begin
@@ -32,6 +39,10 @@ module FFI
           warn "Warning: #{$!}"
         end
 
+        if block_given?
+          yield self
+          self.close()
+        end
       end
 
       # Returns the dotted notation string for the IPv4 network address for 

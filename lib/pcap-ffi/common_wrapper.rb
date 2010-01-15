@@ -12,7 +12,7 @@ module FFI
       def initialize(pcap, opts={})
         @pcap = pcap
         @closed = false
-        @errbuf = ErrorBuffer.create
+        @errbuf ||= ErrorBuffer.create
 
         trap('INT') {stop(); close(); raise(SignalException, 'INT')}
         trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
