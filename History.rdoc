@@ -1,6 +1,16 @@
 === 0.1.2 / 2010-01-03
 
-* Branched by emonti
+* Branched from ffi-by emonti
+* Using ffi_dry for common struct interface (after a few fixes for ffi-0.5.4)
+* Redesigned  the pcap-specific pcap_pkthdr struct.
+* Dismantled all other network packet parsing code. 
+* 'Handlers' have been split out into type-specific 'Wrappers' by features.
+* Added filtering support and interfaces for compiling filters into bpf code.
+* Added packet injection on Live pcap interfaces.
+* Tackled some minor Jruby compatability issues.
+* Lots of documentation added throughout with yardoc tags.
+* Lots of misc namespace mods and such, and some general refactoring.
+* Lots of other stuff I'm probably forgetting.
 
 === 0.1.0 / 2009-04-29
 
