@@ -4,7 +4,7 @@ require 'packet_behaviors'
 
 describe Live do
   before(:each) do
-    @pcap = PCap.open_live(
+    @pcap = Live.new(
       :device => PCAP_DEV,
       :promisc => true
     )
@@ -15,7 +15,7 @@ describe Live do
   end
 
   it_should_behave_like "PCap::CaptureWrapper"
-
+  
   it "should support non-blocking mode" do
     @pcap.non_blocking = true
     @pcap.should be_non_blocking
@@ -33,7 +33,7 @@ describe Live do
 
   describe "live packets" do
     before(:all) do
-      @pcap = PCap.open_live(
+      @pcap = Live.new(
         :device => PCAP_DEV,
         :promisc => true
       )
@@ -46,6 +46,26 @@ describe Live do
     
     it_should_behave_like "PCap::Packet populated"
 
+  end
+
+  describe "yielding to a block" do
+    # Note we also test all the behaviors here together instead of seperately.
+    before(:all) do
+      @pcap=nil
+      @ret = Live.new(:device => PCAP_DEV, :promisc => true) do |this|
+        this.should_not be_nil
+        this.should_not be_closed
+        Live.should === this
+        @pcap = this
+      end
+      @ret.should == @pcap
+    end
+
+    after(:all) do
+      @pcap.close
+    end
+
+    it_should_behave_like "PCap::CaptureWrapper"
   end
 end
 

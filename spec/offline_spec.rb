@@ -3,7 +3,7 @@ require 'wrapper_behaviors'
 
 describe Offline do
   before(:each) do
-    @pcap = PCap.open_offline(PCAP_TESTFILE)
+    @pcap = Offline.new(PCAP_TESTFILE)
   end
 
   after(:each) do
@@ -25,6 +25,26 @@ describe Offline do
 
   it "should indicate whether it is endian swapped" do
     [true,false].include?(@pcap.swapped?).should == true
+  end
+
+  describe "yielding to a block" do
+    # Note we also test all the behaviors here together instead of seperately.
+    before(:all) do
+      @pcap=nil
+      @ret = Offline.new(PCAP_TESTFILE) do |this|
+        this.should_not be_nil
+        this.should_not be_closed
+        Offline.should === this
+        @pcap = this
+      end
+      @ret.should == @pcap
+    end
+
+    after(:all) do
+      @pcap.close
+    end
+
+    it_should_behave_like "PCap::CaptureWrapper"
   end
 
 end

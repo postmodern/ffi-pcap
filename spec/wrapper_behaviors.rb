@@ -27,15 +27,6 @@ shared_examples_for "PCap::CommonWrapper" do
     @pcap.error.should be_empty
   end
 
-  it "should prevent double closes" do
-    @pcap.close
-    @pcap.should be_closed
-
-    lambda {
-      @pcap.close
-    }.should_not raise_error(Exception)
-  end
-
   it "should be able to compile a filter" do
     filter = @pcap.compile("ip")
     filter.should_not be_nil
@@ -49,10 +40,18 @@ shared_examples_for "PCap::CommonWrapper" do
     }.should raise_error(LibError)
   end
 
+  it "should prevent double closes" do
+    @pcap.close
+    @pcap.should be_closed
+
+    lambda {
+      @pcap.close
+    }.should_not raise_error(Exception)
+  end
+
 end
 
 shared_examples_for "PCap::CaptureWrapper" do
-  it_should_behave_like "PCap::CommonWrapper"
 
   it "should pass packets to a block using loop()" do
     i = 0
@@ -97,6 +96,6 @@ shared_examples_for "PCap::CaptureWrapper" do
     }.should raise_error(LibError)
   end
 
-
+  it_should_behave_like "PCap::CommonWrapper"
 end
 
