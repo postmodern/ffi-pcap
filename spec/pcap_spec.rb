@@ -66,7 +66,7 @@ describe PCap do
   end
 
 
-  it "should be able to open a live pcap handler using a chosen device" do
+  it "open_live() should open a live pcap handler given a chosen device" do
     lambda {
       pcap = PCap.open_live(:device => PCAP_DEV)
       pcap.device.should == PCAP_DEV
@@ -75,23 +75,34 @@ describe PCap do
   end
 
 
-  it "should be able to open a live pcap handler using a default device" do
+  it "open_live() should open a live pcap handler using a default device" do
     lambda {
       pcap = PCap.open_live()
+      pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
   end
 
-  it "should be able to open a dead pcap handler" do
+  it "open_dead() should open a dead pcap handler" do
     lambda {
       pcap = PCap.open_dead()
+      pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
   end
 
-  it "should be able to open a pcap dump file" do
+  it "open_offline() should open a pcap dump file" do
     lambda {
       pcap = PCap.open_offline(PCAP_TESTFILE)
+      pcap.should be_ready
+      pcap.close
+    }.should_not raise_error(Exception)
+  end
+
+  it "open_file() should work the same as open_offline()" do
+    lambda {
+      pcap = PCap.open_offline(PCAP_TESTFILE)
+      pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
   end
