@@ -14,8 +14,12 @@ PCAP_TESTADDR = ENV['PCAP_TESTADDR'] || '127.0.0.1'
 $test_ping_pid = nil
 
 def start_traffic_generator
-  if RUBY_PLATFORM != 'java' and $test_ping_pid.nil?
-    $test_ping_pid = Process.fork{ `ping #{PCAP_TESTADDR}` }
+  begin
+    if $test_ping_pid.nil?
+      $test_ping_pid = Process.fork{ `ping #{PCAP_TESTADDR}` }
+    end
+  rescue NotImplementedError
+    $test_ping_pid = nil
   end
 end
 
