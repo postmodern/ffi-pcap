@@ -30,6 +30,15 @@ module FFI
         get_string(0)
       end
 
+      # Older JRuby/ffi versions of MemoryPointer and Buffer don't have a size 
+      # method. We override it here to ensure we can use it.
+      def size
+        begin
+          super()
+        rescue NoMethodError
+          SIZE
+        end
+      end
     end
   end
 end
