@@ -2,7 +2,6 @@ require 'enumerator'
 
 module FFI
   module PCap
-    DEFAULT_TO_MS = 1000     # Default timeout for pcap_open_live()
     DEFAULT_SNAPLEN = 65535  # Default snapshot length for packets
 
     attach_function :pcap_lookupdev, [:pointer], :string
@@ -63,36 +62,10 @@ module FFI
                 maskp.get_array_of_uchar(0,4).join('.') )
       end
     end
-
-
-    attach_function :pcap_open_live, [:string, :int, :int, :int, :pointer], :pcap_t
     
-    # Opens a device for capturing from the network.
-    #
-    # @param [Hash] opts
-    #   Options are ignored and passed to the pcap wrapper except those below.
-    #
-    # @option opts [optional, String, nil] :device
-    #   The device to open. On linux, this can be "any". If nil or unspecified
-    #   lookupdev() is called to obtain a default device. 
-    #
-    # @option opts [optional, Integer] :snaplen
-    #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
-    #
-    # @option opts [optional, Boolean] :promisc
-    #   Specifies if the interface is to be put into promiscuous mode. Defaults
-    #   to false.
-    #
-    # @option opts [optional, Integer] :timeout
-    #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
-    #
-    # @return [Live]
-    #   A FFI::PCap::Live wrapper.
-    #
-    # @raise [LibError]
-    #   On failure, an exception is raised with the relevant error 
-    #   message from libpcap.
-    #
+
+    # Opens a new Live device for capturing from the network. See Live.new()
+    # for arguments.
     def PCap.open_live(opts={},&block)
       return Live.new(opts, &block)
     end

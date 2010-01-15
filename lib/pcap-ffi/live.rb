@@ -2,8 +2,40 @@ require 'pcap-ffi/capture_wrapper'
 
 module FFI
   module PCap
-    # A wrapper class for pcap devices opened with open_live()
+
+    # Opens a device for capturing from the network.
+    #
+    # @param [Hash] opts
+    #   Options are ignored and passed to the pcap wrapper except those below.
+    #
+    # @option opts [optional, String, nil] :device, :dev
+    #   The device to open. On some platforms, this can be "any". If nil or 
+    #   unspecified PCap.lookupdev() is called to obtain a default device. 
+    #
+    # @option opts [optional, Integer] :snaplen
+    #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
+    #
+    # @option opts [optional, Boolean] :promisc
+    #   Specifies if the interface is to be put into promiscuous mode. Defaults
+    #   to false.
+    #
+    # @option opts [optional, Integer] :timeout
+    #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
+    #
+    # @return [Live]
+    #   A FFI::PCap::Live wrapper.
+    #
+    # @raise [LibError]
+    #   On failure, an exception is raised with the relevant error 
+    #   message from libpcap.
+    #
+    # @raise [ArgumentError]
+    #   May raise an exception if a :device cannot be autodetected using 
+    #   PCap.lookupdev() for any reason. This should never happen on most platforms.
+    #
     class Live < CaptureWrapper
+      DEFAULT_TO_MS = 1000     # Default timeout for pcap_open_live()
+
       attr_reader :device, :promisc, :timeout, :direction
 
       def initialize(opts=nil)
@@ -177,11 +209,11 @@ module FFI
 
     attach_function :ntohl, [:uint32], :uint32
 
+    attach_function :pcap_open_live, [:string, :int, :int, :int, :pointer], :pcap_t
     attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
     attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
     attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
     attach_function :pcap_stats, [:pcap_t, Stat], :int
-
     attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
     attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
   end
