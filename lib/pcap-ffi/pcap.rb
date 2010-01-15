@@ -84,7 +84,7 @@ module FFI
     end
 
     # Same as open_offline
-    def PCap.open_file(path, opts={}), &block)
+    def PCap.open_file(path, opts={}, &block)
       return Offline.new(path, opts={}, &block)
     end
 
