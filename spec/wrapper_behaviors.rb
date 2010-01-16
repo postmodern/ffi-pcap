@@ -64,7 +64,7 @@ shared_examples_for "PCap::CaptureWrapper" do
     @pcap.loop(:count => 2) do |this, pkt|
       this.should == @pcap
       pkt.should_not be_nil
-      # id is an arbitrary identifier. unused for now.
+      Packet.should === pkt
       i+=1
     end
     i.should == 2

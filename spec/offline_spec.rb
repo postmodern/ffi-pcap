@@ -19,6 +19,19 @@ describe Offline do
     @pcap.next.should be_nil
   end
 
+  it "should yield packets with a timestamp using loop()" do
+    i = 0
+    @pkt = nil
+    @pcap.loop(:count => 2) do |this, pkt|
+      this.should == @pcap
+      pkt.should_not be_nil
+      Packet.should === pkt
+      pkt.time.to_i.should > 0
+      i+=1
+    end
+    i.should == 2
+  end
+
   it "should supply a file version" do
     @pcap.file_version.should =~ /^\d+\.\d+$/
   end

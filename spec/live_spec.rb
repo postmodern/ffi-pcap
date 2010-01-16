@@ -6,7 +6,8 @@ describe Live do
   before(:each) do
     @pcap = Live.new(
       :device => PCAP_DEV,
-      :promisc => true
+      :promisc => true,
+      :timeout => 1000
     )
     start_traffic_generator()
   end
@@ -32,6 +33,20 @@ describe Live do
     stats.received.should > 0
     stats.received.should >= 10
   end
+
+  it "should yield packets with a timestamp using loop()" do
+    i = 0
+    @pkt = nil
+    @pcap.loop(:count => 2) do |this, pkt|
+      this.should == @pcap
+      pkt.should_not be_nil
+      Packet.should === pkt
+      (Time.now - pkt.time).should_not > 1000
+      i+=1
+    end
+    i.should == 2
+  end
+
 
   describe "live packets" do
     before(:all) do
