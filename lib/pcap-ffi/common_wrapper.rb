@@ -35,7 +35,7 @@ module FFI
         # extract datalink values 
         p = dlt_lst.get_pointer(0)
         ret = p.get_array_of_int(0, cnt).map {|dlt| DataLink.new(dlt) }
-        PCap.free(p)
+        CRT.free(p)
         return ret
       end
 
@@ -164,7 +164,6 @@ module FFI
 
     end
 
-    attach_function :free, [:pointer], :void
 
     attach_function :pcap_close, [:pcap_t], :void
     attach_function :pcap_geterr, [:pcap_t], :string

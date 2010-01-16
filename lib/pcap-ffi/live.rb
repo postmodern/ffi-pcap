@@ -2,6 +2,21 @@ require 'pcap-ffi/capture_wrapper'
 
 module FFI
   module PCap
+    begin
+      attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
+    rescue FFI::NotFoundError
+    end
+
+    begin
+      attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
+    rescue FFI::NotFoundError
+    end
+
+    begin
+      attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
+    rescue FFI::NotFoundError
+    end
+
 
     # Creates a pcap interface for capturing from the network.
     #
@@ -52,7 +67,7 @@ module FFI
 
         @errbuf = ErrorBuffer.create()
         @pcap = PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
-        raise(LibError, "pcap_open_live(): #{errbuf.to_s}") if @pcap.null?
+        raise(LibError, "pcap_open_live(): #{@errbuf.to_s}") if @pcap.null?
 
         # call super to get all our ducks in a row
         super(@pcap, opts)
@@ -92,19 +107,27 @@ module FFI
       # for this device.
       def network_n32
         return nil unless @netp
-        PCap.ntohl(@netp.get_uint32(0))
+        ::FFI::DRY::NetEndian.ntohl(@netp.get_uint32(0))
       end
 
       # Returns the 32-bit numeric representation of the IPv4 network address
       # for this device.
       def netmask_n32
         return nil unless @maskp
-        PCap.ntohl(@maskp.get_uint32(0))
+        ::FFI::DRY::NetEndian.ntohl(@maskp.get_uint32(0))
       end
 
+      @@have_setdirection = PCap.respond_to?(:pcap_setdirection)
+
       # Sets the direction for which packets will be captured.
-      #
+      # 
+      # (Not supported on all platforms)
       def set_direction(dir)
+        unless @@have_setdirection
+          raise(NotImplementedError, 
+                "pcap_setdirection() is not avaiable from your pcap library") 
+        end
+
         dirs = PCap.enum_type(:pcap_direction_t)
         if PCap.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
           return true
@@ -169,7 +192,12 @@ module FFI
         return stats
       end
 
+
+      @@have_inject = PCap.respond_to?(:pcap_inject)
+
       # Transmit a packet (not supported on all platforms)
+      #
+      # (not available on all platforms)
       #
       # @param [Packet, String] obj
       #   The packet to send. This can be a Packet or String object.
@@ -182,7 +210,43 @@ module FFI
       #   On failure, an exception is raised with the relevant libpcap
       #   error message.
       #
+      # @raise [NotImplementedError]
+      #   If the pcap_inject() function is not available from your libpcap
+      #   library this exception will be raised.
+      #
       def inject(pkt)
+        if @@have_inject
+          if pkt.kind_of? Packet
+            len = pkt.caplen
+            bufp = pkt.body_ptr
+            raise(ArgumentError, "packet data null pointer") if bufp.null?
+          elsif pkt.kind_of? String
+            len = pkt.size
+            bufp = FFI::MemoryPointer.from_string(pkt)
+          else
+            raise(ArgumentError, "Don't know how to inject #{pkt.class}")
+          end
+
+          if (sent=PCap.pcap_inject(_pcap, bufp, len)) < 0
+            raise(LibError, "pcap_inject(): #{geterr()}")
+          end
+          return sent
+        else 
+          # fake it with sendpacket on windows
+          if sendpacket(pkt)
+            return (Packet === pkt)? pkt.caplen : pkt.size
+          end
+        end
+      end
+
+      @@have_sendpacket = PCap.respond_to?(:pcap_sendpacket)
+
+      def sendpacket(pkt)
+        unless @@have_sendpacket
+          raise(NotImplementedError, 
+                "packet injectors are not avaiable from your pcap library") 
+        end
+
         if pkt.kind_of? Packet
           len = pkt.caplen
           bufp = pkt.body_ptr
@@ -191,27 +255,23 @@ module FFI
           len = pkt.size
           bufp = FFI::MemoryPointer.from_string(pkt)
         else
-          raise(ArgumentError, "Don't know how to inject #{pkt.class}")
+          raise(ArgumentError, "Don't know how to send #{pkt.class}")
         end
 
-        if (sent=PCap.pcap_inject(_pcap, bufp, len)) < 0
-          raise(LibError, "pcap_inject(): #{geterr()}")
+        if PCap.pcap_sendpacket(_pcap, bufp, len) != 0
+          raise(LibError, "pcap_sendpacket(): #{geterr()}")
         end
-        return sent
+        return true
       end
 
-      alias sendpacket inject
-      alias send_packet inject
+      alias send_packet sendpacket
+
     end
 
-    attach_function :ntohl, [:uint32], :uint32
-
     attach_function :pcap_open_live, [:string, :int, :int, :int, :pointer], :pcap_t
-    attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
     attach_function :pcap_getnonblock, [:pcap_t, :pointer], :int
     attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
     attach_function :pcap_stats, [:pcap_t, Stat], :int
-    attach_function :pcap_inject, [:pcap_t, :pointer, :int], :int
-    attach_function :pcap_sendpacket, [:pcap_t, :pointer, :int], :int
+
   end
 end
