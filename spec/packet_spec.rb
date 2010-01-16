@@ -88,43 +88,43 @@ describe Packet do
 
   describe "error detection for new()" do
     it "should raise an error when two nil values are supplied" do
-      lambda { Packet.new(nil,nil)}.should raise_error(ArgumentError)
+      lambda { Packet.new(nil,nil)}.should raise_error(Exception)
     end
 
     it "should raise an error for an invalid header" do
       lambda { 
         Packet.new(Object.new, FFI::MemoryPointer.new(256))
-      }.should raise_error(ArgumentError)
+      }.should raise_error(Exception)
     end
 
     it "should raise an error for a nil header without a string body" do
       lambda { 
         Packet.new(nil, FFI::MemoryPointer.new(256))
-      }.should raise_error(ArgumentError)
+      }.should raise_error(Exception)
     end
 
     it "should raise an error for a valid header but an invalid body pointer" do
       lambda { 
         Packet.new(PacketHeader.new, "hellotest")
-      }.should raise_error(ArgumentError)
+      }.should raise_error(Exception)
     end
 
     it "should not raise an error for a PacketHeader and a pointer" do
       lambda { 
         Packet.new(PacketHeader.new, FFI::MemoryPointer.new(256))
-      }.should_not raise_error(ArgumentError)
+      }.should_not raise_error(Exception)
     end
 
     it "should not raise an error for a pointer and a pointer" do
       lambda { 
         Packet.new(FFI::MemoryPointer.new(20), FFI::MemoryPointer.new(256))
-      }.should_not raise_error(ArgumentError)
+      }.should_not raise_error(Exception)
     end
 
     it "should not raise an error for a nil and a string" do
       lambda { 
         Packet.new(nil, "hellothere")
-      }.should_not raise_error(ArgumentError)
+      }.should_not raise_error(Exception)
 
     end
 

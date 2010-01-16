@@ -36,7 +36,7 @@ module FFI
       # @option opts [optional, Time] :time, :timestamp
       #   Sets the timestamp in the header.
       #
-      # @raise [ArgumentError]
+      # @raise [ArgumentError, TypeError]
       #   An exception is raised if any of the parameter rules described 
       #   are not followed.
       #
@@ -45,26 +45,28 @@ module FFI
         ts = o.delete(:time) || o.delete(:timestamp)
         case hdr
         when PacketHeader
+          raise(ArgumentError, "NULL header pointer") if hdr.to_ptr.null?
           @header = hdr
         when ::FFI::Pointer
+          raise(ArgumentError, "NULL header pointer") if hdr.null?
           @header = PacketHeader.new(hdr)
         when nil 
           if body.is_a? String
             set_body(body, o)
           else
-            raise(ArgumentError, "can't set body to #{body.class}")
+            raise(TypeError, "invalid body with nil header: #{body.class}")
           end
         else
-          raise(ArgumentError, "invalid header: #{hdr.class}")
+          raise(TypeError, "invalid header: #{hdr.class}")
         end
           
         @header.ts.time = ts if ts
 
         unless @body_ptr
-          if body.is_a?(FFI::Pointer)
+          if body.is_a?(FFI::Pointer) and not body.null?
             @body_ptr = body
           else
-            raise(ArgumentError, "invalid body: #{body.class}")
+            raise(TypeError, "invalid body for header: #{body.class}")
           end
         end
       end
@@ -140,7 +142,16 @@ module FFI
 
       # An optimized copy which allocates new memory for a PacketHeader and
       # body.
+      #
+      # DANGEROUS: This method uses direct FFI bindings for the copy and
+      # may crash Ruby if the packet header or body is incorrect.
+      #
+      # @raise [StandardError]
+      #   An exception is raised if the header or body is a NULL pointer.
+      #
       def copy
+        raise(StandardError, "header is a NULL pointer") if @header.to_ptr.null?
+        raise(StandardError, "body is a NULL pointer") if body_ptr.null?
         cpy_hdr = PacketHeader.new
         cpy_buf = FFI::MemoryPointer.new(@header.caplen)
         CRT.memcpy(cpy_hdr, @header, PacketHeader.size)
