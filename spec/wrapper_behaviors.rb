@@ -61,7 +61,7 @@ shared_examples_for "PCap::CaptureWrapper" do
   it "should pass packets to a block using loop()" do
     i = 0
     @pkt = nil
-    @pcap.loop(:count => 2) do |this, pkt, id|
+    @pcap.loop(:count => 2) do |this, pkt|
       this.should == @pcap
       pkt.should_not be_nil
       # id is an arbitrary identifier. unused for now.
@@ -79,7 +79,7 @@ shared_examples_for "PCap::CaptureWrapper" do
     stopped = false
     i = 0
 
-    @pcap.loop(:count => 3) do |this, pkt, id|
+    @pcap.loop(:count => 3) do |this, pkt|
       stopped = true
       i+=1
       this.stop

@@ -25,7 +25,7 @@ describe Live do
 
   it "should provide statistics about packets received/dropped" do
     i = 0
-    @pcap.loop {|*x| @pcap.stop if (i += 1) == 10 }
+    @pcap.loop {|this,pkt| @pcap.stop if (i += 1) == 10 }
     i.should_not == 0
     stats = @pcap.stats
     Stat.should === stats

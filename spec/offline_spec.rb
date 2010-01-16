@@ -14,7 +14,7 @@ describe Offline do
 
   it "should return a nil from next() at the end of the dump file" do
     i = 0
-    @pcap.loop { i+=1 }
+    @pcap.loop {|this,pkt| i+=1 }
     i.should > 0
     @pcap.next.should be_nil
   end

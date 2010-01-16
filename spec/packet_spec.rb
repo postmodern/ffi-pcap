@@ -75,7 +75,7 @@ describe Packet do
       @pkt = nil
       # we use copy inside the loop because libpcap's loop() frees or reuses 
       # memory for packets after each call to the handler.
-      @pcap.loop(:count => 1) {|this,pkt,id| @pkt = pkt.copy }
+      @pcap.loop(:count => 1) {|this,pkt| @pkt = pkt.copy }
     end
 
     after(:all) do
