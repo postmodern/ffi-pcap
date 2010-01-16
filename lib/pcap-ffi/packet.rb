@@ -4,8 +4,18 @@ module FFI
     class Packet
       attr_reader :body_ptr
 
+      # Creates a Packet from a Ruby string object.
+      #
+      # see new() for more information about the arguments.
       def self.from_string(body, opts={})
         new(nil, body, opts)
+      end
+
+      # Allocates a Packet using new memory. Used primarily for pcap_loop
+      # and pcap_dispatch to retain packets after new ones have been received
+      # or a pcap device is closed.
+      def self.allocate(phdr, buf)
+        new(phdr, buf).copy()
       end
 
       # XXX do we need to worry about the timestamp for dumping? or is that 
