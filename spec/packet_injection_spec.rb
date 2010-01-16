@@ -26,16 +26,12 @@ describe PCap::Live do
 
     it "should allow injection of a String using inject()" do
       test_data = "A" * 1024
-      lambda {
-        @pcap.inject(test_data).should == test_data.size
-      }.should_not raise_error(Exception)
+      @pcap.inject(test_data).should == test_data.size
     end
 
     it "should allow injection of a Packet using inject()" do
       test_data = "B" * 512
-      lambda {
-        @pcap.inject(Packet.from_string(test_data)).should == test_data.size
-      }.should_not raise_error(Exception)
+      @pcap.inject(Packet.from_string(test_data)).should == test_data.size
     end
 
   end

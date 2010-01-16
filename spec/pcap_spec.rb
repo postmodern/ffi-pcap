@@ -36,7 +36,6 @@ describe PCap do
   it ".device_names() should return names for all network interfaces" do
     devs = PCap.device_names
     Array.should === devs
-    devs.include?(PCAP_DEV).should == true
     i = 0
     devs.each do |dev|
       String.should === dev
@@ -45,6 +44,7 @@ describe PCap do
       i+=1
     end
     i.should_not == 0
+    devs.include?(PCAP_DEV).should == true
   end
 
   it ".dump_devices() should return name/network pairs for all interfaces" do
@@ -60,8 +60,8 @@ describe PCap do
       i+=1
     end
     i.should_not == 0
-    devs.map{|dev,net| dev}.include?(PCAP_DEV).should == true
     devs.select{|dev,net| not net.nil? }.should_not be_empty
+    devs.map{|dev,net| dev}.include?(PCAP_DEV).should == true
   end
 
   it ".open_live() should open a live pcap handler given a chosen device" do
@@ -74,6 +74,9 @@ describe PCap do
 
   it ".open_live() should open a live pcap handler using a default device" do
     lambda {
+      # XXX Using Vista and wpcap.dll this breaks on me.
+      #     The lookupdev for a default adapter result is '\', which is just
+      #     wrong.
       pcap = PCap.open_live()
       pcap.should be_ready
       pcap.close
@@ -106,7 +109,7 @@ describe PCap do
 
   it ".open_live() should take a block and close the device after calling it" do
     pcap = nil
-    ret = PCap.open_live() {|this|
+    ret = PCap.open_live(:device => PCAP_DEV) {|this|
       Live.should === this
       this.should be_ready
       this.should_not be_closed

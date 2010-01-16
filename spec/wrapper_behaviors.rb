@@ -75,7 +75,7 @@ shared_examples_for "PCap::CaptureWrapper" do
     pkt.should_not be_nil
   end
 
-  it "should be able to break out of the Handler#loop" do
+  it "should be able to break out of a pcap loop()" do
     stopped = false
     i = 0
 
