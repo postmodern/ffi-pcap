@@ -195,12 +195,15 @@ module FFI
 
       @@have_inject = PCap.respond_to?(:pcap_inject)
 
-      # Transmit a packet (not supported on all platforms)
+      # Transmit a packet using pcap_inject()
       #
       # (not available on all platforms)
       #
       # @param [Packet, String] obj
       #   The packet to send. This can be a Packet or String object.
+      #
+      # @return [Integer]
+      #   The number of bytes sent.
       #
       # @raise [ArgumentError]
       #   An exception is raised if the pkt object type is incorrect or
@@ -212,7 +215,8 @@ module FFI
       #
       # @raise [NotImplementedError]
       #   If the pcap_inject() function is not available from your libpcap
-      #   library this exception will be raised.
+      #   library pcap_sendpacket will be tried, if both are missing, this 
+      #   exception will be raised.
       #
       def inject(pkt)
         if @@have_inject
@@ -241,6 +245,28 @@ module FFI
 
       @@have_sendpacket = PCap.respond_to?(:pcap_sendpacket)
 
+      # Transmit a packet using pcap_sendpacket()
+      #
+      # (not available on all platforms)
+      #
+      # @param [Packet, String] obj
+      #   The packet to send. This can be a Packet or String object.
+      #
+      # @return [True]
+      #   True is returned on success. Otherwise an exception is raised.
+      #
+      # @raise [ArgumentError]
+      #   An exception is raised if the pkt object type is incorrect or
+      #   if it is a Packet and the body pointer is null. 
+      #
+      # @raise [LibError]
+      #   On failure, an exception is raised with the relevant libpcap
+      #   error message.
+      #
+      # @raise [NotImplementedError]
+      #   If the pcap_sendpacket() function is not available from your libpcap
+      #   library this exception will be raised.
+      #
       def sendpacket(pkt)
         unless @@have_sendpacket
           raise(NotImplementedError, 
