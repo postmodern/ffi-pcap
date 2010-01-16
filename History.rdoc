@@ -5,6 +5,7 @@
 * Redesigned  the pcap-specific pcap_pkthdr struct.
 * Dismantled all other network packet parsing code. 
 * 'Handlers' have been split out into type-specific 'Wrappers' by features.
+* The namespace 'Handler' has been reused instead for pcap_handler abstraction
 * Added filtering support and interfaces for compiling filters into bpf code.
 * Added packet injection on Live pcap interfaces.
 * Tackled some minor Jruby compatability issues.
