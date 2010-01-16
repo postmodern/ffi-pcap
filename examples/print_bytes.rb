@@ -5,13 +5,15 @@ require 'pcap-ffi'
 
 include FFI
 
-pcap = PCap.open_live(:device => ARGV[0]) do |user,header,bytes|
-  puts "#{header.timestamp}:"
+pcap =
+  PCap::Live.new(:dev => 'en0', 
+                 :promisc => true, 
+                 :handler => FFI::PCap::Handler)
 
-  header.captured.times { |i|
-    print ' %.2x' % bytes.get_uchar(i)
-  }
+pcap.loop() do |this,pkt|
+  puts "#{pkt.time}:"
+
+  pkt.captured.times {|i| print ' %.2x' % pkt.body_ptr.get_uchar(i) }
   putc "\n"
 end
 
-pcap.loop
