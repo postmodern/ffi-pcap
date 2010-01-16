@@ -11,6 +11,7 @@
 * Lots of documentation added throughout with yardoc tags.
 * Lots of misc namespace mods and such, and some general refactoring.
 * Lots of other stuff I'm probably forgetting.
+* specs all pass on OS X, Linux, and Win32(except 1 which is a known issue)
 
 === 0.1.0 / 2009-04-29
 
