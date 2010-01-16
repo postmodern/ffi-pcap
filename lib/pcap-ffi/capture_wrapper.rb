@@ -1,4 +1,5 @@
 require 'pcap-ffi/common_wrapper'
+require 'pcap-ffi/handler'
 
 module FFI
   module PCap
@@ -26,16 +27,14 @@ module FFI
       # @option [optional, Integer] :count
       #   Limit to :count number of packets. Default is infinite.
       #
-      # @yield [this, pkt, id] 
+      # @yield [self, pkt] 
       #
-      # @yieldparam [self] this
+      # @yieldparam [CaptureWrapper] self
       #   A reference to self is passed to the block.
       #
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
       #
-      # @yieldparam [Object, nil] id
-      #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
       #   returns 0 if cnt is exhausted, or nil if the loop terminated due to
@@ -49,7 +48,8 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(&block), opts[:id])
+        handler = (opts[:handler] || CopyHandler).new(self, block)
+        ret = PCap.pcap_loop(_pcap, cnt, handler.callback, nil)
         if ret == -1
           raise(ReadError, "pcap_loop(): #{geterr()}")
         elsif ret -2
@@ -83,16 +83,13 @@ module FFI
       # code that must work with older versions of libpcap should use -1, nor
       # 0, as the value of cnt.
       # 
-      # @yield [this, pkt, id] 
+      # @yield [self, pkt] 
       #
-      # @yieldparam [self] this
+      # @yieldparam [CaptureWrapper] self
       #   A reference to self is passed to the block.
       #
       # @yieldparam [Packet] pkt
       #   A packet object is yielded which references the header and bytes.
-      #
-      # @yieldparam [Object, nil] id
-      #   A reference to the id is passed if one was supplied with opts[:id].
       #
       # @return [Integer, nil]
       #   Returns the number of packets processed on success; this can be 0 if
@@ -106,9 +103,10 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(&block), o[:id])
+        handler = (opts[:handler] || CopyHandler).new(self, block)
+        ret = PCap.pcap_dispatch(_pcap, cnt, handler.callback, nil)
         if ret == -1
-          raise(ReadError, "pcap_dispatch(): #{geterr()}", caller)
+          raise(ReadError, "pcap_dispatch(): #{geterr()}")
         elsif ret -2
           return nil
         elsif ret > -1
@@ -160,7 +158,7 @@ module FFI
 
         case PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
         when -1 # error
-          raise(ReadError, geterr(), caller)
+          raise(ReadError, "pcap_next_ex(): #{geterr()}")
         when 0  # live capture read timeout expired
           return nil
         when -2 # savefile packets exhausted
@@ -215,14 +213,7 @@ module FFI
       alias setfilter set_filter
       alias filter= set_filter
 
-      private
-        def _wrap_callback(&block)
-          lambda {|u, h, b| block.call(self, Packet.new(h, b), u) }
-        end
-
     end
-
-    callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
 
     attach_function :pcap_loop, [:pcap_t, :int, :pcap_handler, :pointer], :int
     attach_function :pcap_dispatch, [:pcap_t, :int, :pcap_handler, :pointer], :int
@@ -230,7 +221,6 @@ module FFI
     attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
     attach_function :pcap_breakloop, [:pcap_t], :void
     attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
-
 
   end
 end

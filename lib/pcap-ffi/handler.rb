@@ -16,26 +16,26 @@ module FFI
     # It is recommended that for safety, CopyHandler be used in most situations.
     # However the direct Handler class is still available for high performance
     # needs since it may save some processing by not copying each packet.
-    class Handler < Proc
-      attr_reader :callback
+    class Handler
+      attr_reader :handler
 
-      def initialize(wrapper, &block)
-        unless block_given?
-          raise(ArgumentError, "tried to create a Handler without a block")
-        end
-
+      def initialize(wrapper, block)
         unless wrapper.kind_of?(CaptureWrapper)
           raise(TypeError, "expected wrapper to be a FFI::CaptureWrapper")
         end
-        @pcap = wrapper
-        @callback = block
 
-        super() &method(:receive_callback)
+        @pcap = wrapper
+        @handler = block
+      end
+
+      def callback
+        method(:receive_callback)
       end
 
       def receive_callback(id, pkthdr_p, bytes_p)
-        @callback.call(@pcap, Packet.new(pkthdr_p, bytes_p), id)
+        @handler.call(@pcap, Packet.new(pkthdr_p, bytes_p))
       end
+
     end
 
     # CopyHandler works exactly the same as Handler, except for one important
@@ -53,8 +53,8 @@ module FFI
     # packets after new packets have been received or even after you close
     # a pcap interface.
     class CopyHandler < Handler
-      def receive_callback(id, pkthdr_p, bytes_p)
-        @callback.call(@pcap, Packet.new(pkthdr_p, bytes_p).copy(), id)
+      def receive_callback(id, pkthdr, bytes)
+        @handler.call(@pcap, Packet.allocate(pkthdr, bytes))
       end
     end
   end
