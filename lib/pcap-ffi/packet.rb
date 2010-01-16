@@ -18,9 +18,6 @@ module FFI
         new(phdr, buf).copy()
       end
 
-      # XXX do we need to worry about the timestamp for dumping? or is that 
-      # automatically handled by libpcap when dumping.
-      #
       # @param [PacketHeader, nil] hdr
       #   The pcap pkthdr struct for this packet or nil.  hdr may only be
       #   nil if a string is supplied for the body. A header will be 
@@ -49,7 +46,7 @@ module FFI
         case hdr
         when PacketHeader
           @header = hdr
-        when FFI::Pointer
+        when ::FFI::Pointer
           @header = PacketHeader.new(hdr)
         when nil 
           if body.is_a? String
@@ -61,7 +58,7 @@ module FFI
           raise(ArgumentError, "invalid header: #{hdr.class}")
         end
           
-        @header.time = ts if ts
+        @header.ts.time = ts if ts
 
         unless @body_ptr
           if body.is_a?(FFI::Pointer)
@@ -122,6 +119,8 @@ module FFI
         @header.ts.time
       end
 
+      alias timestamp time
+
       # Sets the pcap timestamp.
       def time=(t)
         @header.ts.time=(t)
@@ -139,11 +138,14 @@ module FFI
 
       alias length len
 
+      # An optimized copy which allocates new memory for a PacketHeader and
+      # body.
       def copy
-        self.class.new(nil, 
-                       self.body, 
-                       :caplen => @header.caplen, 
-                       :len => @header.len)
+        cpy_hdr = PacketHeader.new
+        cpy_buf = FFI::MemoryPointer.new(@header.caplen)
+        CRT.memcpy(cpy_hdr, @header, PacketHeader.size)
+        CRT.memcpy(cpy_buf, @body_ptr, @header.caplen)
+        self.class.new( cpy_hdr, cpy_buf )
       end
 
     end
