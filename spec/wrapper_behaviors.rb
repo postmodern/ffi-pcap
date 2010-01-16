@@ -89,6 +89,10 @@ shared_examples_for "PCap::CaptureWrapper" do
     stopped.should == true
   end
 
+  it "should consume packets without a block passed to loop()" do
+    lambda { @pcap.loop(:count => 3) }.should_not raise_error(Exception)
+  end
+
   it "should be able to set a filter" do
     lambda {
       @pcap.set_filter("ip")

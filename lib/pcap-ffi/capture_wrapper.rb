@@ -18,7 +18,7 @@ module FFI
 
           lambda do |usr, phdr, body| 
             yld = h.receive_pcap(self, phdr, body, usr)
-            block.call(*yld)
+            block.call(*yld) if block and yld
           end
         end
       public
