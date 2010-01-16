@@ -17,25 +17,9 @@ module FFI
     # However the direct Handler class is still available for high performance
     # needs since it may save some processing by not copying each packet.
     class Handler
-      attr_reader :handler
-
-      def initialize(wrapper, block)
-        unless wrapper.kind_of?(CaptureWrapper)
-          raise(TypeError, "expected wrapper to be a FFI::CaptureWrapper")
-        end
-
-        @pcap = wrapper
-        @handler = block
+      def receive_pcap(pcap, phdr, bytes, tag=nil)
+        return [pcap, Packet.new(phdr, bytes)]
       end
-
-      def callback
-        method(:receive_callback)
-      end
-
-      def receive_callback(id, pkthdr_p, bytes_p)
-        @handler.call(@pcap, Packet.new(pkthdr_p, bytes_p))
-      end
-
     end
 
     # CopyHandler works exactly the same as Handler, except for one important
@@ -53,8 +37,8 @@ module FFI
     # packets after new packets have been received or even after you close
     # a pcap interface.
     class CopyHandler < Handler
-      def receive_callback(id, pkthdr, bytes)
-        @handler.call(@pcap, Packet.allocate(pkthdr, bytes))
+      def receive_pcap(pcap, phdr, bufp, tag=nil)
+        return [pcap, Packet.allocate(phdr, bufp)]
       end
     end
   end

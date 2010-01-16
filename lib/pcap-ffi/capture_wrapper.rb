@@ -8,6 +8,22 @@ module FFI
     class CaptureWrapper < CommonWrapper
       include Enumerable
 
+      private
+        def _wrap_callback(h, block)
+          if h.kind_of?(Class) and h.instance_methods.include?("receive_pcap")
+            h = h.new()
+          elsif ! h.respond_to?(:receive_pcap)
+            raise(NoMethodError, "#{h} doesn't respond to receive_pcap")
+          end
+
+          lambda do |usr, phdr, body| 
+            yld = h.receive_pcap(self, phdr, body, usr)
+            block.call(*yld)
+          end
+        end
+      public
+
+
       # Processes packets from a live capture or savefile until cnt packets 
       # are processed, the end of the savefile is reached (when reading from a
       # savefile), pcap_breakloop() is called, or an error occurs. 
@@ -48,8 +64,9 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        handler = (opts[:handler] || CopyHandler).new(self, block)
-        ret = PCap.pcap_loop(_pcap, cnt, handler.callback, nil)
+        h = (opts[:handler] || opts[:parser] || CopyHandler.new)
+
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
         if ret == -1
           raise(ReadError, "pcap_loop(): #{geterr()}")
         elsif ret -2
@@ -103,8 +120,9 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        handler = (opts[:handler] || CopyHandler).new(self, block)
-        ret = PCap.pcap_dispatch(_pcap, cnt, handler.callback, nil)
+        h = (opts[:handler] || opts[:parser] || CopyHandler.new)
+
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
         if ret == -1
           raise(ReadError, "pcap_dispatch(): #{geterr()}")
         elsif ret -2
