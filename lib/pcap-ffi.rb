@@ -14,7 +14,7 @@ module FFI
   end
 end
 
-require 'pcap-ffi/libc'
+require 'pcap-ffi/crt'
 
 require 'pcap-ffi/version'
 require 'pcap-ffi/exceptions'
