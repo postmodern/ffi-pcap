@@ -13,7 +13,8 @@ module FFI
       #   The path to the file to open.
       #
       # @param [Hash] opts
-      #   Options are ignored and passed to the super-class except for those below.
+      #   Options are ignored and passed to the super-class except for those 
+      #   below.
       #
       # @option opts [ignored] :path
       #   The :path option will be overridden with the value of the path 
