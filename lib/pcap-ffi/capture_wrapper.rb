@@ -1,5 +1,5 @@
 require 'pcap-ffi/common_wrapper'
-require 'pcap-ffi/handler'
+require 'pcap-ffi/copy_handler'
 
 module FFI
   module PCap
@@ -24,8 +24,20 @@ module FFI
 
       attr_accessor :handler
 
+      # Adds an extra parameter :handler for specifying a capture handler
+      # when using loop or dispatch. The handler defaults to CopyHandler,
+      # which always yields a copy of each packet to a block. Setting :handler
+      # to nil will pass packets directly to a block without copying them,
+      # which may be desirable if the packets are only ever processed within
+      # the block, and code does not need to retain a reference to them 
+      # elsewhere.
       def initialize(pcap, opts={}, &block)
-        @handler = (opts[:handler] || opts[:parser] || CopyHandler)
+        if opts.has_key?(opts[:handler])
+          @handler = opts[:handler]
+        else
+          @handler = CopyHandler
+        end
+
         super(pcap, opts, &block)
       end
 
@@ -93,7 +105,7 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        h = (opts[:handler] || opts[:parser])
+        h = opts[:handler]
 
         ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
         if ret == -1
@@ -149,7 +161,7 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        h = (opts[:handler] || opts[:parser])
+        h = opts[:handler]
 
         ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
         if ret == -1

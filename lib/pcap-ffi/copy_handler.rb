@@ -19,9 +19,18 @@ module FFI
     # generally always safe to keep references to received packets after new
     # packets have been received or even after a pcap interface has been 
     # closed. See CaptureWrapper for more information.
-    class CopyHandler < Handler
-      def receive_pcap(pcap, phdr, bufp, tag=nil)
-        return [pcap, Packet.allocate(phdr, bufp)]
+    class CopyHandler
+      def receive_pcap(pcap, pkt)
+        return [pcap, pkt.copy]
+      end
+    end
+
+
+    # This class only exists for backward compatibility. Setting
+    # pcap handler to nil has the same effect now.
+    class Handler
+      def receive_pcap(*args)
+        return args
       end
     end
   end
