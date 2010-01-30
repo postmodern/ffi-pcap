@@ -4,21 +4,50 @@ require 'pcap-ffi/handler'
 module FFI
   module PCap
     # A superclass for both offline and live interfaces, but not dead interfaces
-    # This class provides all the features necessary for working with packets.
+    # This class provides all the features necessary for receiving packets 
+    # through libpcap.
+    #
+    #
+    # The loop and dispatch methods default to using a CopyHandler object
+    # when preparing values to the callback block. This is done to safely 
+    # provide references to packets outside of the callback blocks.  
+    # See CopyHandler for more information. 
+    #
+    # Note that for performance reasons, you may not need or want to incur 
+    # the extra overhead of creating a copy for every Packet. You can supply 
+    # a nil value for the loop handler which will simply pass volatile 
+    # references to packets directly to your block. You can also write custom
+    # handlers which implement the 'receive_pcap' method and implement custom
+    # defined behaviors.
     class CaptureWrapper < CommonWrapper
       include Enumerable
 
-      private
-        def _wrap_callback(h, block)
-          if h.kind_of?(Class) and h.instance_methods.include?("receive_pcap")
-            h = h.new()
-          elsif ! h.respond_to?(:receive_pcap)
-            raise(NoMethodError, "#{h} doesn't respond to receive_pcap")
-          end
+      attr_accessor :handler
 
-          lambda do |usr, phdr, body| 
-            yld = h.receive_pcap(self, phdr, body, usr)
-            block.call(*yld) if block and yld
+      def initialize(pcap, opts={}, &block)
+        @handler = (opts[:handler] || opts[:parser] || CopyHandler)
+        super(pcap, opts, &block)
+      end
+
+      private
+        def _wrap_callback(h, blk)
+          h ||= @handler
+          if h
+            h = h.new() if h.kind_of?(Class)
+            if ! h.respond_to?(:receive_pcap)
+              raise(NoMethodError, 
+                    "The handler #{h.class} has no receive_pcap method")
+            end
+            return lambda do |usr,phdr,body| 
+              yld = h.receive_pcap(self, Packet.new(phdr,body))
+              blk.call(*yld) if blk and yld
+            end
+          elsif blk.kind_of?(Proc) or blk.kind_of?(Method)
+            return lambda do |usr,phdr,body| 
+              blk.call(pcap, Packet.new(phdr,body))
+            end
+          else
+            raise(ArgumentError, "Neither a handler nor block were provided")
           end
         end
       public
@@ -64,7 +93,7 @@ module FFI
       #
       def loop(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        h = (opts[:handler] || opts[:parser] || CopyHandler.new)
+        h = (opts[:handler] || opts[:parser])
 
         ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
         if ret == -1
@@ -120,7 +149,7 @@ module FFI
       #
       def dispatch(opts={}, &block)
         cnt = opts[:count] || -1 # default to infinite loop
-        h = (opts[:handler] || opts[:parser] || CopyHandler.new)
+        h = (opts[:handler] || opts[:parser])
 
         ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
         if ret == -1
@@ -233,6 +262,7 @@ module FFI
 
     end
 
+    callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
     attach_function :pcap_loop, [:pcap_t, :int, :pcap_handler, :pointer], :int
     attach_function :pcap_dispatch, [:pcap_t, :int, :pcap_handler, :pointer], :int
     attach_function :pcap_next, [:pcap_t, PacketHeader], :pointer
