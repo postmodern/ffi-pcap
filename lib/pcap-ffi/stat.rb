@@ -31,7 +31,6 @@ module FFI
         field :tx_packets,  :ulong, :desc => "total packets transmitted"
         field :rx_bytes,    :ulong, :desc => "total bytes received"
         field :tx_bytes,    :ulong, :desc => "total bytes transmitted"
-        field :tx_bytes,    :ulong, :desc => "total bytes transmitted"
         field :rx_errors,   :ulong, :desc => "bad packets received"
         field :tx_errors,   :ulong, :desc => "packet transmit problems"
         field :rx_dropped,  :ulong, :desc => "no space in Rx buffers"
