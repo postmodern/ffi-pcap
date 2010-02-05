@@ -1,7 +1,7 @@
 === 0.1.2 / 2010-01-03
 
-* Branched from ffi-by emonti
-* Using ffi_dry for common struct interface (after a few fixes for ffi-0.5.4)
+* Branched from sophsec/ffi-pcap by emonti
+* Using ffi_dry for common struct interface
 * Redesigned  the pcap-specific pcap_pkthdr struct.
 * Dismantled all other network packet parsing code. 
 * 'Handlers' have been split out into type-specific 'Wrappers' by features.
@@ -16,5 +16,5 @@
 
 === 0.1.0 / 2009-04-29
 
-* Initial release.
+* Initial release. (sophsec/ffi-pcap)
 
