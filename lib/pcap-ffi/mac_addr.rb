@@ -17,8 +17,8 @@ module FFI
       end
 
       #
-      # Returns +true+ if the MAC is a broadcast address, returns +false+
-      # otherwise.
+      # @return [Boolean]
+      #   Specifies whether the MAC is a broadcast address.
       #
       def broadcast?
         self[:bytes].each do |b|

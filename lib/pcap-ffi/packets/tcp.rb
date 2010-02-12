@@ -89,78 +89,80 @@ module FFI
         end
 
         #
-        # Returns +true+ if the packet has no flags set, +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has no flags set.
         #
         def null?
           self[:th_flags] == NULL
         end
 
         #
-        # Returns +true+ if the packet has the FIN flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the FIN flag set.
         #
         def fin?
           (self[:th_flags] & FIN) != 0
         end
 
         #
-        # Returns +true+ if the packet has the SYN flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the SYN flag set.
         #
         def syn?
           (self[:th_flags] & SYN) != 0
         end
 
         #
-        # Returns +true+ if the packet has the RST flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the RST flag set.
         #
         def rst?
           (self[:th_flags] & RST) != 0
         end
 
         #
-        # Returns +true+ if the packet has the PUSH flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the PUSH flag set.
         #
         def push?
           (self[:th_flags] & PUSH) != 0
         end
 
         #
-        # Returns +true+ if the packet has the ACK flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the ACK flag set.
         #
         def ack?
           (self[:th_flags] & ACK) != 0
         end
 
         #
-        # Returns +true+ if the packet has the URG flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the URG flag set.
         #
         def urg?
           (self[:th_flags] & URG) != 0
         end
 
         #
-        # Returns +true+ if the packet has the ECE flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the ECE flag set.
         #
         def ece?
           (self[:th_flags] & ECE) != 0
         end
 
         #
-        # Returns +true+ if the packet has the CWR flag set, returns
-        # +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies whether the packet has the CWR flag set.
         #
         def cwr?
           (self[:th_flags] & CWR) != 0
         end
 
         #
-        # Returns +true+ if the packet has all flags set, +false+ otherwise.
+        # @return [Boolean]
+        #   Specifies the packet has all flags set.
         #
         def xmas?
           (self[:th_flags] & XMAS) == XMAS
