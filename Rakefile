@@ -1,28 +1,42 @@
-# -*- ruby -*-
-
 require 'rubygems'
-require 'hoe'
-require './tasks/spec.rb'
-require './tasks/yard.rb'
+require 'rake'
+require './lib/pcap-ffi/version.rb'
 
-Hoe.spec('ffi-pcap') do
-  self.rubyforge_name = 'ffi-pcap'
-  self.developer('Postmodern','postmodern.mod3@gmail.com')
-
-  self.readme_file = 'README.rdoc'
-  self.history_file = 'History.rdoc'
-  self.remote_rdoc_dir = ''
-
-  self.extra_deps = [
-    ['ffi', '>=0.5.3']
-  ]
-
-  self.extra_dev_deps = [
-    ['rspec', '>=1.2.9'],
-    ['yard', '>=0.5.2']
-  ]
-
-  self.spec_extras = {:has_rdoc => 'yard'}
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gem|
+    gem.name = 'ffi-pcap'
+    gem.version = FFI::PCap::VERSION
+    gem.summary = %Q{Ruby FFI bindings for libpcap.}
+    gem.description = %Q{Ruby FFI bindings for libpcap.}
+    gem.email = 'postmodern.mod3@gmail.com'
+    gem.homepage = 'http://github.com/sophsec/ffi-pcap'
+    gem.authors = ['Postmodern']
+    gem.add_dependency 'ffi', '>=0.5.3'
+    gem.add_development_dependency 'rspec', '>= 1.3.0'
+    gem.add_development_dependency 'yard', '>= 0.5.3'
+    gem.has_rdoc = 'yard'
+  end
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-# vim: syntax=Ruby
+require 'spec/rake/spectask'
+Spec::Rake::SpecTask.new(:spec) do |spec|
+  spec.libs += ['lib', 'spec']
+  spec.spec_files = FileList['spec/**/*_spec.rb']
+  spec.spec_opts = ['--options', '.specopts']
+end
+
+task :spec => :check_dependencies
+task :default => :spec
+
+begin
+  require 'yard'
+
+  YARD::Rake::YardocTask.new
+rescue LoadError
+  task :yard do
+    abort "YARD is not available. In order to run yard, you must: gem install yard"
+  end
+end
