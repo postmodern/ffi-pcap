@@ -4,10 +4,7 @@ module FFI
     module CRT
       extend FFI::Library
 
-      begin
-        ffi_lib 'msvcrt'
-      rescue LoadError
-      end
+      ffi_lib FFI::Library::LIBC
 
       typedef :ulong, :size_t  # not all platforms have this set for FFI
 
