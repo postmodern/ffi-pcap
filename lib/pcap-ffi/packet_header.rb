@@ -10,7 +10,7 @@ module FFI
       include FFI::DRY::StructHelper
 
       dsl_layout do
-        struct :ts,      TimeVal,     :desc => 'time stamp'
+        struct :ts,      ::FFI::PCap::TimeVal,     :desc => 'time stamp'
         field  :caplen,  :bpf_uint32, :desc => 'length of portion present'
         field  :len,     :bpf_uint32, :desc => 'length of packet (off wire)'
       end
