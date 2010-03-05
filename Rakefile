@@ -17,7 +17,7 @@ begin
     gemspec.description = "Bindings to sniff packets using the FFI interface in Ruby."
     gemspec.authors = ["Postmodern, Dakrone", "Eric Monti"]
     gemspec.add_dependency "ffi"
-    gemspec.add_dependency "ffi_dry", ">= 0.1.8"
+    gemspec.add_dependency "ffi_dry", ">= 0.1.9"
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
