@@ -2,7 +2,7 @@
 module FFI
   module PCap
     class Packet
-      attr_reader :body_ptr
+      attr_reader :body_ptr, :header
 
       # Creates a Packet from a Ruby string object.
       #
