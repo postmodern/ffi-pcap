@@ -13,9 +13,6 @@ module FFI
         @closed = false
         @errbuf ||= ErrorBuffer.create
 
-        trap('INT') {stop(); close(); raise(SignalException, 'INT')}
-        trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
-
         yield(self) if block_given?
       end
 

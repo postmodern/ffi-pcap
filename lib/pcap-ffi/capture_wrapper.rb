@@ -38,6 +38,9 @@ module FFI
           @handler = CopyHandler
         end
 
+        trap('INT') {stop(); close(); raise(SignalException, 'INT')}
+        trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
+
         super(pcap, opts, &block)
       end
 
