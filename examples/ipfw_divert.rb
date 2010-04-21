@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+#
+# Thanks to justfalter(Mike Ryan) for turning me onto Divert Sockets for
+# this example.
+#
 # ipfw add tee 6666 tcp from 192.168.63.128 to any
 # ipfw add tee 6666 tcp from any to 192.168.63.128
 
