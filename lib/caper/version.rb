@@ -1,6 +1,6 @@
 module FFI
   module PCap
-    # pcap-ffi version
+    # caper version
     VERSION = '0.1.2'
   end
 end

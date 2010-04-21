@@ -1,5 +1,5 @@
-require 'pcap-ffi/common_wrapper'
-require 'pcap-ffi/copy_handler'
+require 'caper/common_wrapper'
+require 'caper/copy_handler'
 
 module FFI
   module PCap
