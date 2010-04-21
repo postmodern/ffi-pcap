@@ -29,6 +29,8 @@ Ruby FFI bindings for libpcap.
 
 == LICENSE:
 
+(please see LICENSE.ffi-pcap for the original ffi-pcap license)
+
 The MIT License
 
 Copyright (c) 2010 Eric Monti
