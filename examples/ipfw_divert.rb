@@ -13,8 +13,8 @@ end
 
 IPPROTO_DIVERT = 254
 
-#outfile = ARGV.shift
-outfile = "test_#{$$}.pcap"
+outfile = ARGV.shift
+#outfile = "test_#{$$}.pcap"
 
 # create a dummy pcap handle for dumping
 pcap        = FFI::PCap.open_dead(:datalink => :raw)
