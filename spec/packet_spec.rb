@@ -8,21 +8,8 @@ describe Packet do
       @pkt = Packet.new(nil, @test_body)
     end
 
-    it_should_behave_like "PCap::Packet populated"
+    it_should_behave_like "PCap::Packet composed"
 
-    it "should return the expected header" do
-      @pkt.header.len.should  == @test_body.size
-      @pkt.header.caplen.should == @test_body.size
-      @pkt.header.timestamp.to_time.to_i.should == 0
-    end
-
-    it "should return the expected body String" do
-      @pkt.body.should == @test_body
-    end
-
-    it "should return a pointer to the expected body String" do
-      @pkt.body_ptr.read_string(@pkt.caplen).should == @test_body
-    end
   end
 
   describe 'created using new() with a Header and pointer to body' do
@@ -33,15 +20,8 @@ describe Packet do
       @pkt = Packet.new(PacketHeader.new(:caplen => l, :len => l), body)
     end
 
-    it_should_behave_like "PCap::Packet populated"
+    it_should_behave_like "PCap::Packet composed"
 
-    it "should return the expected body String" do
-      @pkt.body.should == @test_body
-    end
-
-    it "should return a pointer to the expected body String" do
-      @pkt.body_ptr.read_string(@pkt.caplen).should == @test_body
-    end
   end
 
   describe 'created with from_string()' do
@@ -50,15 +30,8 @@ describe Packet do
       @pkt = Packet.from_string("\xde\xad\xbe\xef")
     end
   
-    it_should_behave_like "PCap::Packet populated"
+    it_should_behave_like "PCap::Packet composed"
 
-    it "should return the expected body String" do
-      @pkt.body.should == @test_body
-    end
-
-    it "should return a pointer to the expected body String" do
-      @pkt.body_ptr.read_string(@pkt.caplen).should == @test_body
-    end
   end
 
 

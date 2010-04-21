@@ -1,3 +1,4 @@
+
 shared_examples_for "PCap::Packet" do
   it "should supply a way to get a pointer for the body" do
     @pkt.body_ptr.should_not be_nil
@@ -47,4 +48,21 @@ shared_examples_for "PCap::Packet populated" do
     @pkt.body_ptr.should_not be_null
   end
 
+end
+
+shared_examples_for "PCap::Packet composed" do
+  it "should return the expected header" do
+    @pkt.header.should be_kind_of(PacketHeader)
+    @pkt.header.len.should  == @test_body.size
+    @pkt.header.caplen.should == @test_body.size
+    @pkt.header.timestamp.to_time.to_i.should == 0
+  end
+
+  it "should return the expected body String" do
+    @pkt.body.should == @test_body
+  end
+
+  it "should return a pointer to the expected body String" do
+    @pkt.body_ptr.read_string(@pkt.caplen).should == @test_body
+  end
 end
