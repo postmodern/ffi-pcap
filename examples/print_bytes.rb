@@ -3,12 +3,10 @@
 require 'rubygems'
 require 'caper'
 
-include FFI
-
 pcap =
-  PCap::Live.new(:dev => 'en0', 
+  Caper::Live.new(:dev => 'en0', 
                  :promisc => true, 
-                 :handler => FFI::PCap::Handler)
+                 :handler => Caper::Handler)
 
 pcap.loop() do |this,pkt|
   puts "#{pkt.time}:"

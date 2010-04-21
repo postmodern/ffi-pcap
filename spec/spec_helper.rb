@@ -5,7 +5,7 @@ require 'spec'
 require 'caper'
 
 include FFI
-include FFI::PCap
+include Caper
 
 PCAP_DEV      = ENV['PCAP_DEV'] || 'lo0'
 PCAP_TESTFILE = ENV['PCAP_TESTFILE'] || File.expand_path(File.join(File.dirname(__FILE__), 'dumps', 'simple_tcp.pcap'))

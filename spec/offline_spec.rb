@@ -10,7 +10,7 @@ describe Offline do
     @pcap.close
   end
 
-  it_should_behave_like "PCap::CaptureWrapper"
+  it_should_behave_like "Caper::CaptureWrapper"
 
   it "should return a nil from next() at the end of the dump file" do
     i = 0
@@ -51,7 +51,7 @@ describe Offline do
         @pcap.should_not be_closed
       end
 
-      it_should_behave_like "PCap::CaptureWrapper"
+      it_should_behave_like "Caper::CaptureWrapper"
 
       @pcap.close
     end

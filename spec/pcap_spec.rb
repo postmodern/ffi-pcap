@@ -1,30 +1,30 @@
 require 'spec_helper'
 
-describe PCap do
+describe Caper do
   it "should define a VERSION constant" do
-    PCap.const_defined?('VERSION').should == true
+    Caper.const_defined?('VERSION').should == true
   end
 
   it ".lib_version() should expose the libpcap version banner" do
-    PCap.lib_version.should_not be_nil
-    PCap.lib_version.should_not be_empty
+    Caper.lib_version.should_not be_nil
+    Caper.lib_version.should_not be_empty
   end
 
   it ".lib_version_number() should expose the libpcap version number only" do
-    PCap.lib_version_number.should_not be_nil
-    PCap.lib_version_number.should_not be_empty
-    PCap.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
+    Caper.lib_version_number.should_not be_nil
+    Caper.lib_version_number.should_not be_empty
+    Caper.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
   end
 
   it ".lookupdev() should return a device deafult device" do
-    dev = PCap.lookupdev
+    dev = Caper.lookupdev
     dev.should_not be_nil
     dev.should_not be_empty
   end
 
   it ".each_device() should enumerate over all usable interfaces" do
     i = 0
-    PCap.each_device do |dev|
+    Caper.each_device do |dev|
       dev.should_not be_nil
       Interface.should === dev
       [true,false].include?(dev.loopback?).should == true
@@ -34,7 +34,7 @@ describe PCap do
   end
 
   it ".device_names() should return names for all network interfaces" do
-    devs = PCap.device_names
+    devs = Caper.device_names
     Array.should === devs
     i = 0
     devs.each do |dev|
@@ -49,7 +49,7 @@ describe PCap do
 
   it ".dump_devices() should return name/network pairs for all interfaces" do
     i = 0
-    devs = PCap.dump_devices
+    devs = Caper.dump_devices
     Array.should === devs
     devs.each do |y|
       y.size.should == 2
@@ -66,7 +66,7 @@ describe PCap do
 
   it ".open_live() should open a live pcap handler given a chosen device" do
     lambda {
-      pcap = PCap.open_live(:device => PCAP_DEV)
+      pcap = Caper.open_live(:device => PCAP_DEV)
       pcap.device.should == PCAP_DEV
       pcap.close
     }.should_not raise_error(Exception)
@@ -77,7 +77,7 @@ describe PCap do
       # XXX Using Vista and wpcap.dll this breaks on me.
       #     The lookupdev for a default adapter result is '\', which is just
       #     wrong.
-      pcap = PCap.open_live()
+      pcap = Caper.open_live()
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -85,7 +85,7 @@ describe PCap do
 
   it ".open_dead() should open a dead pcap handler" do
     lambda {
-      pcap = PCap.open_dead()
+      pcap = Caper.open_dead()
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -93,7 +93,7 @@ describe PCap do
 
   it ".open_offline() should open a pcap dump file" do
     lambda {
-      pcap = PCap.open_offline(PCAP_TESTFILE)
+      pcap = Caper.open_offline(PCAP_TESTFILE)
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -101,7 +101,7 @@ describe PCap do
 
   it ".open_file() should work the same as .open_offline()" do
     lambda {
-      pcap = PCap.open_offline(PCAP_TESTFILE)
+      pcap = Caper.open_offline(PCAP_TESTFILE)
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -109,7 +109,7 @@ describe PCap do
 
   it ".open_live() should take a block and close the device after calling it" do
     pcap = nil
-    ret = PCap.open_live(:device => PCAP_DEV) {|this|
+    ret = Caper.open_live(:device => PCAP_DEV) {|this|
       Live.should === this
       this.should be_ready
       this.should_not be_closed
@@ -122,7 +122,7 @@ describe PCap do
 
   it ".open_dead() should take a block and close the device after calling it" do
     pcap = nil
-    ret = PCap.open_dead() {|this|
+    ret = Caper.open_dead() {|this|
       Dead.should === this
       this.should be_ready
       this.should_not be_closed
@@ -135,7 +135,7 @@ describe PCap do
 
   it ".open_file() should take a block and close the device after calling it" do
     pcap = nil
-    ret = PCap.open_file(PCAP_TESTFILE) {|this|
+    ret = Caper.open_file(PCAP_TESTFILE) {|this|
       Offline.should === this
       this.should be_ready
       this.should_not be_closed

@@ -17,7 +17,7 @@ outfile = ARGV.shift
 #outfile = "test_#{$$}.pcap"
 
 # create a dummy pcap handle for dumping
-pcap        = FFI::PCap.open_dead(:datalink => :raw)
+pcap        = Caper.open_dead(:datalink => :raw)
 pcap_dumper = pcap.open_dump(outfile)
 
 begin 
@@ -30,7 +30,7 @@ begin
   while IO.select([divert_sock], nil, nil)
     data = divert_sock.recv(65535) # or MTU?
     pp data
-    pcap_dumper.write_pkt( FFI::PCap::Packet.from_string(data) )
+    pcap_dumper.write_pkt( Caper::Packet.from_string(data) )
     pcap_dumper.flush 
   end
 rescue Errno::EPERM

@@ -1,5 +1,5 @@
 
-shared_examples_for "PCap::Packet" do
+shared_examples_for "Caper::Packet" do
   it "should supply a way to get a pointer for the body" do
     @pkt.body_ptr.should_not be_nil
     ::FFI::Pointer.should === @pkt.body_ptr
@@ -29,8 +29,8 @@ shared_examples_for "PCap::Packet" do
   end
 end
 
-shared_examples_for "PCap::Packet populated" do
-  it_should_behave_like "PCap::Packet"
+shared_examples_for "Caper::Packet populated" do
+  it_should_behave_like "Caper::Packet"
 
   it "should have a non-zero packet length in the header" do
     @pkt.length.should_not == 0
@@ -50,7 +50,7 @@ shared_examples_for "PCap::Packet populated" do
 
 end
 
-shared_examples_for "PCap::Packet composed" do
+shared_examples_for "Caper::Packet composed" do
   it "should return the expected header" do
     @pkt.header.should be_kind_of(PacketHeader)
     @pkt.header.len.should  == @test_body.size

@@ -2,15 +2,13 @@ begin; require 'rubygems'; rescue LoadError; end
 
 require 'ffi_dry'
 
-module FFI
-  module PCap
-    extend FFI::Library
+module Caper
+  extend FFI::Library
 
-    begin
-      ffi_lib "wpcap"
-    rescue LoadError
-      ffi_lib "pcap"
-    end
+  begin
+    ffi_lib "wpcap"
+  rescue LoadError
+    ffi_lib "pcap"
   end
 end
 

@@ -4,8 +4,7 @@
 
 require 'socket'
 
-module FFI
-module PCap
+module Caper
   typedef :uint8, :sa_family_t
   typedef :uint32, :in_addr_t
   typedef :uint16, :in_port_t
@@ -73,7 +72,7 @@ module PCap
       field :family,   :sa_family_t, :desc => 'address family (AF_INET6)'
       field :port,     :in_port_t,   :desc => 'transport layer port'
       field :flowinfo, :uint32,      :desc => 'priority & flow label'
-      struct :addr,    ::FFI::PCap::In6Addr,     :desc => 'IPv6 address'
+      struct :addr,    ::Caper::In6Addr,     :desc => 'IPv6 address'
     end
   end
 
@@ -94,4 +93,4 @@ module PCap
   end
 
 end
-end
+

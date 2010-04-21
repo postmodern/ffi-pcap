@@ -17,7 +17,7 @@ describe Live do
     @pcap.close
   end
 
-  it_should_behave_like "PCap::CaptureWrapper"
+  it_should_behave_like "Caper::CaptureWrapper"
   
   it "should support non-blocking mode" do
     @pcap.non_blocking = true
@@ -63,7 +63,7 @@ describe Live do
       @pcap.close
     end
     
-    it_should_behave_like "PCap::Packet populated"
+    it_should_behave_like "Caper::Packet populated"
 
   end
 
@@ -78,7 +78,7 @@ describe Live do
       end
 
       start_traffic_generator()
-      it_should_behave_like "PCap::CaptureWrapper"
+      it_should_behave_like "Caper::CaptureWrapper"
       stop_traffic_generator()
       @pcap.close
     end
