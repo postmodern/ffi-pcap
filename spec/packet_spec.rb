@@ -10,6 +10,12 @@ describe Packet do
 
     it_should_behave_like "PCap::Packet populated"
 
+    it "should return the expected header" do
+      @pkt.header.len.should  == @test_body.size
+      @pkt.header.caplen.should == @test_body.size
+      @pkt.header.timestamp.to_time.to_i.should == 0
+    end
+
     it "should return the expected body String" do
       @pkt.body.should == @test_body
     end
