@@ -6,7 +6,7 @@ begin
     t.options = [
       '--protected',
       '--files', 'History.rdoc',
-      '--title', 'ffi-pcap'
+      '--title', 'caper'
     ]
   end
 

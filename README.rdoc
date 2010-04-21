@@ -1,4 +1,10 @@
-= ffi-pcap
+= caper
+
+* http://github.com/emonti/caper
+* Eric Monti (esmonti at gmail dot com)
+
+This started as a fork of ffi-pcap by postmodern but has diverged 
+significantly from its original version.
 
 * http://github.com/sophsec/ffi-pcap/
 * Postmodern (postmodern.mod3 at gmail.com)
@@ -19,13 +25,13 @@ Ruby FFI bindings for libpcap.
 
 == INSTALL:
 
-  $ sudo gem install ffi-pcap
+  $ sudo gem install caper
 
 == LICENSE:
 
 The MIT License
 
-Copyright (c) 2009-2010 Hal Brodigan
+Copyright (c) 2010 Eric Monti
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

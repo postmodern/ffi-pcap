@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'pcap-ffi'
+require 'caper'
 
 include FFI
 
