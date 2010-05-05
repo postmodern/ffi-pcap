@@ -21,6 +21,20 @@ shared_examples_for "Caper::CommonWrapper" do
     }.should_not raise_error(Exception)
   end
 
+  it "should be able to write packets to a dump file" do
+    tmpfile = Tempfile.new(rand(0xffff).to_s).path
+    dumper = @pcap.open_dump(tmpfile)
+    dumper.write_pkt( Packet.from_string("i want to be a packet when i grow up") )
+    dumper.flush
+    dumper.close
+
+    chk_pcap = Offline.new(tmpfile)
+    pkt = chk_pcap.next
+    pkt.should be_kind_of Packet
+    pkt.body.should == "i want to be a packet when i grow up"
+    chk_pcap.close
+  end
+
   it "should raise an exception when opening a bad dump file" do
     lambda {
       @pcap.open_dump(File.join('','obviously','not','there'))
