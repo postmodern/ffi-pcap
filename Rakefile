@@ -9,14 +9,14 @@ require './lib/ffi/pcap/version.rb'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
-    gemspec.rubyforge_project = 'ffi/pcap'
-    gemspec.name = "ffi/pcap"
+    gemspec.rubyforge_project = 'ffi-pcap'
+    gemspec.name = "ffi-pcap"
     gemspec.summary = "FFI bindings for libpcap"
     gemspec.email = "postmodern.mod3@gmail.com"
-    gemspec.homepage = "http://github.com/postmodern/ffi/pcap"
-    gemspec.description = "Bindings to sniff packets using the FFI interface in Ruby."
-    gemspec.authors = ["Postmodern, Dakrone", "Eric Monti"]
-    gemspec.add_dependency "ffi"
+    gemspec.homepage = "http://github.com/sophsec/ffi-pcap"
+    gemspec.description = "Bindings to libpcap via FFI interface in Ruby."
+    gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
+    gemspec.add_dependency "ffi", ">= 0.5.0"
     gemspec.add_dependency "ffi_dry", ">= 0.1.9"
   end
 rescue LoadError
