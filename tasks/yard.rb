@@ -2,11 +2,16 @@ begin
   require 'yard'
 
   YARD::Rake::YardocTask.new do |t|
-    t.files   = ['lib/**/*.rb']
+    if File.exist?('VERSION')  
+      version = "- #{File.read('VERSION')}"
+    else  
+      version = ""  
+    end  
+    
+    t.files   = ['ChangeLog*','LICENSE*','lib/**/*.rb']
     t.options = [
+      '--title',"FFI PCap Documentation #{version}",
       '--protected',
-      '--files', 'History.rdoc',
-      '--title', 'ffi-pcap'
     ]
   end
 

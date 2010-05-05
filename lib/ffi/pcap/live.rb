@@ -23,18 +23,18 @@ module PCap
   # @param [Hash] opts
   #   Options are ignored and passed to the super-class except those below.
   #
-  # @option opts [optional, String, nil] :device, :dev
+  # @option opts [String, nil] :device, :dev
   #   The device to open. On some platforms, this can be "any". If nil or 
   #   unspecified FFI::PCap.lookupdev() is called to obtain a default device. 
   #
-  # @option opts [optional, Integer] :snaplen
+  # @option opts [Integer] :snaplen
   #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
   #
-  # @option opts [optional, Boolean] :promisc
+  # @option opts [Boolean] :promisc
   #   Specifies if the interface is to be put into promiscuous mode. Defaults
   #   to false.
   #
-  # @option opts [optional, Integer] :timeout
+  # @option opts [Integer] :timeout
   #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
   #
   # @return [Live]
