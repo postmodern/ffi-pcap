@@ -1,4 +1,5 @@
-module Caper
+module FFI
+module PCap
 
   class DataLink
 
@@ -67,7 +68,7 @@ module Caper
     #   The numeric value for the datalink name or nil on failure.
     def self.name_to_val(n)
       n = n.to_s if n.kind_of?(Symbol)
-      if (v=Caper.pcap_datalink_name_to_val(n)) >= 0
+      if (v=FFI::PCap.pcap_datalink_name_to_val(n)) >= 0
         return v
       end
     end
@@ -79,7 +80,7 @@ module Caper
     #   The string name of the data-link or nil on failure.
     # 
     def self.val_to_name(v)
-      Caper.pcap_datalink_val_to_name(v)
+      FFI::PCap.pcap_datalink_val_to_name(v)
     end
 
     # @param [String, Symbol or Integer] l
@@ -87,11 +88,11 @@ module Caper
     #   are case-insensitive.
     def self.describe(l)
       l = l.to_s if l.kind_of?(Symbol)
-      l = Caper.pcap_datalink_name_to_val(l) if l.kind_of?(String) 
-      Caper.pcap_datalink_val_to_description(l)
+      l = FFI::PCap.pcap_datalink_name_to_val(l) if l.kind_of?(String) 
+      FFI::PCap.pcap_datalink_val_to_description(l)
     end
     
-    # Caper datalink numeric value
+    # FFI::PCap datalink numeric value
     attr_reader :value
 
     # Creates a new DataLink object with the specified value or name.
@@ -168,4 +169,5 @@ module Caper
   attach_function :pcap_datalink_val_to_name, [:int], :string
   attach_function :pcap_datalink_val_to_description, [:int], :string
 
+end
 end

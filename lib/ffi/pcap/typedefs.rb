@@ -1,4 +1,5 @@
-module Caper
+module FFI
+module PCap
   typedef :pointer, :FILE
 
   typedef :int,  :bpf_int32
@@ -22,4 +23,5 @@ module Caper
     [:uint32, :suseconds_t],
   ].each {|t, d| begin; find_type(d); rescue TypeError; typedef t,d; end }
 
+end
 end

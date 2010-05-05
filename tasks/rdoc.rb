@@ -9,7 +9,7 @@ Rake::RDocTask.new do |rdoc|
   end  
   
   rdoc.rdoc_dir = 'rdoc'  
-  rdoc.title = "caper #{version}"  
+  rdoc.title = "ffi-pcap #{version}"  
   rdoc.rdoc_files.include('README*')  
   rdoc.rdoc_files.include('History*')  
   rdoc.rdoc_files.include('lib/**/*.rb')  

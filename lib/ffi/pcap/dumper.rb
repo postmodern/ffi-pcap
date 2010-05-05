@@ -1,10 +1,11 @@
 
-module Caper
+module FFI
+module PCap
 
   # See pcap_dumper_t in pcap.h
   #
-  # A pcap_dumper, or Caper::Dumper is handled opaquely so that it can
-  # be implemented differently on different platforms. In Caper, we
+  # A pcap_dumper, or FFI::PCap::Dumper is handled opaquely so that it can
+  # be implemented differently on different platforms. In FFI::PCap, we
   # simply wrap the pcap_dumper_t pointer with a ruby interface.
   class Dumper
 
@@ -13,7 +14,7 @@ module Caper
     end
 
     def _write(header, bytes)
-      Caper.pcap_dump(@dumper, header, bytes)
+      FFI::PCap.pcap_dump(@dumper, header, bytes)
     end
 
     def write(*args)
@@ -29,15 +30,15 @@ module Caper
     end
 
     def tell
-      Caper.pcap_dump_ftell(@dumper)
+      FFI::PCap.pcap_dump_ftell(@dumper)
     end
 
     def flush
-      Caper.pcap_dump_flush(@dumper)
+      FFI::PCap.pcap_dump_flush(@dumper)
     end
 
     def close
-      Caper.pcap_dump_close(@dumper)
+      FFI::PCap.pcap_dump_close(@dumper)
     end
 
   end
@@ -50,4 +51,5 @@ module Caper
   attach_function :pcap_dump_close, [:pcap_dumper_t], :void
   attach_function :pcap_dump, [:pointer, PacketHeader, :pointer], :void
 
+end
 end

@@ -1,4 +1,5 @@
-module Caper
+module FFI
+module PCap
   class TimeVal < FFI::Struct
     include FFI::DRY::StructHelper
 
@@ -43,4 +44,5 @@ module Caper
     end
 
   end
+end
 end

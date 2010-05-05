@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'tempfile'
 
-shared_examples_for "Caper::CommonWrapper" do
+shared_examples_for "FFI::PCap::CommonWrapper" do
   it "should indicate readiness" do
     @pcap.ready?.should == true
   end
@@ -70,7 +70,7 @@ shared_examples_for "Caper::CommonWrapper" do
 
 end
 
-shared_examples_for "Caper::CaptureWrapper" do
+shared_examples_for "FFI::PCap::CaptureWrapper" do
 
   it "should pass packets to a block using loop()" do
     i = 0
@@ -119,6 +119,6 @@ shared_examples_for "Caper::CaptureWrapper" do
     }.should raise_error(LibError)
   end
 
-  it_should_behave_like "Caper::CommonWrapper"
+  it_should_behave_like "FFI::PCap::CommonWrapper"
 end
 

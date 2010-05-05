@@ -1,5 +1,5 @@
-module Caper
-
+module FFI
+module PCap
   # As returned by pcap_stats()
   #
   # See pcap_stat struct in pcap.h.
@@ -53,4 +53,5 @@ module Caper
       field :tx_window_errors,    :ulong
     end
   end
+end
 end

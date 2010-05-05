@@ -1,7 +1,6 @@
 === 0.2.0 / 2010-04-22
-* Renamed library to 'caper' using Caper as the ruby namespace instead of 
-  FFI::PCap
-* Fully branched as a separate project under the new caper name.
+* emonti fork merged back into sophsec/ffi-pcap 
+* ... ignore that whole "caper" thing.  It'll return as another lib entirely
 
 === 0.1.4 / 2010-04-20
 * Fixes and example for pcap dumper

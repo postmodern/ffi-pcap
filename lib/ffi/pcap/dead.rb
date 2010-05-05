@@ -1,6 +1,7 @@
-require 'caper/common_wrapper'
+require 'ffi/pcap/common_wrapper'
 
-module Caper
+module FFI
+module PCap
   # A wrapper class for pcap devices opened with open_dead()
   class Dead < CommonWrapper
     attr_reader :datalink
@@ -15,16 +16,16 @@ module Caper
     #   The link-layer type for pcap. nil is equivalent to 0 (aka DLT_NULL).
     #
     # @option opts [optional, Integer] :snaplen
-    #   The snapshot length for the pcap object. Defaults to Caper::DEFAULT_SNAPLEN
+    #   The snapshot length for the pcap object. Defaults to FFI::PCap::DEFAULT_SNAPLEN
     #
     # @return [Dead]
-    #   A Caper::Dead wrapper.
+    #   A FFI::PCap::Dead wrapper.
     #
     def initialize(opts={}, &block)
       dl = opts[:datalink] || DataLink.new(0)
       @datalink = dl.kind_of?(DataLink) ? dl : DataLink.new(dl)
       @snaplen  = opts[:snaplen] || DEFAULT_SNAPLEN
-      @pcap = Caper.pcap_open_dead(@datalink.value, @snaplen)
+      @pcap = FFI::PCap.pcap_open_dead(@datalink.value, @snaplen)
       raise(LibError, "pcap_open_dead(): returned a null pointer") if @pcap.null?
       super(@pcap, opts, &block)
     end
@@ -32,4 +33,5 @@ module Caper
 
   attach_function :pcap_open_dead, [:int, :int], :pcap_t
 
+end
 end

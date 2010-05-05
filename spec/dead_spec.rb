@@ -10,7 +10,7 @@ describe Dead do
     @pcap.close
   end
 
-  it_should_behave_like "Caper::CommonWrapper"
+  it_should_behave_like "FFI::PCap::CommonWrapper"
 
   describe "yielding to a block" do
     # Note we also test all the behaviors here together instead of seperately.
@@ -22,7 +22,7 @@ describe Dead do
         @pcap.should_not be_closed
       end
 
-      it_should_behave_like "Caper::CommonWrapper"
+      it_should_behave_like "FFI::PCap::CommonWrapper"
 
       @pcap.close
     end

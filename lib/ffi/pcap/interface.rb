@@ -1,5 +1,6 @@
 
-module Caper
+module FFI
+module PCap
 
   # Item in a list of interfaces.
   #
@@ -11,10 +12,10 @@ module Caper
     LOOPBACK = 0x00000001
 
     dsl_layout do
-      p_struct  :next, ::Caper::Interface
+      p_struct  :next, ::FFI::PCap::Interface
       field     :name,        :string, :desc => 'name used by pcap_open_live()'
       field     :description, :string, :desc => 'text description, or NULL'
-      p_struct  :addresses, ::Caper::Addr,    :desc => 'address linked list'
+      p_struct  :addresses, ::FFI::PCap::Addr,    :desc => 'address linked list'
       field     :flags,   :bpf_uint32, :desc => 'PCAP_IF_ interface flags'
     end
 
@@ -24,4 +25,5 @@ module Caper
 
   end
 
+end
 end

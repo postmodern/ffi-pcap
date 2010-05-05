@@ -1,6 +1,7 @@
 require 'enumerator'
 
-module Caper
+module FFI
+module PCap
   DEFAULT_SNAPLEN = 65535  # Default snapshot length for packets
 
   attach_function :pcap_lookupdev, [:pointer], :string
@@ -14,9 +15,9 @@ module Caper
   #   On failure, an exception is raised with the relevant error 
   #   message from libpcap.
   #
-  def Caper.lookupdev
+  def PCap.lookupdev
     e = ErrorBuffer.create()
-    unless name = Caper.pcap_lookupdev(e)
+    unless name = FFI::PCap.pcap_lookupdev(e)
       raise(LibError, "pcap_lookupdev(): #{e.to_s}")
     end
     return name
@@ -47,11 +48,11 @@ module Caper
   #   On failure, an exception is raised with the relevant error message 
   #   from libpcap. 
   #
-  def Caper.lookupnet(device)
+  def PCap.lookupnet(device)
     netp  = FFI::MemoryPointer.new(find_type(:bpf_uint32))
     maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
     errbuf = ErrorBuffer.create()
-    unless Caper.pcap_lookupnet(device, netp, maskp, errbuf) == 0
+    unless FFI::PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
       raise(LibError, "pcap_lookupnet(): #{errbuf.to_s}")
     end
     if block_given?
@@ -68,7 +69,7 @@ module Caper
   #
   # If passed a block, the block is passed to Live.new() and the Live
   # object is closed after completion of the block
-  def Caper.open_live(opts={},&block)
+  def PCap.open_live(opts={},&block)
     ret = Live.new(opts, &block)
     return block_given? ? ret.close : ret
   end
@@ -76,20 +77,20 @@ module Caper
 
   # Opens a new Dead pcap interface for compiling filters or opening
   # a capture for output. See Dead.new() for arguments.
-  def Caper.open_dead(opts={}, &block)
+  def PCap.open_dead(opts={}, &block)
     ret = Dead.new(opts, &block)
     return block_given? ? ret.close : ret
   end
 
 
   # Opens a saved capture file for reading. See Offline.new for arguments.
-  def Caper.open_offline(path, opts={}, &block)
+  def PCap.open_offline(path, opts={}, &block)
     ret = Offline.new(path, opts={}, &block)
     return block_given? ? ret.close : ret
   end
 
   # Same as open_offline
-  def Caper.open_file(path, opts={}, &block)
+  def PCap.open_file(path, opts={}, &block)
     open_offline(path, opts, &block)
   end
 
@@ -109,11 +110,11 @@ module Caper
   #   On failure, an exception is raised with the relevant error 
   #   message from libpcap.
   #
-  def Caper.each_device
+  def PCap.each_device
     devices = ::FFI::MemoryPointer.new(:pointer)
     errbuf = ErrorBuffer.create()
 
-    Caper.pcap_findalldevs(devices, errbuf)
+    FFI::PCap.pcap_findalldevs(devices, errbuf)
     node = devices.get_pointer(0)
 
     if node.null?
@@ -127,7 +128,7 @@ module Caper
       device = device.next
     end
 
-    Caper.pcap_freealldevs(node)
+    FFI::PCap.pcap_freealldevs(node)
     return nil
   end
 
@@ -137,17 +138,17 @@ module Caper
   #
   # If an interface does not have an address assigned, its network/netmask
   # value is returned as a nil value.
-  def Caper.dump_devices
-    Caper.enum_for(:each_device).map do |dev| 
-      net = begin; Caper.lookupnet(dev.name); rescue LibError; end
+  def PCap.dump_devices
+    FFI::PCap.enum_for(:each_device).map do |dev| 
+      net = begin; FFI::PCap.lookupnet(dev.name); rescue LibError; end
       [dev.name, net]
     end
   end
 
 
   # Returns an array of device names for each interface found on the system.
-  def Caper.device_names
-    Caper.enum_for(:each_device).map {|dev| dev.name }
+  def PCap.device_names
+    FFI::PCap.enum_for(:each_device).map {|dev| dev.name }
   end
 
   attach_function :pcap_lib_version, [], :string
@@ -159,8 +160,8 @@ module Caper
   #  Information about the version of the libpcap library being used; 
   #  note that it  contains more information than just a version number.
   #   
-  def Caper.lib_version
-    Caper.pcap_lib_version
+  def PCap.lib_version
+    FFI::PCap.pcap_lib_version
   end
 
 
@@ -169,7 +170,7 @@ module Caper
   # @return [String]
   #  Version number.
   #   
-  def Caper.lib_version_number
+  def PCap.lib_version_number
     if lib_version() =~ /libpcap version (\d+\.\d+.\d+)/
       return $1
     end
@@ -204,7 +205,7 @@ module Caper
     #   or because the SUDO_USER environment variable is not
     #   a valid user.
     #
-    def Caper.drop_sudo_privs
+    def PCap.drop_sudo_privs
       if ENV["SUDO_USER"] and pwent=Etc.getpwnam(ENV["SUDO_USER"])
         Process::Sys.setgid(pwent.gid) 
         Process::Sys.setegid(pwent.gid) 
@@ -247,4 +248,5 @@ module Caper
   #attach_function :pcap_file, [:pcap_t], :FILE
   #attach_function :pcap_dump_fopen, [:pcap_t, :FILE], :pcap_dumper_t
   #attach_function :pcap_fileno, [:pcap_t], :int
+end
 end

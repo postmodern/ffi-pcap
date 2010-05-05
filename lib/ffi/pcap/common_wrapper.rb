@@ -1,4 +1,5 @@
-module Caper
+module FFI
+module PCap
 
   # An abstract base wrapper class with features common to all pcap
   # wrapper types. Do not use this directly. Instead refer to Live, 
@@ -18,14 +19,14 @@ module Caper
 
     # Returns the DataLink for the pcap device.
     def datalink
-      @datalink ||= DataLink.new(Caper.pcap_datalink(_pcap))
+      @datalink ||= DataLink.new(FFI::PCap.pcap_datalink(_pcap))
     end
 
 
     # Returns an array of supported DataLinks for the pcap device.
     def supported_datalinks
       dlt_lst = FFI::MemoryPointer.new(:pointer)
-      if (cnt=Caper.pcap_list_datalinks(_pcap, dlt_lst)) < 0
+      if (cnt=FFI::PCap.pcap_list_datalinks(_pcap, dlt_lst)) < 0
         raise(LibError, "pcap_list_datalinks(): #{geterr()}")
       end
       # extract datalink values 
@@ -47,7 +48,7 @@ module Caper
     # Closes the pcap interface using libpcap.
     def close
       unless @closed
-        Caper.pcap_close(_pcap)
+        FFI::PCap.pcap_close(_pcap)
         @closed = true
         @pcap = nil
       end
@@ -67,7 +68,7 @@ module Caper
     # @return [Integer]
     #  Snapshot length for the pcap interface.
     def snaplen
-      Caper.pcap_snapshot(_pcap)
+      FFI::PCap.pcap_snapshot(_pcap)
     end
 
 
@@ -89,7 +90,7 @@ module Caper
     #   netmask)
     #
     # @return [BPFProgram]
-    #   A Caper::BPFProgram structure for the compiled filter.
+    #   A FFI::PCap::BPFProgram structure for the compiled filter.
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error message 
@@ -99,7 +100,7 @@ module Caper
       optimize = opts[:optimize] || 1
       netmask  = opts[:netmask] || 0 
       code = BPFProgram.new
-      if Caper.pcap_compile(_pcap, code, expression, optimize, netmask) != 0
+      if FFI::PCap.pcap_compile(_pcap, code, expression, optimize, netmask) != 0
         raise(LibError, "pcap_compile(): #{geterr()}")
       end
       return code
@@ -113,7 +114,7 @@ module Caper
     #   message from libpcap.
     #
     def open_dump(path)
-      dp = Caper.pcap_dump_open(_pcap, File.expand_path(path))
+      dp = FFI::PCap.pcap_dump_open(_pcap, File.expand_path(path))
       raise(LibError, "pcap_dump_open(): #{geterr()}") if dp.null?
       return Dumper.new(dp)
     end
@@ -123,7 +124,7 @@ module Caper
     #   The error text pertaining to the last pcap library error.
     #
     def geterr
-      Caper.pcap_geterr(_pcap)
+      FFI::PCap.pcap_geterr(_pcap)
     end
 
     alias error geterr
@@ -170,4 +171,5 @@ module Caper
   attach_function :pcap_snapshot, [:pcap_t], :int
   attach_function :pcap_dump_open, [:pcap_t, :string], :pcap_dumper_t
 
+end
 end

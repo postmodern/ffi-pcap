@@ -1,5 +1,6 @@
 
-module Caper
+module FFI
+module PCap
 
   # Includes structures defined in pcap-bpf.h
 
@@ -42,7 +43,7 @@ module Caper
     def free!
       unless @closed
         @freed = true
-        Caper.pcap_freecode(self)
+        FFI::PCap.pcap_freecode(self)
       end
     end
 
@@ -83,7 +84,7 @@ module Caper
       optimize = (opts[:optimize] || 1)
       mask     = (opts[:netmask] || 0)
       code = BPFProgram.new()
-      r = Caper.pcap_compile_nopcap(slen, dl.value, code, expr, optimize, mask)
+      r = FFI::PCap.pcap_compile_nopcap(slen, dl.value, code, expr, optimize, mask)
       raise(LibError, "pcap_compile_nopcap(): unspecified error") if r < 0
       return code
     end
@@ -99,6 +100,7 @@ module Caper
   attach_function :bpf_dump, [BPFProgram, :int], :void
   attach_function :pcap_freecode, [BPFProgram], :void
 
+end
 end
 
 

@@ -1,5 +1,6 @@
 
-module Caper
+module FFI
+module PCap
 
   # CopyHandler is a callback handler for use with CaptureWrapper.loop and 
   # CaptureWrapper.dispatch. When used, it works exactly as normal, 
@@ -32,5 +33,6 @@ module Caper
       return args
     end
   end
+end
 end
 

@@ -8,7 +8,7 @@ describe Packet do
       @pkt = Packet.new(nil, @test_body)
     end
 
-    it_should_behave_like "Caper::Packet composed"
+    it_should_behave_like "FFI::PCap::Packet composed"
 
   end
 
@@ -20,7 +20,7 @@ describe Packet do
       @pkt = Packet.new(PacketHeader.new(:caplen => l, :len => l), body)
     end
 
-    it_should_behave_like "Caper::Packet composed"
+    it_should_behave_like "FFI::PCap::Packet composed"
 
   end
 
@@ -30,14 +30,14 @@ describe Packet do
       @pkt = Packet.from_string("\xde\xad\xbe\xef")
     end
   
-    it_should_behave_like "Caper::Packet composed"
+    it_should_behave_like "FFI::PCap::Packet composed"
 
   end
 
 
   describe 'provided by a libpcap savefile using next()' do
     before(:all) do
-      @pcap = Caper.open_offline(PCAP_TESTFILE)
+      @pcap = FFI::PCap.open_offline(PCAP_TESTFILE)
       @pkt = @pcap.next()
     end
 
@@ -45,12 +45,12 @@ describe Packet do
       @pcap.close()
     end
 
-    it_should_behave_like "Caper::Packet populated"
+    it_should_behave_like "FFI::PCap::Packet populated"
   end
 
   describe 'provided by a libpcap savefile using loop()' do
     before(:all) do
-      @pcap = Caper.open_offline(PCAP_TESTFILE)
+      @pcap = FFI::PCap.open_offline(PCAP_TESTFILE)
       @pkt = nil
       # we use copy inside the loop because libpcap's loop() frees or reuses 
       # memory for packets after each call to the handler.
@@ -61,7 +61,7 @@ describe Packet do
       @pcap.close()
     end
 
-    it_should_behave_like "Caper::Packet populated"
+    it_should_behave_like "FFI::PCap::Packet populated"
   end
 
 

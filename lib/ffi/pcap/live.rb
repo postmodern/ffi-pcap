@@ -1,6 +1,7 @@
-require 'caper/capture_wrapper'
+require 'ffi/pcap/capture_wrapper'
 
-module Caper
+module FFI
+module PCap
   begin
     attach_function :pcap_setdirection, [:pcap_t, :pcap_direction_t], :int
   rescue FFI::NotFoundError
@@ -24,7 +25,7 @@ module Caper
   #
   # @option opts [optional, String, nil] :device, :dev
   #   The device to open. On some platforms, this can be "any". If nil or 
-  #   unspecified Caper.lookupdev() is called to obtain a default device. 
+  #   unspecified FFI::PCap.lookupdev() is called to obtain a default device. 
   #
   # @option opts [optional, Integer] :snaplen
   #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
@@ -37,7 +38,7 @@ module Caper
   #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
   #
   # @return [Live]
-  #   A Caper::Live wrapper.
+  #   A FFI::PCap::Live wrapper.
   #
   # @raise [LibError]
   #   On failure, an exception is raised with the relevant error 
@@ -45,7 +46,7 @@ module Caper
   #
   # @raise [ArgumentError]
   #   May raise an exception if a :device cannot be autodetected using 
-  #   Caper.lookupdev() for any reason. This should never happen on most platforms.
+  #   FFI::PCap.lookupdev() for any reason. This should never happen on most platforms.
   #
   class Live < CaptureWrapper
     DEFAULT_TO_MS = 1000     # Default timeout for pcap_open_live()
@@ -54,7 +55,7 @@ module Caper
 
     def initialize(opts=nil)
       opts ||= {}
-      @device = opts[:device] || opts[:dev] || Caper.lookupdev()
+      @device = opts[:device] || opts[:dev] || FFI::PCap.lookupdev()
       unless @device
         raise(ArgumentError, "Couldn't detect a device. One must be specified.")
       end
@@ -65,7 +66,7 @@ module Caper
       @direction = (opts[:direction] || opts[:dir])
 
       @errbuf = ErrorBuffer.create()
-      @pcap = Caper.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
+      @pcap = FFI::PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
       raise(LibError, "pcap_open_live(): #{@errbuf.to_s}") if @pcap.null?
 
       # call super to get all our ducks in a row
@@ -77,7 +78,7 @@ module Caper
       # These pointers may be used internally (and should get autoreleased)
       @netp, @maskp = nil
       begin
-        Caper.lookupnet(@device) do |netp, maskp|
+        FFI::PCap.lookupnet(@device) do |netp, maskp|
           @netp = netp
           @maskp = maskp
         end
@@ -116,7 +117,7 @@ module Caper
       ::FFI::DRY::NetEndian.ntohl(@maskp.get_uint32(0))
     end
 
-    @@have_setdirection = Caper.respond_to?(:pcap_setdirection)
+    @@have_setdirection = FFI::PCap.respond_to?(:pcap_setdirection)
 
     # Sets the direction for which packets will be captured.
     # 
@@ -127,8 +128,8 @@ module Caper
               "pcap_setdirection() is not avaiable from your pcap library") 
       end
 
-      dirs = Caper.enum_type(:pcap_direction_t)
-      if Caper.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
+      dirs = FFI::PCap.enum_type(:pcap_direction_t)
+      if FFI::PCap.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
         return true
       else
         raise(LibError, "pcap_setdirection(): #{geterr()}", caller)
@@ -147,7 +148,7 @@ module Caper
     #
     def set_non_blocking(mode)
       mode =  mode ? 1 : 0
-      if Caper.pcap_setnonblock(_pcap, mode, @errbuf) == 0
+      if FFI::PCap.pcap_setnonblock(_pcap, mode, @errbuf) == 0
         return mode == 1
       else
         raise(LibError, "pcap_setnonblock(): #{@errbuf.to_s}", caller)
@@ -166,7 +167,7 @@ module Caper
     #   from libpcap.
     #
     def non_blocking
-      if (mode=Caper.pcap_getnonblock(_pcap, @errbuf)) == -1
+      if (mode=FFI::PCap.pcap_getnonblock(_pcap, @errbuf)) == -1
         raise(LibError, "pcap_getnonblock(): #{@errbuf.to_s}", caller)
       else
         return mode == 1
@@ -185,14 +186,14 @@ module Caper
     #
     def stats
       stats = Stat.new
-      unless Caper.pcap_stats(_pcap, stats) == 0
+      unless FFI::PCap.pcap_stats(_pcap, stats) == 0
         raise(LibError, "pcap_stats(): #{geterr()}")
       end
       return stats
     end
 
 
-    @@have_inject = Caper.respond_to?(:pcap_inject)
+    @@have_inject = FFI::PCap.respond_to?(:pcap_inject)
 
     # Transmit a packet using pcap_inject()
     #
@@ -230,7 +231,7 @@ module Caper
           raise(ArgumentError, "Don't know how to inject #{pkt.class}")
         end
 
-        if (sent=Caper.pcap_inject(_pcap, bufp, len)) < 0
+        if (sent=FFI::PCap.pcap_inject(_pcap, bufp, len)) < 0
           raise(LibError, "pcap_inject(): #{geterr()}")
         end
         return sent
@@ -242,7 +243,7 @@ module Caper
       end
     end
 
-    @@have_sendpacket = Caper.respond_to?(:pcap_sendpacket)
+    @@have_sendpacket = FFI::PCap.respond_to?(:pcap_sendpacket)
 
     # Transmit a packet using pcap_sendpacket()
     #
@@ -283,7 +284,7 @@ module Caper
         raise(ArgumentError, "Don't know how to send #{pkt.class}")
       end
 
-      if Caper.pcap_sendpacket(_pcap, bufp, len) != 0
+      if FFI::PCap.pcap_sendpacket(_pcap, bufp, len) != 0
         raise(LibError, "pcap_sendpacket(): #{geterr()}")
       end
       return true
@@ -298,4 +299,5 @@ module Caper
   attach_function :pcap_setnonblock, [:pcap_t, :int, :pointer], :int
   attach_function :pcap_stats, [:pcap_t, Stat], :int
 
+end
 end

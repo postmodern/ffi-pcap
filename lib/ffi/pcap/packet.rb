@@ -1,5 +1,5 @@
-
-module Caper
+module FFI
+module PCap
   class Packet
     attr_reader :body_ptr, :header
 
@@ -160,4 +160,5 @@ module Caper
 
   end
 
+end
 end

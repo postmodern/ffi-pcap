@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Caper::Live do
+describe FFI::PCap::Live do
   describe "packet injection" do
     before(:all) do
-      @pcap = Caper.open_live :device => PCAP_DEV, 
+      @pcap = FFI::PCap.open_live :device => PCAP_DEV, 
                              :promisc => false,
                              :timeout => 100,
                              :snaplen => 8192

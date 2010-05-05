@@ -1,4 +1,5 @@
-module Caper
+module FFI
+module PCap
   class ErrorBuffer < FFI::MemoryPointer
 
     # Size of the error buffers
@@ -39,4 +40,5 @@ module Caper
       end
     end
   end
+end
 end

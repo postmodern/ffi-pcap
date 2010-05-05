@@ -1,5 +1,6 @@
 
-module Caper
+module FFI
+module PCap
   class FileHeader < FFI::Struct
     include FFI::DRY::StructHelper
 
@@ -21,4 +22,5 @@ module Caper
       "#{self.version_major}.#{self.version_minor}"
     end
   end
+end
 end

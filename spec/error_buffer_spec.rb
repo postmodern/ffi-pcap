@@ -11,7 +11,7 @@ describe ErrorBuffer do
 
   it "should return an error message with to_s" do
     @errbuf.to_s.should be_empty
-    Caper.pcap_open_offline("/this/file/wont/exist/#{rand(0xFFFF)}", @errbuf )
+    FFI::PCap.pcap_open_offline("/this/file/wont/exist/#{rand(0xFFFF)}", @errbuf )
     @errbuf.to_s.should_not be_empty
   end
 end

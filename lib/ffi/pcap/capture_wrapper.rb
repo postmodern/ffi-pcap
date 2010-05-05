@@ -1,7 +1,8 @@
-require 'caper/common_wrapper'
-require 'caper/copy_handler'
+require 'ffi/pcap/common_wrapper'
+require 'ffi/pcap/copy_handler'
 
-module Caper
+module FFI
+module PCap
   # A superclass for both offline and live interfaces, but not dead interfaces
   # This class provides all the features necessary for receiving packets 
   # through libpcap.
@@ -109,7 +110,7 @@ module Caper
       cnt = opts[:count] || -1 # default to infinite loop
       h = opts[:handler]
 
-      ret = Caper.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
+      ret = FFI::PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
       if ret == -1
         raise(ReadError, "pcap_loop(): #{geterr()}")
       elsif ret -2
@@ -165,7 +166,7 @@ module Caper
       cnt = opts[:count] || -1 # default to infinite loop
       h = opts[:handler]
 
-      ret = Caper.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
+      ret = FFI::PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
       if ret == -1
         raise(ReadError, "pcap_dispatch(): #{geterr()}")
       elsif ret -2
@@ -189,7 +190,7 @@ module Caper
     #
     def old_next
       header = PacketHeader.new
-      bytes = Caper.pcap_next(_pcap, header)
+      bytes = FFI::PCap.pcap_next(_pcap, header)
       if bytes.null?
         return nil # or raise an exception?
       else
@@ -217,7 +218,7 @@ module Caper
       hdr_p = MemoryPointer.new(:pointer)
       buf_p = MemoryPointer.new(:pointer)
 
-      case Caper.pcap_next_ex(_pcap, hdr_p, buf_p)
+      case FFI::PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
       when -1 # error
         raise(ReadError, "pcap_next_ex(): #{geterr()}")
       when 0  # live capture read timeout expired
@@ -243,7 +244,7 @@ module Caper
     # one more packet may be processed.
     #
     def breakloop
-      Caper.pcap_breakloop(_pcap)
+      FFI::PCap.pcap_breakloop(_pcap)
     end
 
     alias stop breakloop
@@ -265,7 +266,7 @@ module Caper
     #
     def set_filter(expression, opts={})
       code = compile(expression, opts)
-      ret = Caper.pcap_setfilter(_pcap, code)
+      ret = FFI::PCap.pcap_setfilter(_pcap, code)
       code.free!  # done with this, we can free it
       raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
       return expression
@@ -284,4 +285,5 @@ module Caper
   attach_function :pcap_breakloop, [:pcap_t], :void
   attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
 
+end
 end
