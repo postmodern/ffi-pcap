@@ -55,8 +55,6 @@ Gem::Specification.new do |s|
      "lib/ffi/pcap/time_val.rb",
      "lib/ffi/pcap/typedefs.rb",
      "lib/ffi/pcap/version.rb",
-     "lib/pcap-ffi/mac_addr.rb",
-     "lib/pcap-ffi/packets/tcp.rb",
      "spec/data_link_spec.rb",
      "spec/dead_spec.rb",
      "spec/dumps/http.pcap",
