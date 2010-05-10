@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'pcap-ffi'
+require 'ffi/pcap'
 
-include FFI
+pcap =
+  FFI::PCap::Live.new(:dev => 'en0', 
+                 :promisc => true, 
+                 :handler => FFI::PCap::Handler)
 
-pcap = PCap.open_live(:device => ARGV[0]) do |user,header,bytes|
-  puts "#{header.timestamp}:"
+pcap.loop() do |this,pkt|
+  puts "#{pkt.time}:"
 
-  header.captured.times { |i|
-    print ' %.2x' % bytes.get_uchar(i)
-  }
+  pkt.captured.times {|i| print ' %.2x' % pkt.body_ptr.get_uchar(i) }
   putc "\n"
 end
 
-pcap.loop

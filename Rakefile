@@ -1,42 +1,26 @@
-require 'rubygems'
-require 'rake'
-require './lib/pcap-ffi/version.rb'
+# -*- ruby -*-
 
+require 'rubygems'
+Dir["tasks/*.rb"].each {|rt| require rt }
+require 'rake/clean'
+require './lib/ffi/pcap/version.rb'
+
+# Generate a gem using jeweler
 begin
   require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = 'ffi-pcap'
-    gem.version = FFI::PCap::VERSION
-    gem.summary = %Q{Ruby FFI bindings for libpcap.}
-    gem.description = %Q{Ruby FFI bindings for libpcap.}
-    gem.email = 'postmodern.mod3@gmail.com'
-    gem.homepage = 'http://github.com/sophsec/ffi-pcap'
-    gem.authors = ['Postmodern']
-    gem.add_dependency 'ffi', '>=0.5.3'
-    gem.add_development_dependency 'rspec', '>= 1.3.0'
-    gem.add_development_dependency 'yard', '>= 0.5.3'
-    gem.has_rdoc = 'yard'
+  Jeweler::Tasks.new do |gemspec|
+    gemspec.rubyforge_project = 'ffi-pcap'
+    gemspec.name = "ffi-pcap"
+    gemspec.summary = "FFI bindings for libpcap"
+    gemspec.email = "postmodern.mod3@gmail.com"
+    gemspec.homepage = "http://github.com/sophsec/ffi-pcap"
+    gemspec.description = "Bindings to libpcap via FFI interface in Ruby."
+    gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
+    gemspec.add_dependency "ffi", ">= 0.5.0"
+    gemspec.add_dependency "ffi_dry", ">= 0.1.9"
   end
 rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs += ['lib', 'spec']
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-  spec.spec_opts = ['--options', '.specopts']
-end
-
-task :spec => :check_dependencies
-task :default => :spec
-
-begin
-  require 'yard'
-
-  YARD::Rake::YardocTask.new
-rescue LoadError
-  task :yard do
-    abort "YARD is not available. In order to run yard, you must: gem install yard"
-  end
-end
+# vim: syntax=Ruby
