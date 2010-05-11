@@ -17,42 +17,46 @@ module PCap
   rescue FFI::NotFoundError
   end
 
-
-  # Creates a pcap interface for capturing from the network.
-  #
-  # @param [Hash] opts
-  #   Options are ignored and passed to the super-class except those below.
-  #
-  # @option opts [String, nil] :device, :dev
-  #   The device to open. On some platforms, this can be "any". If nil or 
-  #   unspecified FFI::PCap.lookupdev() is called to obtain a default device. 
-  #
-  # @option opts [Integer] :snaplen
-  #   The snapshot length for the pcap object. Defaults to DEFAULT_SNAPLEN
-  #
-  # @option opts [Boolean] :promisc
-  #   Specifies if the interface is to be put into promiscuous mode. Defaults
-  #   to false.
-  #
-  # @option opts [Integer] :timeout
-  #   Specifies the read timeout in milliseconds. Defaults to DEFAULT_TO_MS
-  #
-  # @return [Live]
-  #   A FFI::PCap::Live wrapper.
-  #
-  # @raise [LibError]
-  #   On failure, an exception is raised with the relevant error 
-  #   message from libpcap.
-  #
-  # @raise [ArgumentError]
-  #   May raise an exception if a :device cannot be autodetected using 
-  #   FFI::PCap.lookupdev() for any reason. This should never happen on most platforms.
-  #
   class Live < CaptureWrapper
     DEFAULT_TO_MS = 1000     # Default timeout for pcap_open_live()
 
     attr_reader :device, :promisc, :timeout, :direction
 
+    # Creates a pcap interface for capturing from the network.
+    #
+    # @param [Hash] opts
+    #   Options are ignored and passed to the super-class except those
+    #   below.
+    #
+    # @option opts [String, nil] :device, :dev
+    #   The device to open. On some platforms, this can be "any".
+    #   If nil or unspecified FFI::PCap.lookupdev() is called to obtain a
+    #   default device. 
+    #
+    # @option opts [Integer] :snaplen
+    #   The snapshot length for the pcap object.
+    #   Defaults to DEFAULT_SNAPLEN
+    #
+    # @option opts [Boolean] :promisc
+    #   Specifies if the interface is to be put into promiscuous mode.
+    #   Defaults to false.
+    #
+    # @option opts [Integer] :timeout
+    #   Specifies the read timeout in milliseconds.
+    #   Defaults to DEFAULT_TO_MS
+    #
+    # @return [Live]
+    #   A FFI::PCap::Live wrapper.
+    #
+    # @raise [LibError]
+    #   On failure, an exception is raised with the relevant error 
+    #   message from libpcap.
+    #
+    # @raise [ArgumentError]
+    #   May raise an exception if a :device cannot be autodetected using 
+    #   FFI::PCap.lookupdev() for any reason. This should never happen on
+    #   most platforms.
+    #
     def initialize(opts=nil)
       opts ||= {}
       @device = opts[:device] || opts[:dev] || FFI::PCap.lookupdev()
