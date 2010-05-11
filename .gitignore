@@ -7,4 +7,3 @@ ref/*
 .DS_Store
 *.swp
 *~
-*.gemspec
