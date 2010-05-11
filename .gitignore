@@ -1,7 +1,10 @@
 doc
+rdoc
 pkg
 tmp/*
+ref/*
 .yardoc
 .DS_Store
 *.swp
 *~
+*.gemspec
