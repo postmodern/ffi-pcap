@@ -33,6 +33,8 @@ Gem::Specification.new do |s|
      "lib/ffi/pcap.rb",
      "lib/ffi/pcap/addr.rb",
      "lib/ffi/pcap/bpf.rb",
+     "lib/ffi/pcap/bpf/instruction.rb",
+     "lib/ffi/pcap/bpf/program.rb",
      "lib/ffi/pcap/bsd.rb",
      "lib/ffi/pcap/capture_wrapper.rb",
      "lib/ffi/pcap/common_wrapper.rb",
