@@ -18,6 +18,7 @@ begin
     gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
     gemspec.add_dependency "ffi", ">= 0.5.0"
     gemspec.add_dependency "ffi_dry", ">= 0.1.9"
+    gemspec.has_rdoc = 'yard'
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
