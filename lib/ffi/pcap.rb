@@ -15,8 +15,6 @@ end
 end
 
 require 'ffi/pcap/crt'
-
-require 'ffi/pcap/version'
 require 'ffi/pcap/exceptions'
 
 # FFI typedefs, pointer wrappers, and struct
@@ -39,4 +37,3 @@ require 'ffi/pcap/packet'
 require 'ffi/pcap/live'
 require 'ffi/pcap/offline'
 require 'ffi/pcap/dead'
-
