@@ -1,7 +1,5 @@
 require 'rubygems'
-Dir["tasks/*.rb"].each {|rt| require rt }
 require 'rake/clean'
-require './lib/ffi/pcap/version.rb'
 
 # Generate a gem using jeweler
 begin
@@ -22,3 +20,23 @@ begin
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
+
+require 'spec/rake/spectask'
+
+desc "Run all specifications"
+Spec::Rake::SpecTask.new(:spec) do |t|
+  t.libs += ['lib', 'spec']
+  t.spec_opts = ['--colour', '--format', 'specdoc']
+end
+task :default => :spec
+
+require 'spec/rake/spectask'
+Spec::Rake::SpecTask.new(:rcov) do |spec|
+  spec.libs << 'lib' << 'spec'
+  spec.pattern = 'spec/**/*_spec.rb'
+  spec.rcov = true
+end
+
+require 'yard'
+YARD::Rake::YardocTask.new
+task :docs => :yard
