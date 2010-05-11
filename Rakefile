@@ -1,5 +1,3 @@
-# -*- ruby -*-
-
 require 'rubygems'
 Dir["tasks/*.rb"].each {|rt| require rt }
 require 'rake/clean'
@@ -24,5 +22,3 @@ begin
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
-
-# vim: syntax=Ruby
