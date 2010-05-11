@@ -1,24 +1,27 @@
 require 'rubygems'
-require 'rake/clean'
+require 'bundler'
 
-# Generate a gem using jeweler
 begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.rubyforge_project = 'ffi-pcap'
-    gemspec.name = "ffi-pcap"
-    gemspec.summary = "FFI bindings for libpcap"
-    gemspec.email = "postmodern.mod3@gmail.com"
-    gemspec.homepage = "http://github.com/sophsec/ffi-pcap"
-    gemspec.description = "Bindings to libpcap via FFI interface in Ruby."
-    gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
-    gemspec.add_dependency "ffi", ">= 0.5.0"
-    gemspec.add_dependency "ffi_dry", ">= 0.1.9"
-    gemspec.has_rdoc = 'yard'
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  Bundler.setup(:development, :doc)
+rescue Bundler::BundlerError => e
+  STDERR.puts e.message
+  STDERR.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+
+require 'rake'
+require 'rake/clean'
+require 'jeweler'
+
+Jeweler::Tasks.new do |gemspec|
+  gemspec.rubyforge_project = 'ffi-pcap'
+  gemspec.name = "ffi-pcap"
+  gemspec.summary = "FFI bindings for libpcap"
+  gemspec.email = "postmodern.mod3@gmail.com"
+  gemspec.homepage = "http://github.com/sophsec/ffi-pcap"
+  gemspec.description = "Bindings to libpcap via FFI interface in Ruby."
+  gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
+  gemspec.has_rdoc = 'yard'
 end
 
 require 'spec/rake/spectask'

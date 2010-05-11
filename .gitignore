@@ -3,6 +3,7 @@ rdoc
 pkg
 tmp/*
 ref/*
+.bundle
 .yardoc
 .DS_Store
 *.swp
