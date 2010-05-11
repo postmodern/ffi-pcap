@@ -1,3 +1,5 @@
+require 'ffi/pcap/typedefs'
+
 module FFI
   module PCap
     #

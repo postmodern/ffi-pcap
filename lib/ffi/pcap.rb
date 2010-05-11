@@ -26,7 +26,8 @@ require 'ffi/pcap/file_header'
 require 'ffi/pcap/time_val'
 require 'ffi/pcap/packet_header'
 require 'ffi/pcap/stat'
-require 'ffi/pcap/bpf'
+require 'ffi/pcap/bpf_instruction'
+require 'ffi/pcap/bpf_program'
 require 'ffi/pcap/dumper'
 
 # Ruby FFI function bindings, sugar, and misc wrappers

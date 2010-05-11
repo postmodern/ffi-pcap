@@ -1,3 +1,6 @@
+require 'ffi/pcap/bpf_instruction'
+require 'ffi/pcap/bpf_program'
+
 require 'enumerator'
 
 module FFI
@@ -191,6 +194,15 @@ module FFI
         return $1
       end
     end
+
+    attach_function :pcap_compile_nopcap, [:int, :int, BPFProgram, :string, :int, :bpf_uint32], :int
+
+    attach_function :bpf_filter, [BPFInstruction, :pointer, :uint, :uint], :uint
+    attach_function :bpf_validate, [BPFInstruction, :int], :int
+    attach_function :bpf_image, [BPFInstruction, :int], :string
+    attach_function :bpf_dump, [BPFProgram, :int], :void
+    attach_function :pcap_freecode, [BPFProgram], :void
+
 
     # Unix Only:
     begin
