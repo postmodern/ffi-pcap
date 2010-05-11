@@ -1,3 +1,5 @@
+require 'ffi/pcap/bsd/typedefs'
+
 module FFI
   module PCap
     #

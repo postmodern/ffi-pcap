@@ -1,3 +1,4 @@
+require 'ffi/pcap/bsd/typedefs'
 require 'ffi/pcap/bsd/sock_addr_family'
 
 module FFI
