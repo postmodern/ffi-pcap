@@ -5,18 +5,18 @@ module FFI
       attr_reader :body_ptr, :header
 
       #
-      # Creates a Packet from a Ruby string object.
+      # Creates a {Packet} from a Ruby string object.
       #
-      # see new() for more information about the arguments.
+      # @see new
       #
       def self.from_string(body, opts={})
         new(nil, body, opts)
       end
 
       #
-      # Allocates a Packet using new memory. Used primarily for pcap_loop
-      # and pcap_dispatch to retain packets after new ones have been
-      # received or a pcap device is closed.
+      # Allocates a {Packet} using new memory. Used primarily for
+      # `pcap_loop` and `pcap_dispatch` to retain packets after new ones
+      # have been received or a pcap device is closed.
       #
       def self.allocate(phdr, buf)
         new(phdr, buf).copy()
@@ -24,19 +24,19 @@ module FFI
 
       #
       # @param [PacketHeader, nil] hdr
-      #   The pcap pkthdr struct for this packet or nil.  hdr may only be
+      #   The pcap pkthdr struct for this packet or `nil`.  hdr may only be
       #   nil if a string is supplied for the body. A header will be 
-      #   created automatically and set_body called with opts.
+      #   created automatically and {#set_body} called with opts.
       #
       # @param [FFI::Pointer, String] body
       #   A string or pointer for the body of the packet. A String may
-      #   only be specified if hdr is set to nil.
+      #   only be specified if hdr is set to `nil`.
       #
       # @param [optional, Hash] opts
       #   Specifies additional options at creation time. Only those
       #   below are applicable for all initiatialization styles.
-      #   All other options are sent to set_body(), but only if the header
-      #   is nil and body is a String. See set_body() for more info.
+      #   All other options are sent to {#set_body}, but only if the header
+      #   is nil and body is a String. See {#set_body} for more info.
       # 
       # @option opts [optional, Time] :time, :timestamp
       #   Sets the timestamp in the header.
@@ -88,16 +88,16 @@ module FFI
       #
       # @option opts [optional, Integer] :caplen, :captured
       #   The captured length (or snaplen) for this packet.
-      #   Length of data portion present. Defaults to body.size(). If
+      #   Length of data portion present. Defaults to `body.size()`. If
       #   caplen is larger than the body, then it is overridden with
-      #   body.size.
+      #   `body.size`.
       #   
       # @option opts [optional, Integer] :len, :length
-      #   The total length of the packet (off wire). Defaults to caplen. If
+      #   The total length of the packet (off wire). Defaults to caplen.
       #   If :length is less than the :caplen, it is overridden as :caplen.
       #
       # @return [String]
-      #   Returns the data as supplied per attr_writer convention.
+      #   Returns the data as supplied per `attr_writer` convention.
       #
       def set_body(data, opts={})
         cl = opts[:caplen] || opts[:captured] || data.size
@@ -154,14 +154,14 @@ module FFI
       alias length len
 
       #
-      # An optimized copy which allocates new memory for a PacketHeader and
-      # body.
+      # An optimized copy which allocates new memory for a {PacketHeader}
+      # and body.
       #
       # DANGEROUS: This method uses direct FFI bindings for the copy and
       # may crash Ruby if the packet header or body is incorrect.
       #
       # @raise [StandardError]
-      #   An exception is raised if the header or body is a NULL pointer.
+      #   An exception is raised if the header or body is a `NULL` pointer.
       #
       def copy
         raise(StandardError, "header is a NULL pointer") if @header.to_ptr.null?

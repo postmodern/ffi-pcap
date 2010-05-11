@@ -2,9 +2,9 @@ module FFI
   module PCap
     module BPF
       #
-      # Structure for pcap_compile(), pcap_setfilter(), etc.
+      # Structure for `pcap_compile()`, `pcap_setfilter()`, etc.
       #
-      # See bpf_program struct in pcap-bpf.h
+      # See bpf_program struct in `pcap-bpf.h`
       #
       class Program < FFI::Struct
 

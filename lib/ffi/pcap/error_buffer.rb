@@ -6,20 +6,24 @@ module FFI
       SIZE = 256
 
       #
-      # Creates a new ErrorBuffer object. Because of wierdness in JRuby
-      # when trying to subclass FFI::Buffer, always use this instead of
-      # 'new()'
+      # Creates a new {ErrorBuffer} object. Because of wierdness in JRuby
+      # when trying to subclass `FFI::Buffer`, always use this instead of
+      # {#initialize}.
       #
-      # See http://github.com/ffi/ffi/issues#issue/27
+      # @see http://github.com/ffi/ffi/issues#issue/27
+      #
       def self.create()
         new(SIZE)
       end
 
       #
-      # Creates a new ErrorBuffer object.
-      # The argument is nil and is only present for compatability with JRuby.
+      # Creates a new {ErrorBuffer} object.
       #
-      # See http://github.com/ffi/ffi/issues#issue/27
+      # @param [Object] nil
+      #   The argument is nil and is only present for compatability with
+      #   JRuby.
+      #
+      # @see http://github.com/ffi/ffi/issues#issue/27
       #
       def initialize(arg=nil)
         super(SIZE)

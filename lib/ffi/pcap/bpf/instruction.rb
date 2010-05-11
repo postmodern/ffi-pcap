@@ -2,11 +2,11 @@ module FFI
   module PCap
     module BPF
       #
-      # Includes structures defined in pcap-bpf.h
+      # Includes structures defined in `pcap-bpf.h`
       #
       # Berkeley Packet Filter instruction data structure.
       #
-      # See bpf_insn struct in pcap-bpf.h
+      # See bpf_insn struct in `pcap-bpf.h`
       #
       class Instruction < FFI::Struct
 

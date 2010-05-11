@@ -3,7 +3,7 @@ module FFI
     #
     # Item in a list of interfaces.
     #
-    # See pcap_if struct in pcap.h
+    # See `pcap_if` struct in `pcap.h`.
     #
     class Interface < FFI::Struct
 

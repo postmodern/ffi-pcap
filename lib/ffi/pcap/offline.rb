@@ -3,7 +3,7 @@ require 'ffi/pcap/capture_wrapper'
 module FFI
   module PCap
     #
-    # A wrapper class for pcap devices opened with open_offline()
+    # A wrapper class for pcap devices opened with {PCap.open_offline}.
     #
     class Offline < CaptureWrapper
 

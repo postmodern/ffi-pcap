@@ -3,7 +3,7 @@ module FFI
     #
     # Representation of an interface address.
     #
-    # See pcap_addr struct in pcap.h
+    # See pcap_addr struct in `pcap.h`
     #
     class Addr < FFI::Struct
 

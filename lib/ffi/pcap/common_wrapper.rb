@@ -2,9 +2,9 @@ module FFI
   module PCap
     #
     # An abstract base wrapper class with features common to all pcap
-    # wrapper types. Do not use this directly. Instead refer to Live, 
-    # Dead, or Offline class for open_live, open_dead, or open_file 
-    # respectively.
+    # wrapper types. Do not use this directly. Instead refer to {Live}, 
+    # {Dead}, or {Offline} class for {PCap.open_live}, {PCap.open_dead}, or
+    # {PCap.open_file}, respectively.
     #
     class CommonWrapper
 
@@ -85,7 +85,7 @@ module FFI
       # Compiles a pcap filter but does not apply it to the pcap interface.
       #
       # @param [String] expression
-      #   A pcap filter expression. See pcap-filter(7) manpage for syntax.
+      #   A pcap filter expression. See `pcap-filter(7)` manpage for syntax.
       #
       # @param [Hash] opts
       #   Additional options for compile
@@ -99,8 +99,8 @@ module FFI
       #   for IPv4 broadcast addresses in the filter program.
       #   Default: 0 (unspecified netmask)
       #
-      # @return [BPFProgram]
-      #   A FFI::PCap::BPFProgram structure for the compiled filter.
+      # @return [BPF::Program]
+      #   A BPF program structure for the compiled filter.
       #
       # @raise [LibError]
       #   On failure, an exception is raised with the relevant error
@@ -142,7 +142,7 @@ module FFI
       private
 
       #
-      # Raises an exception if @pcap is not set.
+      # Raises an exception if `@pcap` is not set.
       #
       # Internal sanity check to confirm the pcap instance
       # variable has been set. Otherwise very bad things can 

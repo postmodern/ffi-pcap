@@ -1,9 +1,9 @@
 module FFI
   module PCap
     #
-    # As returned by pcap_stats()
+    # As returned by `pcap_stats`.
     #
-    # See pcap_stat struct in pcap.h.
+    # See `pcap_stat` struct in `pcap.h`.
     #
     class Stat < FFI::Struct
 
@@ -23,9 +23,9 @@ module FFI
     end
 
     #
-    # As returned by pcap_stats_ex() (MSDOS only)
+    # As returned by `pcap_stats_ex()` (MSDOS only).
     #
-    # See pcap_stat_ex struct in pcap.h
+    # See `pcap_stat_ex` struct in `pcap.h`.
     #
     class StatEx < FFI::Struct
 

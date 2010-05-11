@@ -19,7 +19,7 @@ module FFI
     #
     def PCap.lookupdev
       e = ErrorBuffer.create()
-      unless name = FFI::PCap.pcap_lookupdev(e)
+      unless name = PCap.pcap_lookupdev(e)
         raise(LibError, "pcap_lookupdev(): #{e.to_s}")
       end
       return name
@@ -44,8 +44,8 @@ module FFI
     #   A pointer to the netmask return value.
     #
     # @return [nil, String] 
-    #   The IPv4 network number and mask presented as "n.n.n.n/m.m.m.m".
-    #   nil is returned when a block is specified.
+    #   The IPv4 network number and mask presented as `n.n.n.n/m.m.m.m`.
+    #   `nil` is returned when a block is specified.
     #
     # @raise [LibError]
     #   On failure, an exception is raised with the relevant error message 
@@ -55,7 +55,7 @@ module FFI
       netp  = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       errbuf = ErrorBuffer.create()
-      unless FFI::PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
+      unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
         raise(LibError, "pcap_lookupnet(): #{errbuf.to_s}")
       end
       if block_given?
@@ -67,11 +67,11 @@ module FFI
     end
 
     #
-    # Opens a new Live device for capturing from the network. See Live.new()
-    # for arguments.
+    # Opens a new Live device for capturing from the network. See
+    # {Live#initialize} for arguments.
     #
-    # If passed a block, the block is passed to Live.new() and the Live
-    # object is closed after completion of the block
+    # If passed a block, the block is passed to {Live#initialize} and the
+    # {Live} object is closed after completion of the block
     #
     def PCap.open_live(opts={},&block)
       ret = Live.new(opts, &block)
@@ -80,7 +80,9 @@ module FFI
 
     #
     # Opens a new Dead pcap interface for compiling filters or opening
-    # a capture for output. See Dead.new() for arguments.
+    # a capture for output.
+    #
+    # @see Dead#initialize
     #
     def PCap.open_dead(opts={}, &block)
       ret = Dead.new(opts, &block)
@@ -88,7 +90,9 @@ module FFI
     end
 
     #
-    # Opens a saved capture file for reading. See Offline.new for arguments.
+    # Opens a saved capture file for reading.
+    #
+    # @see Offline#initialize
     #
     def PCap.open_offline(path, opts={}, &block)
       ret = Offline.new(path, opts={}, &block)
@@ -96,7 +100,7 @@ module FFI
     end
 
     #
-    # Same as open_offline.
+    # @see Pcap.open_offline
     #
     def PCap.open_file(path, opts={}, &block)
       open_offline(path, opts, &block)
@@ -106,7 +110,7 @@ module FFI
     attach_function :pcap_freealldevs, [Interface], :void
 
     #
-    # List all capture devices and yield them each to a block
+    # List all capture devices and yield them each to a block.
     #
     # @yield [dev]
     #
@@ -120,10 +124,10 @@ module FFI
     #   message from libpcap.
     #
     def PCap.each_device
-      devices = ::FFI::MemoryPointer.new(:pointer)
+      devices = FFI::MemoryPointer.new(:pointer)
       errbuf = ErrorBuffer.create()
 
-      FFI::PCap.pcap_findalldevs(devices, errbuf)
+      PCap.pcap_findalldevs(devices, errbuf)
       node = devices.get_pointer(0)
 
       if node.null?
@@ -137,7 +141,7 @@ module FFI
         device = device.next
       end
 
-      FFI::PCap.pcap_freealldevs(node)
+      PCap.pcap_freealldevs(node)
       return nil
     end
 
@@ -149,8 +153,8 @@ module FFI
     # value is returned as a nil value.
     #
     def PCap.dump_devices
-      FFI::PCap.enum_for(:each_device).map do |dev| 
-        net = begin; FFI::PCap.lookupnet(dev.name); rescue LibError; end
+      PCap.enum_for(:each_device).map do |dev| 
+        net = begin; PCap.lookupnet(dev.name); rescue LibError; end
         [dev.name, net]
       end
     end
@@ -160,7 +164,7 @@ module FFI
     # system.
     #
     def PCap.device_names
-      FFI::PCap.enum_for(:each_device).map {|dev| dev.name }
+      PCap.enum_for(:each_device).map {|dev| dev.name }
     end
 
     attach_function :pcap_lib_version, [], :string
@@ -169,21 +173,21 @@ module FFI
     # Get the version information for libpcap.
     #
     # @return [String]
-    #  Information about the version of the libpcap library being used; 
-    #  note that it  contains more information than just a version number.
+    #   Information about the version of the libpcap library being used; 
+    #   note that it contains more information than just a version number.
     #   
     def PCap.lib_version
-      FFI::PCap.pcap_lib_version
+      PCap.pcap_lib_version
     end
 
     #
-    # Extract just the version number from the lib_version string.
+    # Extract just the version number from the {PCap.lib_version} string.
     #
     # @return [String]
-    #  Version number.
+    #   Version number.
     #   
     def PCap.lib_version_number
-      if lib_version() =~ /libpcap version (\d+\.\d+.\d+)/
+      if PCap.lib_version =~ /libpcap version (\d+\.\d+.\d+)/
         return $1
       end
     end

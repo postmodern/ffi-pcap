@@ -1,11 +1,11 @@
 module FFI
   module PCap
     #
-    # See pcap_dumper_t in pcap.h
+    # See `pcap_dumper_t` in `pcap.h`.
     #
-    # A pcap_dumper, or FFI::PCap::Dumper is handled opaquely so that it can
-    # be implemented differently on different platforms. In FFI::PCap, we
-    # simply wrap the pcap_dumper_t pointer with a ruby interface.
+    # A `pcap_dumper`, {Dumper} is handled opaquely so that it can
+    # be implemented differently on different platforms. In {FFI::PCap}, we
+    # simply wrap the `pcap_dumper_t` pointer with a ruby interface.
     #
     class Dumper
 

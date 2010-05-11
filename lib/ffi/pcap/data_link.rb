@@ -8,7 +8,7 @@ module FFI
       # their pcap DLT value.
       #
       # Don't use this Array for anything except quick reference.  Use the 
-      # 'lookup' class methods for actually resolving name to value 
+      # {lookup} class methods for actually resolving name to value 
       # mappings or such.
       #
       SOME_DLTS = %w[
@@ -34,7 +34,7 @@ module FFI
       ]
 
       #
-      # Uses the pcap_datalnk_* functions to lookup a datalink name and
+      # Uses the `pcap_datalnk_*` functions to lookup a datalink name and
       # value pair.
       # 
       # @param [String, Symbol or Integer] l
@@ -42,8 +42,8 @@ module FFI
       #   Names are case-insensitive.
       #
       # @return [Array]
-      #   A 2-element array containing [value, name]. Both elements are nil
-      #   if the lookup failed.
+      #   A 2-element array containing [value, name]. Both elements are
+      #   `nil` if the lookup failed.
       #
       def self.lookup(l)
         val, name = nil
@@ -65,14 +65,14 @@ module FFI
       end
 
       #
-      # Translates a data link type name, which is a DLT_ name with the
-      # DLT_ removed, to the corresponding data link type numeric value.
+      # Translates a data link type name, which is a `DLT_` name with the
+      # `DLT_` removed, to the corresponding data link type numeric value.
       #
       # @param [String or Symbol] n
       #   The name to lookup. Names are case-insensitive.
       #
       # @return [Integer or nil] 
-      #   The numeric value for the datalink name or nil on failure.
+      #   The numeric value for the datalink name or `nil` on failure.
       #
       def self.name_to_val(n)
         n = n.to_s if n.kind_of?(Symbol)
@@ -82,11 +82,11 @@ module FFI
       end
 
       #
-      # Translates a data link type  value  to  the corresponding data link 
+      # Translates a data link type value to the corresponding data link 
       # type name.
       #
       # @return [String or nil]
-      #   The string name of the data-link or nil on failure.
+      #   The string name of the data-link or `nil` on failure.
       # 
       def self.val_to_name(v)
         FFI::PCap.pcap_datalink_val_to_name(v)
@@ -176,7 +176,7 @@ module FFI
       end
 
       #
-      # Override 'inspect' we'll to always provide the name for irb, 
+      # Override `inspect` to always provide the name for irb, 
       # pretty_print, etc.
       #
       def inspect

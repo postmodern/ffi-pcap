@@ -5,7 +5,7 @@ module FFI
     # is used to track only the libpcap header and just contains the
     # timestamp and length information used by libpcap.
     #
-    # See pcap_pkthdr struct in pcap.h
+    # See `pcap_pkthdr` struct in `pcap.h`.
     #
     class PacketHeader < FFI::Struct
 

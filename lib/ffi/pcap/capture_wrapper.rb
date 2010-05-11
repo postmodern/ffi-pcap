@@ -8,16 +8,16 @@ module FFI
     # interfaces. This class provides all the features necessary for
     # receiving packets through libpcap.
     #
-    # The loop and dispatch methods default to using a CopyHandler object
+    # The loop and dispatch methods default to using a {CopyHandler} object
     # when preparing values to the callback block. This is done to safely 
     # provide references to packets outside of the callback blocks.  
     # See CopyHandler for more information. 
     #
     # Note that for performance reasons, you may not need or want to incur 
     # the extra overhead of creating a copy for every Packet. You can supply
-    # a nil value for the loop handler which will simply pass volatile 
+    # a `nil` value for the loop handler which will simply pass volatile 
     # references to packets directly to your block. You can also write
-    # custom handlers which implement the 'receive_pcap' method and
+    # custom handlers which implement the `receive_pcap` method and
     # implement custom defined behaviors.
     #
     class CaptureWrapper < CommonWrapper
@@ -28,10 +28,10 @@ module FFI
 
       #
       # Adds an extra parameter :handler for specifying a capture handler
-      # when using loop or dispatch. The handler defaults to CopyHandler,
+      # when using loop or dispatch. The handler defaults to {CopyHandler},
       # which always yields a copy of each packet to a block.
       #
-      # Setting :handler to nil will pass packets directly to a block
+      # Setting :handler to `nil` will pass packets directly to a block
       # without copying them, which may be desirable if the packets are
       # only ever processed within the block, and code does not need to
       # retain a reference to them elsewhere.
@@ -74,9 +74,10 @@ module FFI
 
       public
 
+      #
       # Processes packets from a live capture or savefile until cnt packets 
       # are processed, the end of the savefile is reached (when reading
-      # from a savefile), pcap_breakloop() is called, or an error occurs. 
+      # from a savefile), `pcap_breakloop()` is called, or an error occurs. 
       #
       # It does not return when live read timeouts occur. A value of -1 or
       # 0 for cnt is equivalent to infinity, so that packets are processed
@@ -103,8 +104,8 @@ module FFI
       #
       #
       # @return [Integer, nil]
-      #   returns 0 if cnt is exhausted, or nil if the loop terminated due
-      #   to a call to pcap_breakloop() before any packets were processed.
+      #   Returns 0 if cnt is exhausted, or `nil` if the loop terminated due
+      #   to a call to `pcap_breakloop()` before any packets were processed.
       #   It does not return when live read timeouts occur; instead,
       #   it attempts to read more packets.
       #
@@ -161,7 +162,7 @@ module FFI
       # @return [Integer, nil]
       #   Returns the number of packets processed on success; this can be 0
       #   if no packets were read from a live capture or if no more packets
-      #   are available in a savefile. It returns nil if the loop
+      #   are available in a savefile. It returns `nil` if the loop
       #   terminated due to a call to CommonWrapper.stop() before any
       #   packets were processed.
       #
@@ -186,14 +187,14 @@ module FFI
       end
 
       #
-      # This method uses the older pcap_next() function which has been
-      # deprecated in favor of pcap_next_ex(). It is included only for
+      # This method uses the older `pcap_next()` function which has been
+      # deprecated in favor of `pcap_next_ex()`. It is included only for
       # backward compatability purposes.
       #
       # Important Note. According to libpcap documentation: 
       #
-      # Unfortunately, there is no way to determine whether an error 
-      # occured or not when using pcap_next().
+      #     Unfortunately, there is no way to determine whether an error 
+      #     occured or not when using pcap_next().
       #
       def old_next
         header = PacketHeader.new
@@ -210,13 +211,13 @@ module FFI
       # success/failure indication.
       #
       # @return [Packet, nil]
-      #   A packet is returned on success or a nil if the timeout expired or
-      #   all packets in a dump file have been exhausted when reading from
-      #   a savefile.
+      #   A packet is returned on success or a `nil` if the timeout expired
+      #   or all packets in a dump file have been exhausted when reading
+      #   from a savefile.
       #
       # @raise [ReadError]
       #   This exception is raised if there was an error calling
-      #   pcap_next_ex().
+      #   `pcap_next_ex()`.
       #
       # @raise [TimeoutError]
       #   This exception is raised if the timeout expires
@@ -242,12 +243,12 @@ module FFI
       alias next_ex next
 
       #
-      # Sets a flag that will force dispatch() or loop() to return rather 
+      # Sets a flag that will force {#dispatch} or {#loop} to return rather 
       # than looping; they will return the number of packets that have been 
-      # processed so far, or nil if no packets have been processed so far.
+      # processed so far, or `nil` if no packets have been processed so far.
       #
       # breakloop does not guarantee that no further packets will be
-      # processed by dispatch() or loop() after it is called. At most
+      # processed by {#dispatch} or {#loop} after it is called. At most
       # one more packet may be processed.
       #
       def breakloop
