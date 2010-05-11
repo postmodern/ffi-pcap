@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe FFI::PCap do
-  it "should define a VERSION constant" do
-    FFI::PCap.const_defined?('VERSION').should == true
-  end
-
   it ".lib_version() should expose the libpcap version banner" do
     FFI::PCap.lib_version.should_not be_nil
     FFI::PCap.lib_version.should_not be_empty
