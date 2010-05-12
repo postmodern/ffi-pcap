@@ -190,8 +190,8 @@ module FFI
     #   Version number.
     #   
     def PCap.lib_version_number
-      if PCap.lib_version =~ /libpcap version (\d+\.\d+.\d+)/
-        return $1
+      if (version = PCap.lib_version.match(/libpcap version (\d+\.\d+.\d+)/))
+        return version[1]
       end
     end
 
