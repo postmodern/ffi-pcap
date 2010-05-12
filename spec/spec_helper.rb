@@ -9,15 +9,25 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
+require 'pathname'
 require 'spec'
 require 'ffi/pcap'
 
 include FFI
 include FFI::PCap
 
-PCAP_DEV      = ENV['PCAP_DEV'] || 'lo0'
-PCAP_TESTFILE = ENV['PCAP_TESTFILE'] || File.expand_path(File.join(File.dirname(__FILE__), 'dumps', 'simple_tcp.pcap'))
-PCAP_TESTADDR = ENV['PCAP_TESTADDR'] || '127.0.0.1'
+DEFAULT_PCAP_DEV = case RUBY_PLATFORM
+                   when /linux/
+                     'lo'
+                   when /(bsd|darwin)/
+                     'lo0'
+                   end
+DEFAULT_TESTFILE = Pathname.new(__FILE__).dirname.join('dumps','simple_tcp.pcap')
+DEFAULT_TESTADDR = '127.0.0.1'
+
+PCAP_DEV      = (ENV['PCAP_DEV'] || DEFAULT_PCAP_DEV)
+PCAP_TESTFILE = (ENV['PCAP_TESTFILE'] || DEFAULT_TESTFILE)
+PCAP_TESTADDR = (ENV['PCAP_TESTADDR'] || DEFAULT_TESTADDR)
 
 $test_ping_pid = nil
 
