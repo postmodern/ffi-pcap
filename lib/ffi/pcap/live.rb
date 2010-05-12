@@ -32,7 +32,7 @@ module FFI
       #
       # @option opts [String, nil] :device, :dev
       #   The device to open. On some platforms, this can be "any".
-      #   If nil or unspecified FFI::PCap.lookupdev() is called to obtain a
+      #   If nil or unspecified {PCap.lookupdev} is called to obtain a
       #   default device. 
       #
       # @option opts [Integer] :snaplen
@@ -48,7 +48,7 @@ module FFI
       #   Defaults to DEFAULT_TO_MS
       #
       # @return [Live]
-      #   A FFI::PCap::Live wrapper.
+      #   A live wrapper.
       #
       # @raise [LibError]
       #   On failure, an exception is raised with the relevant error 
@@ -56,14 +56,16 @@ module FFI
       #
       # @raise [ArgumentError]
       #   May raise an exception if a :device cannot be autodetected using 
-      #   FFI::PCap.lookupdev() for any reason. This should never happen on
+      #   {PCap.lookupdev} for any reason. This should never happen on
       #   most platforms.
       #
       def initialize(opts=nil)
         opts ||= {}
-        @device = opts[:device] || opts[:dev] || FFI::PCap.lookupdev()
+
+        @device = (opts[:device] || opts[:dev] || PCap.lookupdev)
+
         unless @device
-          raise(ArgumentError, "Couldn't detect a device. One must be specified.")
+          raise(ArgumentError,"Couldn't detect a device. One must be specified",caller)
         end
 
         @snaplen   = opts[:snaplen] || DEFAULT_SNAPLEN
@@ -72,8 +74,11 @@ module FFI
         @direction = (opts[:direction] || opts[:dir])
 
         @errbuf = ErrorBuffer.create()
-        @pcap = FFI::PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
-        raise(LibError, "pcap_open_live(): #{@errbuf.to_s}") if @pcap.null?
+        @pcap = PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
+
+        if @pcap.null?
+          raise(LibError, "pcap_open_live(): #{@errbuf}",caller)
+        end
 
         # call super to get all our ducks in a row
         super(@pcap, opts)
@@ -84,7 +89,7 @@ module FFI
         # These pointers may be used internally (and should get autoreleased)
         @netp, @maskp = nil
         begin
-          FFI::PCap.lookupnet(@device) do |netp, maskp|
+          PCap.lookupnet(@device) do |netp, maskp|
             @netp = netp
             @maskp = maskp
           end
@@ -100,8 +105,9 @@ module FFI
       # the device used by this pcap interface.
       #
       def network
-        return nil unless @netp
-        @network ||= @netp.get_array_of_uchar(0,4).join('.')
+        if @netp
+          @network ||= @netp.get_array_of_uchar(0,4).join('.')
+        end
       end
 
       #
@@ -109,8 +115,9 @@ module FFI
       # device used by this pcap interface.
       #
       def netmask
-        return nil unless @maskp
-        @netmask ||= @maskp.get_array_of_uchar(0,4).join('.')
+        if @maskp
+          @netmask ||= @maskp.get_array_of_uchar(0,4).join('.')
+        end
       end
 
       #
@@ -118,8 +125,9 @@ module FFI
       # address for this device.
       #
       def network_n32
-        return nil unless @netp
-        ::FFI::DRY::NetEndian.ntohl(@netp.get_uint32(0))
+        if @netp
+          ::FFI::DRY::NetEndian.ntohl(@netp.get_uint32(0))
+        end
       end
 
       #
@@ -127,11 +135,12 @@ module FFI
       # address for this device.
       #
       def netmask_n32
-        return nil unless @maskp
-        ::FFI::DRY::NetEndian.ntohl(@maskp.get_uint32(0))
+        if @maskp
+          ::FFI::DRY::NetEndian.ntohl(@maskp.get_uint32(0))
+        end
       end
 
-      @@have_setdirection = FFI::PCap.respond_to?(:pcap_setdirection)
+      @@have_setdirection = PCap.respond_to?(:pcap_setdirection)
 
       #
       # Sets the direction for which packets will be captured.
@@ -140,15 +149,15 @@ module FFI
       #
       def set_direction(dir)
         unless @@have_setdirection
-          raise(NotImplementedError, 
-                "pcap_setdirection() is not avaiable from your pcap library") 
+          raise(NotImplementedError,"pcap_setdirection() is not avaiable from your pcap library",caller) 
         end
 
-        dirs = FFI::PCap.enum_type(:pcap_direction_t)
-        if FFI::PCap.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
+        dirs = PCap.enum_type(:pcap_direction_t)
+
+        if PCap.pcap_setdirection(_pcap, dirs[:"pcap_d_#{dir}"]) == 0
           return true
         else
-          raise(LibError, "pcap_setdirection(): #{geterr()}", caller)
+          raise(LibError,"pcap_setdirection(): #{geterr}",caller)
         end
       end
 
@@ -165,10 +174,11 @@ module FFI
       #
       def set_non_blocking(mode)
         mode =  mode ? 1 : 0
-        if FFI::PCap.pcap_setnonblock(_pcap, mode, @errbuf) == 0
-          return mode == 1
+
+        if PCap.pcap_setnonblock(_pcap, mode, @errbuf) == 0
+          return (mode == 1)
         else
-          raise(LibError, "pcap_setnonblock(): #{@errbuf.to_s}", caller)
+          raise(LibError,"pcap_setnonblock(): #{@errbuf}",caller)
         end
       end
 
@@ -185,8 +195,10 @@ module FFI
       #   message from libpcap.
       #
       def non_blocking
-        if (mode=FFI::PCap.pcap_getnonblock(_pcap, @errbuf)) == -1
-          raise(LibError, "pcap_getnonblock(): #{@errbuf.to_s}", caller)
+        mode = PCap.pcap_getnonblock(_pcap, @errbuf)
+
+        if mode == -1
+          raise(LibError,"pcap_getnonblock(): #{@errbuf}",caller)
         else
           return mode == 1
         end
@@ -205,13 +217,15 @@ module FFI
       #
       def stats
         stats = Stat.new
-        unless FFI::PCap.pcap_stats(_pcap, stats) == 0
-          raise(LibError, "pcap_stats(): #{geterr()}")
+
+        unless PCap.pcap_stats(_pcap, stats) == 0
+          raise(LibError,"pcap_stats(): #{geterr}",caller)
         end
+
         return stats
       end
 
-      @@have_inject = FFI::PCap.respond_to?(:pcap_inject)
+      @@have_inject = PCap.respond_to?(:pcap_inject)
 
       #
       # Transmit a packet using pcap_inject()
@@ -239,30 +253,36 @@ module FFI
       #
       def inject(pkt)
         if @@have_inject
-          if pkt.kind_of? Packet
+          if pkt.kind_of?(Packet)
             len = pkt.caplen
             bufp = pkt.body_ptr
-            raise(ArgumentError, "packet data null pointer") if bufp.null?
-          elsif pkt.kind_of? String
+
+            if bufp.null?
+              raise(ArgumentError,"packet data null pointer",caller)
+            end
+          elsif pkt.kind_of?(String)
             len = pkt.size
             bufp = FFI::MemoryPointer.from_string(pkt)
           else
-            raise(ArgumentError, "Don't know how to inject #{pkt.class}")
+            raise(ArgumentError,"Don't know how to inject #{pkt.class}",caller)
           end
 
-          if (sent=FFI::PCap.pcap_inject(_pcap, bufp, len)) < 0
-            raise(LibError, "pcap_inject(): #{geterr()}")
+          sent = PCap.pcap_inject(_pcap, bufp, len)
+
+          if sent < 0
+            raise(LibError,"pcap_inject(): #{geterr}",caller)
           end
+
           return sent
         else 
           # fake it with sendpacket on windows
           if sendpacket(pkt)
-            return (Packet === pkt)? pkt.caplen : pkt.size
+            return (Packet === pkt) ? pkt.caplen : pkt.size
           end
         end
       end
 
-      @@have_sendpacket = FFI::PCap.respond_to?(:pcap_sendpacket)
+      @@have_sendpacket = PCap.respond_to?(:pcap_sendpacket)
 
       #
       # Transmit a packet using pcap_sendpacket()
@@ -289,24 +309,27 @@ module FFI
       #
       def sendpacket(pkt)
         unless @@have_sendpacket
-          raise(NotImplementedError, 
-                "packet injectors are not avaiable from your pcap library") 
+          raise(NotImplementedError,"packet injectors are not avaiable from your pcap library",caller)
         end
 
         if pkt.kind_of? Packet
           len = pkt.caplen
           bufp = pkt.body_ptr
-          raise(ArgumentError, "packet data null pointer") if bufp.null?
+
+          if bufp.null?
+            raise(ArgumentError,"packet data null pointer",caller)
+          end
         elsif pkt.kind_of? String
           len = pkt.size
           bufp = FFI::MemoryPointer.from_string(pkt)
         else
-          raise(ArgumentError, "Don't know how to send #{pkt.class}")
+          raise(ArgumentError,"Don't know how to send #{pkt.class}",caller)
         end
 
-        if FFI::PCap.pcap_sendpacket(_pcap, bufp, len) != 0
-          raise(LibError, "pcap_sendpacket(): #{geterr()}")
+        if PCap.pcap_sendpacket(_pcap, bufp, len) != 0
+          raise(LibError,"pcap_sendpacket(): #{geterr}",caller)
         end
+
         return true
       end
 

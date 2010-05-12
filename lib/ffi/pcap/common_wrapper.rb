@@ -15,7 +15,7 @@ module FFI
         @closed = false
         @errbuf ||= ErrorBuffer.create
 
-        yield(self) if block_given?
+        yield self if block_given?
       end
 
       #
@@ -30,12 +30,15 @@ module FFI
       #
       def supported_datalinks
         dlt_lst = FFI::MemoryPointer.new(:pointer)
+
         if (cnt=FFI::PCap.pcap_list_datalinks(_pcap, dlt_lst)) < 0
-          raise(LibError, "pcap_list_datalinks(): #{geterr()}")
+          raise(LibError, "pcap_list_datalinks(): #{geterr}",caller)
         end
+
         # extract datalink values 
         p = dlt_lst.get_pointer(0)
         ret = p.get_array_of_int(0, cnt).map {|dlt| DataLink.new(dlt) }
+
         CRT.free(p)
         return ret
       end
@@ -48,7 +51,7 @@ module FFI
       end
 
       def ready?
-        @closed == false and not @pcap.nil? and not @pcap.null?
+        (@closed == false && !(@pcap.nil?) && !(@pcap.null?))
       end
 
       #
@@ -56,7 +59,8 @@ module FFI
       #
       def close
         unless @closed
-          FFI::PCap.pcap_close(_pcap)
+          PCap.pcap_close(_pcap)
+
           @closed = true
           @pcap = nil
         end
@@ -110,9 +114,11 @@ module FFI
         optimize = opts[:optimize] || 1
         netmask  = opts[:netmask] || 0 
         code = BPFProgram.new
-        if FFI::PCap.pcap_compile(_pcap, code, expression, optimize, netmask) != 0
-          raise(LibError, "pcap_compile(): #{geterr()}")
+
+        if PCap.pcap_compile(_pcap, code, expression, optimize, netmask) != 0
+          raise(LibError,"pcap_compile(): #{geterr()}",caller)
         end
+
         return code
       end
 
@@ -125,7 +131,11 @@ module FFI
       #
       def open_dump(path)
         dp = FFI::PCap.pcap_dump_open(_pcap, File.expand_path(path))
-        raise(LibError, "pcap_dump_open(): #{geterr()}") if dp.null?
+
+        if dp.null?
+          raise(LibError,"pcap_dump_open(): #{geterr}",caller)
+        end
+
         return Dumper.new(dp)
       end
 
@@ -151,9 +161,9 @@ module FFI
       #
       def _check_pcap
         if @pcap.nil?
-          raise(StandardError, "nil pcap device")
+          raise(StandardError,"nil pcap device",caller)
         else
-          return @pcap
+          @pcap
         end
       end
 
@@ -166,10 +176,13 @@ module FFI
       # pointer to various libpcap functions.
       #
       def _pcap
-        if (p = _check_pcap()).null?
-          raise(StandardError, "null pointer to pcap device")
+        ptr = _check_pcap
+
+        if ptr.null?
+          raise(StandardError,"null pointer to pcap device",caller)
+        else
+          ptr
         end
-        p
       end
 
     end

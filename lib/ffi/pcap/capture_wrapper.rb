@@ -24,6 +24,9 @@ module FFI
 
       include Enumerable
 
+      # Default packet count (-1: infinite loop)
+      DEFAULT_COUNT = -1
+
       attr_accessor :handler
 
       #
@@ -37,42 +40,27 @@ module FFI
       # retain a reference to them elsewhere.
       #
       def initialize(pcap, opts={}, &block)
-        if opts.has_key?(opts[:handler])
-          @handler = opts[:handler]
-        else
-          @handler = CopyHandler
+        @handler = if opts.has_key?(opts[:handler])
+                     opts[:handler]
+                   else
+                     CopyHandler
+                   end
+
+        trap('INT') do
+          stop()
+          close()
+
+          raise(SignalException,'INT',caller)
         end
 
-        trap('INT') {stop(); close(); raise(SignalException, 'INT')}
-        trap('TERM') {stop(); close(); raise(SignalException, 'TERM')}
+        trap('TERM') do
+          stop()
+          close()
+          raise(SignalException,'TERM',caller)
+        end
 
         super(pcap, opts, &block)
       end
-
-      private
-
-      def _wrap_callback(h, blk)
-        h ||= @handler
-        if h
-          h = h.new() if h.kind_of?(Class)
-          if ! h.respond_to?(:receive_pcap)
-            raise(NoMethodError, 
-                  "The handler #{h.class} has no receive_pcap method")
-          end
-          return lambda do |usr,phdr,body| 
-            yld = h.receive_pcap(self, Packet.new(phdr,body))
-            blk.call(*yld) if blk and yld
-          end
-        elsif blk.kind_of?(Proc) or blk.kind_of?(Method)
-          return lambda do |usr,phdr,body| 
-            blk.call(pcap, Packet.new(phdr,body))
-          end
-        else
-          raise(ArgumentError, "Neither a handler nor block were provided")
-        end
-      end
-
-      public
 
       #
       # Processes packets from a live capture or savefile until cnt packets 
@@ -114,18 +102,19 @@ module FFI
       #   an unexpected value.
       #
       def loop(opts={}, &block)
-        cnt = opts[:count] || -1 # default to infinite loop
+        cnt = (opts[:count] || DEFAULT_COUNT)
         h = opts[:handler]
 
-        ret = FFI::PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block), nil)
+
         if ret == -1
-          raise(ReadError, "pcap_loop(): #{geterr()}")
+          raise(ReadError,"pcap_loop(): #{geterr}",caller)
         elsif ret -2
           return nil
         elsif ret > -1
           return ret
         else
-          raise(ReadError, "unexpected return from pcap_loop(): #{ret}")
+          raise(ReadError,"unexpected return from pcap_loop(): #{ret}",caller)
         end
       end
 
@@ -135,7 +124,7 @@ module FFI
       # Processes packets from a live capture or savefile until cnt packets
       # are processed, the end of the current bufferful of packets is
       # reached when doing a live capture, the end of the savefile is
-      # reached (when reading from a savefile), pcap_breakloop() is called,
+      # reached (when reading from a savefile), `pcap_breakloop()` is called,
       # or an error occurs. 
       # 
       # Thus, when doing a live capture, cnt is the maximum number of
@@ -163,7 +152,7 @@ module FFI
       #   Returns the number of packets processed on success; this can be 0
       #   if no packets were read from a live capture or if no more packets
       #   are available in a savefile. It returns `nil` if the loop
-      #   terminated due to a call to CommonWrapper.stop() before any
+      #   terminated due to a call to {CommonWrapper#stop} before any
       #   packets were processed.
       #
       # @raise [ReadError]
@@ -171,18 +160,18 @@ module FFI
       #   an unexpected value.
       #
       def dispatch(opts={}, &block)
-        cnt = opts[:count] || -1 # default to infinite loop
+        cnt = (opts[:count] || DEFAULT_COUNT) # default to infinite loop
         h = opts[:handler]
 
-        ret = FFI::PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
+        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
         if ret == -1
-          raise(ReadError, "pcap_dispatch(): #{geterr()}")
+          raise(ReadError,"pcap_dispatch(): #{geterr}",caller)
         elsif ret -2
           return nil
         elsif ret > -1
           return ret
         else
-          raise(ReadError, "unexpected return from pcap_dispatch() -> #{ret}")
+          raise(ReadError,"unexpected return from pcap_dispatch() -> #{ret}",caller)
         end
       end
 
@@ -198,12 +187,9 @@ module FFI
       #
       def old_next
         header = PacketHeader.new
-        bytes = FFI::PCap.pcap_next(_pcap, header)
-        if bytes.null?
-          return nil # or raise an exception?
-        else
-          return Packet.new(header, bytes)
-        end
+        bytes = PCap.pcap_next(_pcap, header)
+
+        return Packet.new(header, bytes) unless bytes.null?
       end
 
       #
@@ -228,13 +214,13 @@ module FFI
 
         case FFI::PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
         when -1 # error
-          raise(ReadError, "pcap_next_ex(): #{geterr()}")
+          raise(ReadError,"pcap_next_ex(): #{geterr}",caller)
         when 0  # live capture read timeout expired
           return nil
         when -2 # savefile packets exhausted
           return nil
         when 1
-          hdr = PacketHeader.new( hdr_p.get_pointer(0) )
+          hdr = PacketHeader.new(hdr_p.get_pointer(0))
           return Packet.new(hdr, buf_p.get_pointer(0))
         end
       end
@@ -252,7 +238,7 @@ module FFI
       # one more packet may be processed.
       #
       def breakloop
-        FFI::PCap.pcap_breakloop(_pcap)
+        PCap.pcap_breakloop(_pcap)
       end
 
       alias stop breakloop
@@ -274,14 +260,46 @@ module FFI
       #
       def set_filter(expression, opts={})
         code = compile(expression, opts)
-        ret = FFI::PCap.pcap_setfilter(_pcap, code)
-        code.free!  # done with this, we can free it
-        raise(LibError, "pcap_setfilter(): #{geterr()}") if ret < 0
+        ret = PCap.pcap_setfilter(_pcap, code)
+
+        # done with this, we can free it
+        code.free!
+
+        if ret < 0
+          raise(LibError, "pcap_setfilter(): #{geterr}",caller)
+        end
+
         return expression
       end
 
       alias setfilter set_filter
       alias filter= set_filter
+
+      private
+
+      def _wrap_callback(h, block)
+        h ||= @handler
+
+        if h
+          h = h.new() if h.kind_of?(Class)
+
+          unless h.respond_to?(:receive_pcap)
+            raise(NoMethodError, "The handler #{h.class} has no receive_pcap method",caller)
+          end
+
+          return lambda { |usr,phdr,body| 
+            yld = h.receive_pcap(self, Packet.new(phdr,body))
+
+            block.call(*yld) if (block && yld)
+          }
+        elsif (block.kind_of?(Proc) || block.kind_of?(Method))
+          return lambda { |usr,phdr,body|
+            block.call(pcap,Packet.new(phdr,body))
+          }
+        else
+          raise(ArgumentError,"Neither a handler nor block were provided",caller)
+        end
+      end
 
     end
 

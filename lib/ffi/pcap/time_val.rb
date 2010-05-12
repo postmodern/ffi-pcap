@@ -10,8 +10,8 @@ module FFI
       end
 
       def initialize(*args)
-        if args.size == 1 and (t=args[0]).kind_of?(Time)
-          self.time = t
+        if ((args.size == 1) && args[0].kind_of?(Time))
+          self.time = args[0]
         else
           super(*args)
         end
@@ -35,16 +35,17 @@ module FFI
       #
       # Sets the time value from a ruby Time object
       #
-      # @param [Time] t
+      # @param [Time] new_time
       #   A ruby time object from which to set the time.
       #
       # @return [Time]
       #   Returns the same Time object supplied per convention.
       #
-      def time=(t)
-        self.tv_sec = t.tv_sec
-        self.tv_usec = t.tv_usec
-        return t
+      def time=(new_time)
+        self.tv_sec = new_time.tv_sec
+        self.tv_usec = new_time.tv_usec
+
+        return new_time
       end
 
     end

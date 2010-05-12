@@ -22,9 +22,11 @@ module FFI
     #
     def PCap.lookupdev
       e = ErrorBuffer.create()
-      unless name = PCap.pcap_lookupdev(e)
-        raise(LibError, "pcap_lookupdev(): #{e.to_s}")
+
+      unless (name = PCap.pcap_lookupdev(e))
+        raise(LibError,"pcap_lookupdev(): #{e}",caller)
       end
+
       return name
     end
 
@@ -58,14 +60,19 @@ module FFI
       netp  = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
       errbuf = ErrorBuffer.create()
+
       unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
-        raise(LibError, "pcap_lookupnet(): #{errbuf.to_s}")
+        raise(LibError, "pcap_lookupnet(): #{errbuf}",caller)
       end
+
       if block_given?
-        yield(netp, maskp)
+        yield netp, maskp
       else
-        return( netp.get_array_of_uchar(0,4).join('.') << "/" <<
-               maskp.get_array_of_uchar(0,4).join('.') )
+        net = netp.get_array_of_uchar(0,4).join('.')
+        net << '/'
+        net << maskp.get_array_of_uchar(0,4).join('.')
+
+        return net
       end
     end
 
@@ -134,13 +141,14 @@ module FFI
       node = devices.get_pointer(0)
 
       if node.null?
-        raise(LibError, "pcap_findalldevs(): #{errbuf.to_s}")
+        raise(LibError,"pcap_findalldevs(): #{errbuf}",caller)
       end
 
       device = Interface.new(node)
 
       while device
         yield(device)
+
         device = device.next
       end
 
@@ -157,7 +165,11 @@ module FFI
     #
     def PCap.dump_devices
       PCap.enum_for(:each_device).map do |dev| 
-        net = begin; PCap.lookupnet(dev.name); rescue LibError; end
+        net = begin
+                PCap.lookupnet(dev.name)
+              rescue LibError
+              end
+
         [dev.name, net]
       end
     end
@@ -167,7 +179,7 @@ module FFI
     # system.
     #
     def PCap.device_names
-      PCap.enum_for(:each_device).map {|dev| dev.name }
+      PCap.enum_for(:each_device).map { |dev| dev.name }
     end
 
     attach_function :pcap_lib_version, [], :string
@@ -232,18 +244,23 @@ module FFI
       #   a valid user.
       #
       def PCap.drop_sudo_privs
-        if ENV["SUDO_USER"] and pwent=Etc.getpwnam(ENV["SUDO_USER"])
-          Process::Sys.setgid(pwent.gid) 
-          Process::Sys.setegid(pwent.gid) 
-          Process::Sys.setuid(pwent.uid)
-          Process::Sys.seteuid(pwent.uid)
-          return true if ( 
-                          Process::Sys.getuid  == pwent.uid and 
-                          Process::Sys.geteuid == pwent.uid and 
-                          Process::Sys.getgid  == pwent.gid and 
-                          Process::Sys.getegid == pwent.gid )
+        if ENV["SUDO_USER"]
+          if (pwent = Etc.getpwnam(ENV["SUDO_USER"]))
+            Process::Sys.setgid(pwent.gid) 
+            Process::Sys.setegid(pwent.gid) 
+            Process::Sys.setuid(pwent.uid)
+            Process::Sys.seteuid(pwent.uid)
+
+            return true if ( 
+                            Process::Sys.getuid  == pwent.uid and 
+                            Process::Sys.geteuid == pwent.uid and 
+                            Process::Sys.getgid  == pwent.gid and 
+                            Process::Sys.getegid == pwent.gid
+                           )
+          end
         end
-        raise(StandardError, "Unable to drop privileges")
+
+        raise(StandardError,"Unable to drop privileges",caller)
       end
     rescue FFI::NotFoundError
       $pcap_not_unix=true

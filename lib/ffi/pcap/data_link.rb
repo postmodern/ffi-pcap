@@ -47,11 +47,11 @@ module FFI
       #
       def self.lookup(l)
         val, name = nil
-        l = l.to_s if l.kind_of? Symbol
+        l = l.to_s if l.kind_of?(Symbol)
 
         case l
         when String
-          if v=name_to_val(l)
+          if (v = name_to_val(l))
             name = val_to_name(v)  # get the canonical name
             val = v
           end
@@ -59,7 +59,7 @@ module FFI
           name = val_to_name(l)
           val = l
         else
-          raise(ArgumentError, "lookup takes either a String or Integer")
+          raise(ArgumentError,"lookup takes either a String or Integer",caller)
         end
         return [val, name]
       end
@@ -76,9 +76,9 @@ module FFI
       #
       def self.name_to_val(n)
         n = n.to_s if n.kind_of?(Symbol)
-        if (v=FFI::PCap.pcap_datalink_name_to_val(n)) >= 0
-          return v
-        end
+        v = PCap.pcap_datalink_name_to_val(n)
+
+        return v if v >= 0
       end
 
       #
@@ -89,7 +89,7 @@ module FFI
       #   The string name of the data-link or `nil` on failure.
       # 
       def self.val_to_name(v)
-        FFI::PCap.pcap_datalink_val_to_name(v)
+        PCap.pcap_datalink_val_to_name(v)
       end
 
       #
@@ -99,8 +99,9 @@ module FFI
       #
       def self.describe(l)
         l = l.to_s if l.kind_of?(Symbol)
-        l = FFI::PCap.pcap_datalink_name_to_val(l) if l.kind_of?(String) 
-        FFI::PCap.pcap_datalink_val_to_description(l)
+        l = PCap.pcap_datalink_name_to_val(l) if l.kind_of?(String) 
+
+        PCap.pcap_datalink_val_to_description(l)
       end
 
       # FFI::PCap datalink numeric value
@@ -120,15 +121,16 @@ module FFI
       #   value fails or if the arg parameter is an invalid type.
       #
       def initialize(arg)
-        if arg.kind_of? String or arg.kind_of? Symbol
-          unless @value = self.class.name_to_val(arg.to_s)
+        if (arg.kind_of?(String) || arg.kind_of?(Symbol))
+          unless (@value = self.class.name_to_val(arg.to_s))
             raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.to_s}")
           end
-        elsif arg.kind_of? Numeric
+        elsif arg.kind_of?(Numeric)
           @value = arg
         else
-          raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.inspect}")
+          raise(UnsupportedDataLinkError,"Invalid DataLink: #{arg.inspect}",caller)
         end
+
         @name = self.class.val_to_name(@value)
       end
 

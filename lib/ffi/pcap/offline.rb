@@ -24,7 +24,7 @@ module FFI
       #   argument.  If specified in opts, its value will be ignored.
       #
       # @return [Offline]
-      #   A FFI::PCap::Offline wrapper.
+      #   A offline wrapper.
       #
       # @raise [LibError]
       #   On failure, an exception is raised with the relevant error 
@@ -33,17 +33,21 @@ module FFI
       def initialize(path, opts={}, &block)
         @path = path
         @errbuf = ErrorBuffer.create()
-        @pcap = FFI::PCap.pcap_open_offline(File.expand_path(@path), @errbuf)
-        raise(LibError, "pcap_open_offline(): #{@errbuf.to_s}") if @pcap.null?
+        @pcap = PCap.pcap_open_offline(File.expand_path(@path), @errbuf)
+
+        if @pcap.null?
+          raise(LibError,"pcap_open_offline(): #{@errbuf}",caller)
+        end
+
         super(@pcap, opts, &block)
       end
 
       def swapped?
-        FFI::PCap.pcap_is_swapped(_pcap) == 1 ? true : false
+        PCap.pcap_is_swapped(_pcap) == 1 ? true : false
       end
 
       def file_version
-        "#{FFI::PCap.pcap_major_version(_pcap)}.#{FFI::PCap.pcap_minor_version(_pcap)}"
+        "#{PCap.pcap_major_version(_pcap)}.#{PCap.pcap_minor_version(_pcap)}"
       end
 
     end

@@ -14,7 +14,7 @@ module FFI
       end
 
       def _write(header, bytes)
-        FFI::PCap.pcap_dump(@dumper, header, bytes)
+        PCap.pcap_dump(@dumper, header, bytes)
       end
 
       def write(*args)
@@ -30,15 +30,15 @@ module FFI
       end
 
       def tell
-        FFI::PCap.pcap_dump_ftell(@dumper)
+        PCap.pcap_dump_ftell(@dumper)
       end
 
       def flush
-        FFI::PCap.pcap_dump_flush(@dumper)
+        PCap.pcap_dump_flush(@dumper)
       end
 
       def close
-        FFI::PCap.pcap_dump_close(@dumper)
+        PCap.pcap_dump_close(@dumper)
       end
 
     end

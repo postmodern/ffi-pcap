@@ -30,10 +30,15 @@ module FFI
       #
       def initialize(opts={}, &block)
         dl = opts[:datalink] || DataLink.new(0)
+
         @datalink = dl.kind_of?(DataLink) ? dl : DataLink.new(dl)
         @snaplen  = opts[:snaplen] || DEFAULT_SNAPLEN
         @pcap = FFI::PCap.pcap_open_dead(@datalink.value, @snaplen)
-        raise(LibError, "pcap_open_dead(): returned a null pointer") if @pcap.null?
+
+        if @pcap.null?
+          raise(LibError,"pcap_open_dead(): returned a null pointer",caller)
+        end
+
         super(@pcap, opts, &block)
       end
 

@@ -47,31 +47,38 @@ module FFI
       #
       def initialize(hdr, body, opts={})
         o = opts.dup
-        ts = o.delete(:time) || o.delete(:timestamp)
+        ts = (o.delete(:time) || o.delete(:timestamp))
+
         case hdr
         when PacketHeader
-          raise(ArgumentError, "NULL header pointer") if hdr.to_ptr.null?
+          if hdr.to_ptr.null?
+            raise(ArgumentError,"NULL header pointer",caller)
+          end
+
           @header = hdr
         when ::FFI::Pointer
-          raise(ArgumentError, "NULL header pointer") if hdr.null?
+          if hdr.null?
+            raise(ArgumentError, "NULL header pointer",caller)
+          end
+
           @header = PacketHeader.new(hdr)
         when nil 
-          if body.is_a? String
+          if body.is_a?(String)
             set_body(body, o)
           else
-            raise(TypeError, "invalid body with nil header: #{body.class}")
+            raise(TypeError,"invalid body with nil header: #{body.class}",caller)
           end
         else
-          raise(TypeError, "invalid header: #{hdr.class}")
+          raise(TypeError,"invalid header: #{hdr.class}",caller)
         end
 
         @header.ts.time = ts if ts
 
         unless @body_ptr
-          if body.is_a?(FFI::Pointer) and not body.null?
+          if (body.is_a?(FFI::Pointer) && !(body.null?))
             @body_ptr = body
           else
-            raise(TypeError, "invalid body for header: #{body.class}")
+            raise(TypeError,"invalid body for header: #{body.class}",caller)
           end
         end
       end
@@ -100,8 +107,9 @@ module FFI
       #   Returns the data as supplied per `attr_writer` convention.
       #
       def set_body(data, opts={})
-        cl = opts[:caplen] || opts[:captured] || data.size
-        l = opts[:length] || opts[:len] || cl
+        cl = (opts[:caplen] || opts[:captured] || data.size)
+        l = (opts[:length] || opts[:len] || cl)
+
         clen = (cl < data.size) ? cl : data.size
         len = (l < clen) ? clen : l
 
@@ -164,13 +172,21 @@ module FFI
       #   An exception is raised if the header or body is a `NULL` pointer.
       #
       def copy
-        raise(StandardError, "header is a NULL pointer") if @header.to_ptr.null?
-        raise(StandardError, "body is a NULL pointer") if body_ptr.null?
+        if @header.to_ptr.null?
+          raise(StandardError,"header is a NULL pointer",caller)
+        end
+
+        if body_ptr.null?
+          raise(StandardError,"body is a NULL pointer",caller)
+        end
+
         cpy_hdr = PacketHeader.new
         cpy_buf = FFI::MemoryPointer.new(@header.caplen)
+
         CRT.memcpy(cpy_hdr, @header, PacketHeader.size)
         CRT.memcpy(cpy_buf, @body_ptr, @header.caplen)
-        self.class.new( cpy_hdr, cpy_buf )
+
+        return self.class.new( cpy_hdr, cpy_buf )
       end
 
     end
