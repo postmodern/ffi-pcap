@@ -63,6 +63,7 @@ Gem::Specification.new do |s|
     "lib/ffi/pcap/packet_header.rb",
     "lib/ffi/pcap/pcap.rb",
     "lib/ffi/pcap/stat.rb",
+    "lib/ffi/pcap/stat_ex.rb",
     "lib/ffi/pcap/time_val.rb",
     "lib/ffi/pcap/typedefs.rb",
     "spec/data_link_spec.rb",
