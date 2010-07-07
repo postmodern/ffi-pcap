@@ -21,6 +21,7 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.homepage = "http://github.com/sophsec/ffi-pcap"
   gemspec.description = "Bindings to libpcap via FFI interface in Ruby."
   gemspec.authors = ["Postmodern", "Dakrone", "Eric Monti"]
+  gemspec.requirements = ['libpcap or winpcap (if on Windows)']
   gemspec.has_rdoc = 'yard'
 end
 
