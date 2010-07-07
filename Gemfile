@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 group :runtime do
-  gem 'ffi',		'~> 0.5.0'
+  gem 'ffi',		'~> 0.6.0'
   gem 'ffi_dry',	'~> 0.1.9'
 end
 
