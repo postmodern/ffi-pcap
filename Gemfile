@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 group :runtime do
   gem 'ffi',		'~> 0.6.0'
