@@ -275,7 +275,13 @@ module FFI
       alias setfilter set_filter
       alias filter= set_filter
 
-      private
+      def fileno
+        PCap.pcap_fileno(_pcap)
+      end
+
+      def selectable_io
+        ::IO.new(self.fileno, 'r')
+      end
 
       def _wrap_callback(h, block)
         h ||= @handler
@@ -301,6 +307,8 @@ module FFI
         end
       end
 
+      private :_wrap_callback
+
     end
 
     callback :pcap_handler, [:pointer, PacketHeader, :pointer], :void
@@ -310,6 +318,7 @@ module FFI
     attach_function :pcap_next_ex, [:pcap_t, :pointer, :pointer], :int
     attach_function :pcap_breakloop, [:pcap_t], :void
     attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
+    attach_function :pcap_fileno, [:pcap_t], :int
 
   end
 end
