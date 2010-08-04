@@ -1,3 +1,6 @@
+### 0.2.1 / 2010-08-04
+* experimental selectable IO support
+
 ### 0.2.0 / 2010-04-22
 
 * emonti fork merged back into sophsec/ffi-pcap 
