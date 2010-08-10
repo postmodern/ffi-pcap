@@ -18,7 +18,7 @@ shared_examples_for "FFI::PCap::Packet" do
   it "should allow time timestamp to be changed" do
     t = Time.now
     lambda {@pkt.time = t}.should_not raise_error(Exception)
-    @pkt.time.should == t
+    @pkt.time.to_i.should == t.to_i
   end
 
   it "should return a deep copy of itself with copy()" do
