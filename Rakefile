@@ -25,6 +25,6 @@ PROJ.rcov.opts += [
 ]
 
 
-depend_on 'ffi', '>= 2.1.1'
+depend_on 'ffi', '>= 0.5.0'
 depend_on 'ffi_dry', '>= 0.1.9'
 
