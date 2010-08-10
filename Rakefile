@@ -15,8 +15,7 @@ PROJ.readme_file = 'README.md'
 PROJ.history_file = 'ChangeLog.md'
 PROJ.readme_file = 'README.rdoc'
 
-PROJ.spec.opts << '--color'
-PROJ.rdoc.opts << '--line-numbers'
+PROJ.spec.opts += File.read(".specopts").split("\n")
 
 # exclude rcov.rb and external libs from rcov report
 PROJ.rcov.opts += [
