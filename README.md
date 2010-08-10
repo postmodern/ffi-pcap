@@ -16,8 +16,8 @@ Ruby FFI bindings for libpcap.
 ## Requirements
 
 * [libpcap](http://www.tcpdump.org/) or [winpcap](http://winpcap.org/)
-* [ffi](http://github.com/ffi/ffi) >= 0.5.0
-* [ffi_dry](http://github.com/emonti/ffi_dry) >= 0.1.9
+* [ffi](http://github.com/ffi/ffi) ~> 0.6.0
+* [ffi_dry](http://github.com/emonti/ffi_dry) ~> 0.1.9
 
 ## Install
 
