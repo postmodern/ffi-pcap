@@ -1,0 +1,24 @@
+## This File...
+.pkg_ignore
+## MAC OS X
+.DS_Store
+## TEXTMATE
+*.tmproj
+tmtags
+## EMACS
+*~
+\#*
+.\#*
+## VIM
+*.swp
+.*.swp
+## MISC
+.git
+.gitignore
+.yardoc
+.document
+coverage
+rdoc
+pkg
+## PROJECT::SPECIFIC
+*.gemspec
