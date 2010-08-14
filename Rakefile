@@ -1,3 +1,4 @@
+
 rubyforge_project = 'ffi-pcap'
 name = "ffi-pcap"
 summary = "FFI bindings for libpcap"
@@ -10,6 +11,7 @@ authors = ["Postmodern", "Dakrone", "Eric Monti"]
 ### to use a pared down project rakefile
 ### with fewer development dependencies
 unless File.exists?('.justrake')
+
   require 'rubygems'
   require 'bundler'
 
