@@ -163,7 +163,7 @@ module FFI
         cnt = (opts[:count] || DEFAULT_COUNT) # default to infinite loop
         h = opts[:handler]
 
-        ret = PCap.pcap_loop(_pcap, cnt, _wrap_callback(h, block),nil)
+        ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(h, block),nil)
         if ret == -1
           raise(ReadError,"pcap_dispatch(): #{geterr}",caller)
         elsif ret -2
@@ -279,8 +279,16 @@ module FFI
         PCap.pcap_fileno(_pcap)
       end
 
+      def selectable_fd
+        if PCap.respond_to?(:pcap_get_selectable_fd)
+          PCap.pcap_get_selectable_fd(pcap)
+        else
+          raise(NotImplementedError, "selectable pcap IO is not available for your platform")
+        end
+      end
+
       def selectable_io
-        ::IO.new(self.fileno, 'r')
+        ::IO.new(self.selectable_fd, 'r')
       end
 
       def _wrap_callback(h, block)

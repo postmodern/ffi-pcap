@@ -183,6 +183,7 @@ module FFI
       end
 
       alias non_blocking= set_non_blocking
+      alias nonblocking= set_non_blocking
 
       #
       # get the state of non-blocking mode on a capture device
