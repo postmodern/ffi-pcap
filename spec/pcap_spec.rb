@@ -12,7 +12,7 @@ describe FFI::PCap do
     FFI::PCap.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
   end
 
-  it ".lookupdev() should return a device deafult device" do
+  it ".lookupdev() should return a device default device" do
     dev = FFI::PCap.lookupdev
     dev.should_not be_nil
     dev.should_not be_empty
