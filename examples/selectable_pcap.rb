@@ -19,7 +19,7 @@ class PcapWatcher < EM::Connection
 
 end
 
-dev = ARGV.shift || 'en1'
+dev = ARGV.shift || 'lo0'
 if ARGV[0]
   filter = ARGV.join(' ')
 end
