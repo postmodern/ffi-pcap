@@ -3,8 +3,11 @@
 require 'rubygems'
 require 'ffi/pcap'
 
+dev = ARGV.shift || 'lo0'
+
 pcap =
-  FFI::PCap::Live.new(:dev => 'en0', 
+  FFI::PCap::Live.new(:dev => dev, 
+                      :timeout => 1,
                  :promisc => true, 
                  :handler => FFI::PCap::Handler)
 
