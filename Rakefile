@@ -20,8 +20,9 @@ PROJ.spec.opts += File.read(".specopts").split("\n")
 # exclude rcov.rb and external libs from rcov report
 PROJ.rcov.opts += [
   "--exclude",  "rcov", 
-  "--exclude", "ffi",
+  "--exclude", "gems/ffi-*.*.*/lib/ffi",
   "--exclude", "ffi_dry",
+  "--include-file", "lib/**/*.rb",
 ]
 
 
