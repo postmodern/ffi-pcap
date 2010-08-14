@@ -8,3 +8,4 @@ ref/*
 .DS_Store
 *.swp
 *~
+.justrake
