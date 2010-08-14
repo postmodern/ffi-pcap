@@ -285,10 +285,21 @@ module FFI
 
     attach_function :pcap_fileno, [:pcap_t], :int
 
-    #### XXX not sure if we even want FILE io stuff yet (or ever).
+
+    ### not sure if we want FILE stuff now or ever
 
     #attach_function :pcap_fopen_offline, [:FILE, :pointer], :pcap_t
     #attach_function :pcap_file, [:pcap_t], :FILE
     #attach_function :pcap_dump_fopen, [:pcap_t, :FILE], :pcap_dumper_t
+
+    # MISC functions only in 1.0.0+
+    # They added a very different way of creating 'live' pcap handles
+    attach_optional_function :pcap_create, [:string, :pointer], :pcap_t
+    attach_optional_function :pcap_set_snaplen, [:pcap_t, :int], :int
+    attach_optional_function :pcap_set_promisc, [:pcap_t, :int], :int
+    attach_optional_function :pcap_can_set_rfmon, [:pcap_t, :int], :int
+    attach_optional_function :pcap_set_timeout, [:pcap_t, :int], :int
+    attach_optional_function :pcap_set_buffer_size, [:pcap_t, :int], :int
+    attach_optional_function :activate, [:pcap_t], :int
   end
 end
