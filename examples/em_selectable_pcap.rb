@@ -25,7 +25,7 @@ if ARGV[0]
 end
 
 EM.run{
-  pcap = FFI::PCap::Live.new(:device => dev, :timeout => 100)
+  pcap = FFI::PCap::Live.new(:device => dev, :timeout => 1)
   pcap.nonblocking=true
   pcap.setfilter filter if filter
 
