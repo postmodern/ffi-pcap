@@ -4,6 +4,18 @@ module FFI
 
       attr_reader :body_ptr, :header
 
+
+      # Unmarshall a marshalled {Packet}
+      def self._load(s)
+        time, body = Marshal.load(s)
+        self.from_string(body, :timestamp => time)
+      end
+
+      # Marshal this {Packet}
+      def _dump(lv)
+        Marshal.dump([self.time, self.body])
+      end
+
       #
       # Creates a {Packet} from a Ruby string object.
       #

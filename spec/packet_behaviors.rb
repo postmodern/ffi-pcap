@@ -27,6 +27,15 @@ shared_examples_for "FFI::PCap::Packet" do
     cp.body_ptr.object_id.should_not == @pkt.body_ptr.object_id
     cp.body.should == @pkt.body
   end
+
+  it "should marshal and umarshal" do
+    m = Marshal.dump(@pkt)
+    unm = Marshal.load(m)
+
+    unm.should be_kind_of(@pkt.class)
+    unm.time.to_i.should == @pkt.time.to_i
+    unm.body.should == @pkt.body
+  end
 end
 
 shared_examples_for "FFI::PCap::Packet populated" do
