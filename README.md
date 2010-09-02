@@ -19,6 +19,8 @@ The choice of what to use is left up to you.
 
 ## Examples
 
+
+
 Reading ICMP packets from a live interface.
 
     require 'rubygems'
@@ -30,7 +32,7 @@ Reading ICMP packets from a live interface.
                           :promisc => true,
                           :handler => FFI::PCap::Handler)
 
-    pcap.setfilter "icmp"
+    pcap.setfilter("icmp")
 
     pcap.loop() do |this,pkt|
       puts "#{pkt.time}:"
@@ -45,11 +47,7 @@ Reading packets from a pcap dump file:
     require 'rubygems'
     require 'ffi/pcap'
 
-    pcap =
-      FFI::PCap::Live.new(:dev => 'lo0',
-                          :timeout => 1,
-                          :promisc => true,
-                          :handler => FFI::PCap::Handler)
+    pcap = FFI::PCap::Offline.new("./foo.cap")
 
     pcap.loop() do |this,pkt|
       puts "#{pkt.time}:"
