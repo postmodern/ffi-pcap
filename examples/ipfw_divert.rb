@@ -6,6 +6,7 @@
 # ipfw add tee 6666 tcp from 192.168.63.128 to any
 # ipfw add tee 6666 tcp from any to 192.168.63.128
 
+$: << File.expand_path( File.join(File.dirname(__FILE__), '../lib'))
 require 'ffi/pcap'
 require "socket"
 require 'pp'
