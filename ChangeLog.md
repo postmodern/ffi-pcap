@@ -1,7 +1,7 @@
 ### 0.2.1 / 2010-08-04
-* experimental selectable IO support
+* Experimental selectable IO support
 * Added Marshal support to Packet objects
-* irrelevent tweaks made to project dev environment/pkg mgmt
+* Irrelevent tweaks made to project dev environment/pkg mgmt
 
 ### 0.2.0 / 2010-04-22
 
