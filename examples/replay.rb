@@ -1,3 +1,4 @@
+
 require 'rubygems'
 require 'ffi/pcap'
 $: << File.expand_path( File.join(File.dirname(__FILE__), '../lib'))
