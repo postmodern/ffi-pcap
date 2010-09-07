@@ -3,21 +3,28 @@
 # Thanks to justfalter(Mike Ryan) for turning me onto Divert Sockets for
 # this example.
 #
-# This demos the ability to use PCAP dump to write a pcap file with
+# This example was written to demonstrate a workaround for a specific
+# problem using pcap on VMWare Fusion vmnet interfaces.
+#
+# It demos the ability to use PCAP dump to write a pcap file with
 # packets captured using a divert socket. In order to generate 
 # packets that are diverted you need a system that supports IPFW
-# and you need to establish some ipfw rules that divert packets to
-# a chosen 
+# with divert sockets and you need to establish some ipfw rules that 
+# divert packets to a chosen port. 
 #
-# ipfw add tee 6666 tcp from 192.168.63.128 to any
-# ipfw add tee 6666 tcp from any to 192.168.63.128
-
+# Below are some example IPFW rules that will capture tcp packets to 
+# or from 192.168.63.128 using port 6666:
+#
+#   ipfw add tee 6666 tcp from 192.168.63.128 to any
+#   ipfw add tee 6666 tcp from any to 192.168.63.128
+#
 $: << File.expand_path( File.join(File.dirname(__FILE__), '../lib'))
 
 require 'rubygems'
 require 'ffi/pcap'
 require "socket"
 require 'pp'
+
 IPPROTO_DIVERT = 254
 
 unless Process::Sys.getuid == 0  
@@ -25,10 +32,13 @@ unless Process::Sys.getuid == 0
   exit!
 end
 
+# First argument is an output pcap file
 outfile = ARGV.shift
+
+# Second argument is optional for an alternate divert port
 my_divert_port = ARGV.shift || 6666
 
-# create a dummy pcap handle for dumping
+# Create a dummy pcap handle for dumping
 puts "Dumping packets to #{outfile}"
 pcap        = FFI::PCap.open_dead(:datalink => :raw)
 pcap_dumper = pcap.open_dump(outfile)
