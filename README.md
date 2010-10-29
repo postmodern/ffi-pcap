@@ -17,6 +17,11 @@ offline packet capture, live packet injection, etc..
 Currently, FFI::PCap does _not_ supply any packet dissection routines. 
 The choice of what to use is left up to you.
 
+Packet dissection libraries:
+
+* [ffi-packets](http://github.com/emonti/ffi-packets) - Maps raw packets to
+  `FFI::Struct` objects.
+
 ## Examples
 
 Reading ICMP packets from a live interface.
