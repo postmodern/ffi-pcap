@@ -19,8 +19,6 @@ The choice of what to use is left up to you.
 
 ## Examples
 
-
-
 Reading ICMP packets from a live interface.
 
     require 'rubygems'
@@ -40,7 +38,6 @@ Reading ICMP packets from a live interface.
       pkt.body.each_byte {|x| print "%0.2x " % x }
       putc "\n"
     end
-
 
 Reading packets from a pcap dump file:
 
