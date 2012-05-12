@@ -7,9 +7,9 @@ module FFI
     extend FFI::Library
 
     begin
-      ffi_lib "wpcap"
+      ffi_lib 'wpcap'
     rescue LoadError
-      ffi_lib "pcap"
+      ffi_lib ['pcap', 'libpcap.so.1']
     end
   end
 
