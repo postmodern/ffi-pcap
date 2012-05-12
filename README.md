@@ -73,6 +73,7 @@ Replaying packets from a pcap dump file on a live interface:
 ## Requirements
 
 * [libpcap](http://www.tcpdump.org/) or [winpcap](http://winpcap.org/)
+  >= 1.0.0
 * [ffi](http://github.com/ffi/ffi) ~> 0.6.0
 * [ffi_dry](http://github.com/emonti/ffi_dry) ~> 0.1.9
 

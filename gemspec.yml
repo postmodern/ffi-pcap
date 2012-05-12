@@ -11,7 +11,7 @@ email: postmodern.mod3@gmail.com
 homepage: http://github.com/sophsec/ffi-pcap
 has_yard: true
 
-requirements: libpcap
+requirements: libpcap >= 1.0.0
 
 dependencies:
   ffi: ~> 1.0
