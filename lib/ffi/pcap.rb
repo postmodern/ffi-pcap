@@ -1,5 +1,3 @@
-begin; require 'rubygems'; rescue LoadError; end
-
 require 'ffi_dry'
 
 module FFI
