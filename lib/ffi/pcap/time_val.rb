@@ -21,8 +21,8 @@ module FFI
           super()
 
           self.time = timeval
-        else Pointer then super(timeval)
-        else         then super()
+        when Pointer then super(timeval)
+        else              super()
         end
       end
 
