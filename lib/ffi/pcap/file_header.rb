@@ -20,7 +20,7 @@ module FFI
       end
 
       def datalink
-        DataLink.new(self.linktype)
+        @data_link ||= DataLink.new(self.linktype)
       end
 
       def version
