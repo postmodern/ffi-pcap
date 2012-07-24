@@ -1,4 +1,5 @@
 require 'ffi/pcap/bpf_instruction'
+require 'ffi/pcap/data_link'
 
 module FFI
   module PCap
@@ -18,7 +19,8 @@ module FFI
 
       def instructions
         i = 0
-        sz = BPFInstruction.size()
+        sz = BPFInstruction.size
+
         Array.new(self.bf_len) do 
           ins = BPFInstruction.new( self[:bf_insn] + i )
           i += sz
@@ -29,12 +31,12 @@ module FFI
       def free!
         unless @closed
           @freed = true
-          FFI::PCap.pcap_freecode(self)
+          PCap.pcap_freecode(self)
         end
       end
 
       def freed?
-        return @freed == true
+        @freed == true
       end
 
       #
@@ -70,8 +72,10 @@ module FFI
         slen     = (opts[:snaplen] || DEFAULT_SNAPLEN)
         optimize = (opts[:optimize] || 1)
         mask     = (opts[:netmask] || 0)
-        code = BPFProgram.new()
-        r = FFI::PCap.pcap_compile_nopcap(slen, dl.value, code, expr, optimize, mask)
+
+        code = new()
+        r = PCap.pcap_compile_nopcap(slen, dl.value, code, expr, optimize, mask)
+
         raise(LibError, "pcap_compile_nopcap(): unspecified error") if r < 0
         return code
       end

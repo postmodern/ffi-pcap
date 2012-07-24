@@ -11,9 +11,9 @@ module FFI
       attr_accessor :pcap
 
       def initialize(pcap, opts={})
-        @pcap = pcap
-        @closed = false
-        @errbuf ||= ErrorBuffer.create
+        @pcap     = pcap
+        @closed   = false
+        @errbuf ||= ErrorBuffer.new
 
         yield self if block_given?
       end
@@ -22,16 +22,16 @@ module FFI
       # Returns the DataLink for the pcap device.
       #
       def datalink
-        @datalink ||= DataLink.new(FFI::PCap.pcap_datalink(_pcap))
+        @datalink ||= DataLink.new(PCap.pcap_datalink(_pcap))
       end
 
       #
       # Returns an array of supported DataLinks for the pcap device.
       #
       def supported_datalinks
-        dlt_lst = FFI::MemoryPointer.new(:pointer)
+        dlt_lst = MemoryPointer.new(:pointer)
 
-        if (cnt=FFI::PCap.pcap_list_datalinks(_pcap, dlt_lst)) < 0
+        if (cnt = PCap.pcap_list_datalinks(_pcap, dlt_lst)) < 0
           raise(LibError, "pcap_list_datalinks(): #{geterr}",caller)
         end
 
@@ -82,7 +82,7 @@ module FFI
       # @return [Integer]
       #  Snapshot length for the pcap interface.
       def snaplen
-        FFI::PCap.pcap_snapshot(_pcap)
+        PCap.pcap_snapshot(_pcap)
       end
 
       #
@@ -130,7 +130,7 @@ module FFI
       #   message from libpcap.
       #
       def open_dump(path)
-        dp = FFI::PCap.pcap_dump_open(_pcap, File.expand_path(path))
+        dp = PCap.pcap_dump_open(_pcap, File.expand_path(path))
 
         if dp.null?
           raise(LibError,"pcap_dump_open(): #{geterr}",caller)
@@ -144,7 +144,7 @@ module FFI
       #   The error text pertaining to the last pcap library error.
       #
       def geterr
-        FFI::PCap.pcap_geterr(_pcap)
+        PCap.pcap_geterr(_pcap)
       end
 
       alias error geterr

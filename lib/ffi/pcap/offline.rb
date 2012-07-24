@@ -31,9 +31,9 @@ module FFI
       #   message from libpcap.
       #
       def initialize(path, opts={}, &block)
-        @path = path
-        @errbuf = ErrorBuffer.create()
-        @pcap = PCap.pcap_open_offline(File.expand_path(@path), @errbuf)
+        @path   = path
+        @errbuf = ErrorBuffer.new
+        @pcap   = PCap.pcap_open_offline(File.expand_path(@path), @errbuf)
 
         if @pcap.null?
           raise(LibError,"pcap_open_offline(): #{@errbuf}",caller)
@@ -56,6 +56,5 @@ module FFI
     attach_function :pcap_is_swapped, [:pcap_t], :int
     attach_function :pcap_major_version, [:pcap_t], :int
     attach_function :pcap_minor_version, [:pcap_t], :int
-
   end
 end

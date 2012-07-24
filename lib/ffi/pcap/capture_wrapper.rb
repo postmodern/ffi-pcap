@@ -40,11 +40,7 @@ module FFI
       # retain a reference to them elsewhere.
       #
       def initialize(pcap, opts={}, &block)
-        @handler = if opts.has_key?(opts[:handler])
-                     opts[:handler]
-                   else
-                     CopyHandler
-                   end
+        @handler = opts.fetch(handler,CopyHandler)
 
         trap('INT') do
           stop()
@@ -56,6 +52,7 @@ module FFI
         trap('TERM') do
           stop()
           close()
+
           raise(SignalException,'TERM',caller)
         end
 
@@ -164,6 +161,7 @@ module FFI
         h = opts[:handler]
 
         ret = PCap.pcap_dispatch(_pcap, cnt, _wrap_callback(h, block),nil)
+
         if ret == -1
           raise(ReadError,"pcap_dispatch(): #{geterr}",caller)
         elsif ret -2
@@ -212,7 +210,7 @@ module FFI
         hdr_p = MemoryPointer.new(:pointer)
         buf_p = MemoryPointer.new(:pointer)
 
-        case FFI::PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
+        case PCap.pcap_next_ex(_pcap, hdr_p, buf_p)
         when -1 # error
           raise(ReadError,"pcap_next_ex(): #{geterr}",caller)
         when 0  # live capture read timeout expired
@@ -327,6 +325,5 @@ module FFI
     attach_function :pcap_breakloop, [:pcap_t], :void
     attach_function :pcap_setfilter, [:pcap_t, BPFProgram], :int
     attach_function :pcap_fileno, [:pcap_t], :int
-
   end
 end

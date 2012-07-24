@@ -1,9 +1,10 @@
+require 'ffi/pcap/packet_header'
+
 module FFI
   module PCap
     class Packet
 
       attr_reader :body_ptr, :header
-
 
       # Unmarshall a marshalled {Packet}
       def self._load(s)
@@ -122,13 +123,13 @@ module FFI
         cl = (opts[:caplen] || opts[:captured] || data.size)
         l = (opts[:length] || opts[:len] || cl)
 
-        clen = (cl < data.size) ? cl : data.size
-        len = (l < clen) ? clen : l
+        clen = [cl, data.size].min
+        len  = [l, clen].max
 
         @header ||= PacketHeader.new
         @header.caplen = len || @header.caplen
         @header.len = len || @header.caplen
-        @body_ptr = FFI::MemoryPointer.from_string(data)
+        @body_ptr = MemoryPointer.from_string(data)
         return self
       end
 
@@ -158,7 +159,7 @@ module FFI
       # Sets the pcap timestamp.
       #
       def time=(t)
-        @header.ts.time=(t)
+        @header.ts.time = t
       end
 
       def caplen

@@ -1,4 +1,5 @@
 require 'ffi/pcap/common_wrapper'
+require 'ffi/pcap/data_link'
 
 module FFI
   module PCap
@@ -33,7 +34,7 @@ module FFI
 
         @datalink = dl.kind_of?(DataLink) ? dl : DataLink.new(dl)
         @snaplen  = opts[:snaplen] || DEFAULT_SNAPLEN
-        @pcap = FFI::PCap.pcap_open_dead(@datalink.value, @snaplen)
+        @pcap = PCap.pcap_open_dead(@datalink.value, @snaplen)
 
         if @pcap.null?
           raise(LibError,"pcap_open_dead(): returned a null pointer",caller)
@@ -45,6 +46,5 @@ module FFI
     end
 
     attach_function :pcap_open_dead, [:int, :int], :pcap_t
-
   end
 end

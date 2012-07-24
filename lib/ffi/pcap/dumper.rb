@@ -4,7 +4,7 @@ module FFI
     # See `pcap_dumper_t` in `pcap.h`.
     #
     # A `pcap_dumper`, {Dumper} is handled opaquely so that it can
-    # be implemented differently on different platforms. In {FFI::PCap}, we
+    # be implemented differently on different platforms. In {PCap}, we
     # simply wrap the `pcap_dumper_t` pointer with a ruby interface.
     #
     class Dumper
@@ -18,10 +18,9 @@ module FFI
       end
 
       def write(*args)
-        if args.first.is_a? Packet
-          write_pkt(*args)
-        else
-          _write(*args)
+        case args.first
+        when Packet then write_pkt(*args)
+        else             _write(*args)
         end
       end
 
@@ -50,6 +49,5 @@ module FFI
     attach_function :pcap_dump_flush, [:pcap_dumper_t], :int
     attach_function :pcap_dump_close, [:pcap_dumper_t], :void
     attach_function :pcap_dump, [:pointer, PacketHeader, :pointer], :void
-
   end
 end

@@ -121,11 +121,12 @@ module FFI
       #   value fails or if the arg parameter is an invalid type.
       #
       def initialize(arg)
-        if (arg.kind_of?(String) || arg.kind_of?(Symbol))
+        case arg
+        when String, Symbol
           unless (@value = self.class.name_to_val(arg.to_s))
             raise(UnsupportedDataLinkError, "Invalid DataLink: #{arg.to_s}")
           end
-        elsif arg.kind_of?(Numeric)
+        when Numeric
           @value = arg
         else
           raise(UnsupportedDataLinkError,"Invalid DataLink: #{arg.inspect}",caller)
@@ -141,15 +142,15 @@ module FFI
       def ==(other)
         case other
         when DataLink
-          return (self.value == other.value)
+          self.value == other.value
         when Numeric
-          return (self.value == other)
+          self.value == other
         when Symbol
-          return (@value == self.class.name_to_val(other.to_s))
+          @value == self.class.name_to_val(other.to_s)
         when String
-          return (@value == self.class.name_to_val(other))
+          @value == self.class.name_to_val(other)
         else
-          return false
+          false
         end
       end
 
@@ -193,6 +194,5 @@ module FFI
     attach_function :pcap_datalink_name_to_val, [:string], :int
     attach_function :pcap_datalink_val_to_name, [:int], :string
     attach_function :pcap_datalink_val_to_description, [:int], :string
-
   end
 end

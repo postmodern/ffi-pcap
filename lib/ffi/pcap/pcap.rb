@@ -21,7 +21,7 @@ module FFI
     #   message from libpcap.
     #
     def PCap.lookupdev
-      e = ErrorBuffer.create()
+      e = ErrorBuffer.new
 
       unless (name = PCap.pcap_lookupdev(e))
         raise(LibError,"pcap_lookupdev(): #{e}",caller)
@@ -57,9 +57,9 @@ module FFI
     #   from libpcap. 
     #
     def PCap.lookupnet(device)
-      netp  = FFI::MemoryPointer.new(find_type(:bpf_uint32))
-      maskp = FFI::MemoryPointer.new(find_type(:bpf_uint32))
-      errbuf = ErrorBuffer.create()
+      netp   = MemoryPointer.new(find_type(:bpf_uint32))
+      maskp  = MemoryPointer.new(find_type(:bpf_uint32))
+      errbuf = ErrorBuffer.new
 
       unless PCap.pcap_lookupnet(device, netp, maskp, errbuf) == 0
         raise(LibError, "pcap_lookupnet(): #{errbuf}",caller)
@@ -135,7 +135,7 @@ module FFI
     #
     def PCap.each_device
       devices = FFI::MemoryPointer.new(:pointer)
-      errbuf = ErrorBuffer.create()
+      errbuf  = ErrorBuffer.new
 
       PCap.pcap_findalldevs(devices, errbuf)
       node = devices.get_pointer(0)
@@ -263,25 +263,29 @@ module FFI
         raise(StandardError,"Unable to drop privileges",caller)
       end
     rescue FFI::NotFoundError
-      $pcap_not_unix=true
+      $pcap_not_unix = true
     end
 
-    # Win32 only:
-    begin
-      attach_function :pcap_setbuff, [:pcap_t, :int], :int
-      attach_function :pcap_setmode, [:pcap_t, :pcap_w32_modes_enum], :int
-      attach_function :pcap_setmintocopy, [:pcap_t, :int], :int
-    rescue FFI::NotFoundError
-      $pcap_not_win32=true
-    end if $pcap_not_unix
+    if $pcap_not_unix
+      # Win32 only:
+      begin
+        attach_function :pcap_setbuff, [:pcap_t, :int], :int
+        attach_function :pcap_setmode, [:pcap_t, :pcap_w32_modes_enum], :int
+        attach_function :pcap_setmintocopy, [:pcap_t, :int], :int
+      rescue FFI::NotFoundError
+        $pcap_not_win32 = true
+      end
+    end
 
-    # MSDOS only???:
-    begin
-      attach_function :pcap_stats_ex, [:pcap_t, StatEx], :int
-      attach_function :pcap_set_wait, [:pcap_t, :pointer, :int], :void
-      attach_function :pcap_mac_packets, [], :ulong
-    rescue FFI::NotFoundError
-    end if $pcap_not_win32
+    if $pcap_not_win32
+      # MSDOS only???:
+      begin
+        attach_function :pcap_stats_ex, [:pcap_t, StatEx], :int
+        attach_function :pcap_set_wait, [:pcap_t, :pointer, :int], :void
+        attach_function :pcap_mac_packets, [], :ulong
+      rescue FFI::NotFoundError
+      end
+    end
 
     attach_function :pcap_fileno, [:pcap_t], :int
 

@@ -21,7 +21,7 @@ module FFI
     #
     class CopyHandler
       def receive_pcap(pcap, pkt)
-        return [pcap, pkt.copy]
+        [pcap, pkt.copy]
       end
     end
 
@@ -31,7 +31,7 @@ module FFI
     #
     class Handler
       def receive_pcap(*args)
-        return args
+        args
       end
     end
   end

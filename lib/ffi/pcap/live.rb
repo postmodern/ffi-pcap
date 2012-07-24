@@ -73,8 +73,8 @@ module FFI
         @timeout   = opts[:timeout] || DEFAULT_TO_MS
         @direction = (opts[:direction] || opts[:dir])
 
-        @errbuf = ErrorBuffer.create()
-        @pcap = PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
+        @errbuf = ErrorBuffer.new
+        @pcap   = PCap.pcap_open_live(@device, @snaplen, @promisc, @timeout, @errbuf)
 
         if @pcap.null?
           raise(LibError, "pcap_open_live(): #{@errbuf}",caller)
