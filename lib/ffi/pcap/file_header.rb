@@ -1,3 +1,8 @@
+require 'ffi/pcap/typedefs'
+require 'ffi/pcap/data_link'
+
+require 'ffi_dry'
+
 module FFI
   module PCap
     class FileHeader < FFI::Struct
