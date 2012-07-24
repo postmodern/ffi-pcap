@@ -9,11 +9,20 @@ module FFI
         field :tv_usec, :suseconds_t
       end
 
-      def initialize(*args)
-        if ((args.size == 1) && args[0].kind_of?(Time))
-          self.time = args[0]
-        else
-          super(*args)
+      #
+      # Initializes the new {TimeVal}.
+      #
+      # @param [Time, FFI::Pointer] timeval
+      #   A Time object or a pointer to another {TimeVal}.
+      #
+      def initialize(timeval=nil)
+        case timeval
+        when Time
+          super()
+
+          self.time = timeval
+        else Pointer then super(timeval)
+        else         then super()
         end
       end
 
@@ -42,7 +51,7 @@ module FFI
       #   Returns the same Time object supplied per convention.
       #
       def time=(new_time)
-        self.tv_sec = new_time.tv_sec
+        self.tv_sec  = new_time.tv_sec
         self.tv_usec = new_time.tv_usec
 
         return new_time
