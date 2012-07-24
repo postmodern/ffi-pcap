@@ -4,11 +4,7 @@ module FFI
   module PCap
     extend FFI::Library
 
-    begin
-      ffi_lib 'wpcap'
-    rescue LoadError
-      ffi_lib ['pcap', 'libpcap.so.1']
-    end
+    ffi_lib ['pcap', 'libpcap.so.1', 'wpcap']
   end
 
   Pcap = PCap
