@@ -1,5 +1,7 @@
 module FFI
   module PCap
+    extend FFI::Library
+
     typedef :pointer, :FILE
 
     typedef :int,  :bpf_int32
