@@ -1,7 +1,10 @@
 require 'rubygems'
-require 'pathname'
-require 'spec'
+
+gem 'rspec', '~> 2.0'
+require 'rspec'
+
 require 'ffi/pcap'
+require 'pathname'
 
 include FFI
 include FFI::PCap
