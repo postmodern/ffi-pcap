@@ -1,28 +1,34 @@
+require 'spec_helper'
 
 shared_examples_for "FFI::PCap::Packet" do
   it "should supply a way to get a pointer for the body" do
     @pkt.body_ptr.should_not be_nil
-    ::FFI::Pointer.should === @pkt.body_ptr
+
+    @pkt.body_ptr.should be_kind_of(FFI::Pointer)
   end
 
   it "should supply a way to get a String for the body" do
     @pkt.body.should_not be_nil
-    String.should === @pkt.body
+
+    @pkt.body.should be_kind_of(String)
   end
 
   it "should supply a timestamp as a Time object" do
     @pkt.time.should_not be_nil
-    Time.should === @pkt.time
+
+    @pkt.time.should be_kind_of(Time)
   end
 
   it "should allow time timestamp to be changed" do
     t = Time.now
-    lambda {@pkt.time = t}.should_not raise_error(Exception)
+
+    @pkt.time = t
     @pkt.time.to_i.should == t.to_i
   end
 
   it "should return a deep copy of itself with copy()" do
     cp = @pkt.copy()
+
     cp.object_id.should_not == @pkt.object_id
     cp.body_ptr.object_id.should_not == @pkt.body_ptr.object_id
     cp.body.should == @pkt.body
@@ -56,7 +62,6 @@ shared_examples_for "FFI::PCap::Packet populated" do
   it "should have a non-null body pointer" do
     @pkt.body_ptr.should_not be_null
   end
-
 end
 
 shared_examples_for "FFI::PCap::Packet composed" do

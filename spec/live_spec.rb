@@ -26,10 +26,13 @@ describe Live do
 
   it "should provide statistics about packets received/dropped" do
     i = 0
+
     @pcap.loop {|this,pkt| @pcap.stop if (i += 1) == 10 }
+
     i.should_not == 0
+
     stats = @pcap.stats
-    Stat.should === stats
+    stats.should be_kind_of(Stat)
     stats.received.should > 0
     stats.received.should >= 10
   end
@@ -37,16 +40,19 @@ describe Live do
   it "should yield packets with a timestamp using loop()" do
     i = 0
     @pkt = nil
+
     @pcap.loop(:count => 2) do |this, pkt|
       this.should == @pcap
       pkt.should_not be_nil
-      Packet.should === pkt
+      pkt.should be_kind_of(Packet)
+
       (Time.now - pkt.time).should_not > 1000
-      i+=1
+
+      i += 1
     end
+
     i.should == 2
   end
-
 
   describe "live packets" do
     before(:all) do
@@ -64,7 +70,6 @@ describe Live do
     end
     
     it_should_behave_like "FFI::PCap::Packet populated"
-
   end
 
   describe "yielding to a block" do
@@ -78,7 +83,9 @@ describe Live do
       end
 
       start_traffic_generator()
+      
       it_should_behave_like "FFI::PCap::CaptureWrapper"
+
       stop_traffic_generator()
       @pcap.close
     end

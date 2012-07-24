@@ -26,9 +26,5 @@ describe Dead do
 
       @pcap.close
     end
-
-
   end
-
 end
-

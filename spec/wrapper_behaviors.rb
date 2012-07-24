@@ -67,11 +67,9 @@ shared_examples_for "FFI::PCap::CommonWrapper" do
       @pcap.close
     }.should_not raise_error(Exception)
   end
-
 end
 
 shared_examples_for "FFI::PCap::CaptureWrapper" do
-
   it "should pass packets to a block using loop()" do
     i = 0
     @pkt = nil
@@ -121,4 +119,3 @@ shared_examples_for "FFI::PCap::CaptureWrapper" do
 
   it_should_behave_like "FFI::PCap::CommonWrapper"
 end
-

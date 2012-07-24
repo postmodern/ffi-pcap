@@ -1,28 +1,31 @@
 require 'spec_helper'
 
 describe FFI::PCap do
+  subject { described_class }
+
   it ".lib_version() should expose the libpcap version banner" do
-    FFI::PCap.lib_version.should_not be_nil
-    FFI::PCap.lib_version.should_not be_empty
+    subject.lib_version.should_not be_nil
+    subject.lib_version.should_not be_empty
   end
 
   it ".lib_version_number() should expose the libpcap version number only" do
-    FFI::PCap.lib_version_number.should_not be_nil
-    FFI::PCap.lib_version_number.should_not be_empty
-    FFI::PCap.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
+    subject.lib_version_number.should =~ /^\d+\.\d+\.\d+$/
   end
 
   it ".lookupdev() should return a device default device" do
-    dev = FFI::PCap.lookupdev
+    dev = subject.lookupdev
+
     dev.should_not be_nil
     dev.should_not be_empty
   end
 
   it ".each_device() should enumerate over all usable interfaces" do
     i = 0
-    FFI::PCap.each_device do |dev|
+
+    subject.each_device do |dev|
       dev.should_not be_nil
-      Interface.should === dev
+      dev.should be_kind_of(Interface)
+
       [true,false].include?(dev.loopback?).should == true
       i+=1
     end
@@ -30,39 +33,44 @@ describe FFI::PCap do
   end
 
   it ".device_names() should return names for all network interfaces" do
-    devs = FFI::PCap.device_names
-    Array.should === devs
+    devs = subject.device_names
+    devs.should be_kind_of(Array)
+
     i = 0
+
     devs.each do |dev|
-      String.should === dev
-      dev.should_not be_nil
+      dev.should     be_kind_of(String)
       dev.should_not be_empty
-      i+=1
+
+      i += 1
     end
+
     i.should_not == 0
     devs.include?(PCAP_DEV).should == true
   end
 
   it ".dump_devices() should return name/network pairs for all interfaces" do
     i = 0
-    devs = FFI::PCap.dump_devices
-    Array.should === devs
-    devs.each do |y|
-      y.size.should == 2
-      dev, net = y
-      String.should === dev
-      dev.should_not be_nil
+
+    devs = subject.dump_devices
+    devs.should be_kind_of(Array)
+
+    devs.each do |(dev,net)|
+      dev.should be_kind_of(String)
       dev.should_not be_empty
-      i+=1
+
+      i += 1
     end
+
     i.should_not == 0
+
     devs.select{|dev,net| not net.nil? }.should_not be_empty
     devs.map{|dev,net| dev}.include?(PCAP_DEV).should == true
   end
 
   it ".open_live() should open a live pcap handler given a chosen device" do
     lambda {
-      pcap = FFI::PCap.open_live(:device => PCAP_DEV)
+      pcap = subject.open_live(:device => PCAP_DEV)
       pcap.device.should == PCAP_DEV
       pcap.close
     }.should_not raise_error(Exception)
@@ -73,7 +81,7 @@ describe FFI::PCap do
       # XXX Using Vista and wpcap.dll this breaks on me.
       #     The lookupdev for a default adapter result is '\', which is just
       #     wrong.
-      pcap = FFI::PCap.open_live()
+      pcap = subject.open_live()
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -81,7 +89,7 @@ describe FFI::PCap do
 
   it ".open_dead() should open a dead pcap handler" do
     lambda {
-      pcap = FFI::PCap.open_dead()
+      pcap = subject.open_dead()
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -89,7 +97,7 @@ describe FFI::PCap do
 
   it ".open_offline() should open a pcap dump file" do
     lambda {
-      pcap = FFI::PCap.open_offline(PCAP_TESTFILE)
+      pcap = subject.open_offline(PCAP_TESTFILE)
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -97,7 +105,7 @@ describe FFI::PCap do
 
   it ".open_file() should work the same as .open_offline()" do
     lambda {
-      pcap = FFI::PCap.open_offline(PCAP_TESTFILE)
+      pcap = subject.open_offline(PCAP_TESTFILE)
       pcap.should be_ready
       pcap.close
     }.should_not raise_error(Exception)
@@ -105,12 +113,15 @@ describe FFI::PCap do
 
   it ".open_live() should take a block and close the device after calling it" do
     pcap = nil
-    ret = FFI::PCap.open_live(:device => PCAP_DEV) {|this|
-      Live.should === this
+
+    ret = subject.open_live(:device => PCAP_DEV) do |this|
+      this.should be_kind_of(Live)
       this.should be_ready
       this.should_not be_closed
+
       pcap = this
-    }
+    end
+
     ret.should be_nil
     pcap.should_not be_ready
     pcap.should be_closed
@@ -118,12 +129,15 @@ describe FFI::PCap do
 
   it ".open_dead() should take a block and close the device after calling it" do
     pcap = nil
-    ret = FFI::PCap.open_dead() {|this|
-      Dead.should === this
+
+    ret = subject.open_dead() do |this|
+      this.should be_kind_of(Dead)
       this.should be_ready
       this.should_not be_closed
+
       pcap = this
-    }
+    end
+
     ret.should be_nil
     pcap.should_not be_ready
     ret.should be_nil
@@ -131,15 +145,17 @@ describe FFI::PCap do
 
   it ".open_file() should take a block and close the device after calling it" do
     pcap = nil
-    ret = FFI::PCap.open_file(PCAP_TESTFILE) {|this|
-      Offline.should === this
+
+    ret = subject.open_file(PCAP_TESTFILE) do |this|
+      this.should be_kind_of(Offline)
       this.should be_ready
       this.should_not be_closed
+
       pcap = this
-    }
+    end
+
     ret.should be_nil
     pcap.should_not be_ready
     ret.should be_nil
   end
-
 end

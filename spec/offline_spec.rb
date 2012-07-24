@@ -2,19 +2,17 @@ require 'spec_helper'
 require 'wrapper_behaviors'
 
 describe Offline do
-  before(:each) do
-    @pcap = Offline.new(PCAP_TESTFILE)
-  end
+  before(:each) { @pcap = Offline.new(PCAP_TESTFILE) }
 
-  after(:each) do
-    @pcap.close
-  end
+  after(:each) { @pcap.close }
 
   it_should_behave_like "FFI::PCap::CaptureWrapper"
 
   it "should return a nil from next() at the end of the dump file" do
     i = 0
-    @pcap.loop {|this,pkt| i+=1 }
+
+    @pcap.loop {|this,pkt| i += 1 }
+
     i.should > 0
     @pcap.next.should be_nil
   end
@@ -22,11 +20,14 @@ describe Offline do
   it "should yield packets with a timestamp using loop()" do
     i = 0
     @pkt = nil
-    @pcap.loop(:count => 2) do |this, pkt|
+
+    @pcap.loop(:count => 2) do |this,pkt|
       this.should == @pcap
+
       pkt.should_not be_nil
-      Packet.should === pkt
+      pkt.should be_kind_of(Packet)
       pkt.time.to_i.should > 0
+
       i+=1
     end
     i.should == 2
@@ -41,7 +42,6 @@ describe Offline do
   end
 
   describe "yielding to a block" do
-
     # Note we also test all the behaviors here together instead of seperately.
     Offline.new(PCAP_TESTFILE) do |this|
       @pcap = this
@@ -55,7 +55,6 @@ describe Offline do
 
       @pcap.close
     end
-
   end
 end
 

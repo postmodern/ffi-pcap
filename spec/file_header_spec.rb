@@ -1,28 +1,27 @@
 require 'spec_helper'
 
 describe FileHeader do
-  before(:all) do
-    @file_header = FileHeader.new( :raw => File.read(PCAP_TESTFILE) )
+  subject do
+    described_class.new(:raw => File.read(PCAP_TESTFILE))
   end
 
   it "should parse a pcap file correctly" do
-    @file_header.magic.should == 0xa1b2c3d4
-    @file_header.version_major.should == 2
-    @file_header.version_minor.should == 4
-    @file_header.thiszone.should == 0
-    @file_header.sigfigs.should == 0
-    @file_header.snaplen.should == 96
-    @file_header.linktype.should == 1
+    subject.magic.should == 0xa1b2c3d4
+    subject.version_major.should == 2
+    subject.version_minor.should == 4
+    subject.thiszone.should == 0
+    subject.sigfigs.should == 0
+    subject.snaplen.should == 96
+    subject.linktype.should == 1
   end
 
   it "should return a file format version string" do
-    String.should === @file_header.version
-    @file_header.version.should == "2.4"
+    subject.version.should == "2.4"
   end
 
   it "should return a DataLink for the linktype using datalink()" do
-    DataLink.should === @file_header.datalink
-    (@file_header.datalink == :en10mb).should == true
-  end
+    subject.datalink.should be_kind_of(DataLink)
 
+    (subject.datalink == :en10mb).should == true
+  end
 end
