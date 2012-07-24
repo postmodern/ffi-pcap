@@ -1,32 +1,20 @@
 module FFI
   module PCap
-    class ErrorBuffer < FFI::MemoryPointer
+    class ErrorBuffer < FFI::Buffer
 
       # Size of the error buffers
       SIZE = 256
 
       #
-      # Creates a new {ErrorBuffer} object. Because of wierdness in JRuby
-      # when trying to subclass `FFI::Buffer`, always use this instead of
-      # {#initialize}.
-      #
-      # @see http://github.com/ffi/ffi/issues#issue/27
-      #
-      def self.create()
-        new(SIZE)
-      end
-
-      #
       # Creates a new {ErrorBuffer} object.
       #
-      # @param [Object] nil
-      #   The argument is nil and is only present for compatability with
-      #   JRuby.
+      # @param [FFI::Pointer] ptr
+      #   Optional pointer to an existing {ErrorBuffer}.
       #
-      # @see http://github.com/ffi/ffi/issues#issue/27
-      #
-      def initialize(arg=nil)
-        super(SIZE)
+      def initialize(ptr=nil)
+        if ptr then super(ptr)
+        else        super(SIZE)
+        end
       end
 
       #
@@ -34,18 +22,6 @@ module FFI
       #
       def to_s
         get_string(0)
-      end
-
-      #
-      # Older JRuby/ffi versions of MemoryPointer and Buffer don't have a
-      # size method. We override it here to ensure we can use it.
-      #
-      def size
-        begin
-          super()
-        rescue NoMethodError
-          SIZE
-        end
       end
 
     end
