@@ -15,6 +15,16 @@ module FFI
     end
 
     #
+    # A {NoDeviceError} indicates a pcap device that has already
+    # been stopped and closed
+    #
+    class NoDeviceError < StandardError
+    end
+    
+    class NullPointerError < StandardError
+    end
+
+    #
     # A {ReadError} is a sub-class of {LibError} that
     # indicates a problem reading from a pcap device.
     #
