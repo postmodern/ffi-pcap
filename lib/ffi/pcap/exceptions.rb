@@ -20,7 +20,11 @@ module FFI
     #
     class NoDeviceError < StandardError
     end
-    
+
+    #
+    # A {NullPointerError} indicates a pcap device that doesn't
+    # have a pointer assigned to it
+    #
     class NullPointerError < StandardError
     end
 
