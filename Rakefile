@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rake'
 
 begin
-  gem 'rubygems-tasks', '~> 0.1'
+  gem 'rubygems-tasks', '~> 0.2'
   require 'rubygems/tasks'
 
   Gem::Tasks.new
@@ -25,7 +25,7 @@ task :test => :spec
 task :default => :spec
 
 begin
-  gem 'yard', '~> 0.7'
+  gem 'yard', '~> 0.8'
   require 'yard'
 
   YARD::Rake::YardocTask.new  
