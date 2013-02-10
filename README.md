@@ -1,7 +1,7 @@
 # ffi-pcap
 
-* [github.com/sophsec/ffi-pcap](http://github.com/sophsec/ffi-pcap/)
-* [github.com/sophsec/ffi-pcap/issues](http://github.com/sophsec/ffi-pcap/issues)
+* [github.com/sophsec/ffi-pcap](https://github.com/sophsec/ffi-pcap/)
+* [github.com/sophsec/ffi-pcap/issues](https://github.com/sophsec/ffi-pcap/issues)
 * Postmodern (postmodern.mod3 at gmail.com)
 * Eric Monti (esmonti at gmail.com)
 
@@ -74,8 +74,8 @@ Replaying packets from a pcap dump file on a live interface:
 
 * [libpcap](http://www.tcpdump.org/) or [winpcap](http://winpcap.org/)
   >= 1.0.0
-* [ffi](http://github.com/ffi/ffi) ~> 0.6.0
-* [ffi_dry](http://github.com/emonti/ffi_dry) ~> 0.1.9
+* [ffi](https://github.com/ffi/ffi) ~> 0.6.0
+* [ffi_dry](https://github.com/emonti/ffi_dry) ~> 0.1.9
 
 ## Install
 
