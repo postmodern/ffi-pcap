@@ -1,7 +1,8 @@
 # ffi-pcap
 
-* [github.com/sophsec/ffi-pcap](https://github.com/sophsec/ffi-pcap/)
-* [github.com/sophsec/ffi-pcap/issues](https://github.com/sophsec/ffi-pcap/issues)
+* [Source](https://github.com/sophsec/ffi-pcap/)
+* [Issues](https://github.com/sophsec/ffi-pcap/issues)
+* [Documentation](http://rubydoc.info/gems/ffi-pcap/frames)
 * Postmodern (postmodern.mod3 at gmail.com)
 * Eric Monti (esmonti at gmail.com)
 
@@ -19,8 +20,7 @@ The choice of what to use is left up to you.
 
 Packet dissection libraries:
 
-* [ffi-packets](http://github.com/emonti/ffi-packets) - Maps raw packets to
-  `FFI::Struct` objects.
+* [ffi-packets] - Maps raw packets to `FFI::Struct` objects.
 
 ## Examples
 
@@ -72,10 +72,9 @@ Replaying packets from a pcap dump file on a live interface:
 
 ## Requirements
 
-* [libpcap](http://www.tcpdump.org/) or [winpcap](http://winpcap.org/)
-  >= 1.0.0
-* [ffi](https://github.com/ffi/ffi) ~> 0.6.0
-* [ffi_dry](https://github.com/emonti/ffi_dry) ~> 0.1.9
+* [libpcap] or [winpcap] >= 1.0.0
+* [ffi] ~> 0.6.0
+* [ffi_dry] ~> 0.1.9
 
 ## Install
 
@@ -85,3 +84,9 @@ Replaying packets from a pcap dump file on a live interface:
 
 See {file:LICENSE.txt} for license information.
 
+[libpcap]: http://www.tcpdump.org/
+[winpcap]: http://winpcap.org/
+
+[ffi]: https://github.com/ffi/ffi#readme
+[ffi_dry]: https://github.com/emonti/ffi_dry#readme
+[ffi-packets]: http://github.com/emonti/ffi-packets#readme
