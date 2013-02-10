@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 describe FileHeader do
-  subject do
-    described_class.new(:raw => File.read(PCAP_TESTFILE))
+  let(:pcap_file) do
+    File.open(PCAP_TESTFILE,'rb') do |file|
+      file.read
+    end
   end
+
+  subject { described_class.new(:raw => pcap_file) }
 
   it "should parse a pcap file correctly" do
     subject.magic.should == 0xa1b2c3d4
