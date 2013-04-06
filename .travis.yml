@@ -1,0 +1,13 @@
+language: ruby
+before_install:
+  - sudo apt-get install libpcap-dev
+  - sudo gem install ffi ffi_dry rubygems-tasks rspec yard
+rvm:
+  - 1.9.3
+  - rbx-18mode
+  - rbx-19mode
+matrix:
+  allow_failures:
+    - rvm: rbx-18mode
+    - rvm: rbx-19mode
+script: sudo rake test
