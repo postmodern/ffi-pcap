@@ -304,6 +304,6 @@ module FFI
     attach_optional_function :pcap_can_set_rfmon, [:pcap_t, :int], :int
     attach_optional_function :pcap_set_timeout, [:pcap_t, :int], :int
     attach_optional_function :pcap_set_buffer_size, [:pcap_t, :int], :int
-    attach_optional_function :activate, [:pcap_t], :int
+    attach_optional_function :pcap_activate, [:pcap_t], :int
   end
 end
