@@ -42,20 +42,17 @@ module FFI
       def initialize(pcap, opts={}, &block)
         @handler = opts.fetch(handler,CopyHandler)
 
-        trap('INT') do
-          stop()
-          close()
-
-          raise(SignalException,'INT',caller)
+        at_exit do
+          begin
+            stop()
+            close()
+          rescue NoDeviceError
+          rescue NullPointerError
+            # Indicates the device has already been stopped and closed
+            # Therefore there's nothing to do.
+          end
         end
-
-        trap('TERM') do
-          stop()
-          close()
-
-          raise(SignalException,'TERM',caller)
-        end
-
+        
         super(pcap, opts, &block)
       end
 

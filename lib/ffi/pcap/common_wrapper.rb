@@ -161,7 +161,7 @@ module FFI
       #
       def _check_pcap
         if @pcap.nil?
-          raise(StandardError,"nil pcap device",caller)
+          raise(NoDeviceError,"nil pcap device",caller)
         else
           @pcap
         end
@@ -179,7 +179,7 @@ module FFI
         ptr = _check_pcap
 
         if ptr.null?
-          raise(StandardError,"null pointer to pcap device",caller)
+          raise(NullPointerError,"null pointer to pcap device",caller)
         else
           ptr
         end
