@@ -1,11 +1,7 @@
-doc
-rdoc
-pkg
-tmp/*
-ref/*
-.bundle
-.yardoc
+/doc
+/pkg
+/.bundle
+/.yardoc
 .DS_Store
 *.swp
 *~
-.justrake
