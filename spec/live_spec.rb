@@ -21,7 +21,7 @@ describe Live do
   
   it "should support non-blocking mode" do
     @pcap.non_blocking = true
-    @pcap.should be_non_blocking
+    expect(@pcap).to be_non_blocking
   end
 
   it "should provide statistics about packets received/dropped" do
@@ -29,12 +29,12 @@ describe Live do
 
     @pcap.loop {|this,pkt| @pcap.stop if (i += 1) == 10 }
 
-    i.should_not == 0
+    expect(i).not_to eq(0)
 
     stats = @pcap.stats
-    stats.should be_kind_of(Stat)
-    stats.received.should > 0
-    stats.received.should >= 10
+    expect(stats).to be_kind_of(Stat)
+    expect(stats.received).to be > 0
+    expect(stats.received).to be >= 10
   end
 
   it "should yield packets with a timestamp using loop()" do
@@ -42,16 +42,16 @@ describe Live do
     @pkt = nil
 
     @pcap.loop(:count => 2) do |this, pkt|
-      this.should == @pcap
-      pkt.should_not be_nil
-      pkt.should be_kind_of(Packet)
+      expect(this).to eq(@pcap)
+      expect(pkt).not_to be_nil
+      expect(pkt).to be_kind_of(Packet)
 
-      (Time.now - pkt.time).should_not > 1000
+      expect(Time.now - pkt.time).not_to be > 1000
 
       i += 1
     end
 
-    i.should == 2
+    expect(i).to eq(2)
   end
 
   describe "live packets" do
@@ -78,8 +78,8 @@ describe Live do
       @pcap = this
 
       it "should be in a ready state in the block" do
-        @pcap.should be_ready
-        @pcap.should_not be_closed
+        expect(@pcap).to be_ready
+        expect(@pcap).not_to be_closed
       end
 
       start_traffic_generator()

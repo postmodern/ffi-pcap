@@ -13,8 +13,8 @@ describe Offline do
 
     @pcap.loop {|this,pkt| i += 1 }
 
-    i.should > 0
-    @pcap.next.should be_nil
+    expect(i).to be > 0
+    expect(@pcap.next).to be_nil
   end
 
   it "should yield packets with a timestamp using loop()" do
@@ -22,23 +22,23 @@ describe Offline do
     @pkt = nil
 
     @pcap.loop(:count => 2) do |this,pkt|
-      this.should == @pcap
+      expect(this).to eq(@pcap)
 
-      pkt.should_not be_nil
-      pkt.should be_kind_of(Packet)
-      pkt.time.to_i.should > 0
+      expect(pkt).not_to be_nil
+      expect(pkt).to be_kind_of(Packet)
+      expect(pkt.time.to_i).to be > 0
 
       i+=1
     end
-    i.should == 2
+    expect(i).to eq(2)
   end
 
   it "should supply a file version" do
-    @pcap.file_version.should =~ /^\d+\.\d+$/
+    expect(@pcap.file_version).to match(/^\d+\.\d+$/)
   end
 
   it "should indicate whether it is endian swapped" do
-    [true,false].include?(@pcap.swapped?).should == true
+    expect([true,false].include?(@pcap.swapped?)).to eq(true)
   end
 
   describe "yielding to a block" do
@@ -47,8 +47,8 @@ describe Offline do
       @pcap = this
 
       it "should be in a ready state in the block" do
-        @pcap.should be_ready
-        @pcap.should_not be_closed
+        expect(@pcap).to be_ready
+        expect(@pcap).not_to be_closed
       end
 
       it_should_behave_like "FFI::PCap::CaptureWrapper"

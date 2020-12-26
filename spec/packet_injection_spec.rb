@@ -14,26 +14,26 @@ describe FFI::PCap::Live do
     after(:all) { @pcap.close }
 
     it "should detect when an invalid argument is supplied" do
-      lambda { @pcap.inject(Object.new)}.should raise_error(ArgumentError)
-      lambda { @pcap.inject(nil)}.should raise_error(ArgumentError)
-      lambda { @pcap.inject(1)}.should raise_error(ArgumentError)
-      lambda { @pcap.inject([])}.should raise_error(ArgumentError)
-      lambda { @pcap.inject(:foo => :bar)}.should raise_error(ArgumentError)
-      lambda { 
+      expect { @pcap.inject(Object.new)}.to raise_error(ArgumentError)
+      expect { @pcap.inject(nil)}.to raise_error(ArgumentError)
+      expect { @pcap.inject(1)}.to raise_error(ArgumentError)
+      expect { @pcap.inject([])}.to raise_error(ArgumentError)
+      expect { @pcap.inject(:foo => :bar)}.to raise_error(ArgumentError)
+      expect {
         @pcap.inject(FFI::MemoryPointer.new(10))
-      }.should raise_error(ArgumentError)
+      }.to raise_error(ArgumentError)
     end
 
     it "should allow injection of a String using inject()" do
       test_data = "A" * 1024
 
-      @pcap.inject(test_data).should == test_data.size
+      expect(@pcap.inject(test_data)).to eq(test_data.size)
     end
 
     it "should allow injection of a Packet using inject()" do
       test_data = "B" * 512
 
-      @pcap.inject(Packet.from_string(test_data)).should == test_data.size
+      expect(@pcap.inject(Packet.from_string(test_data))).to eq(test_data.size)
     end
   end
 end

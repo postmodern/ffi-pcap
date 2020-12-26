@@ -2,45 +2,45 @@ require 'spec_helper'
 
 shared_examples_for "FFI::PCap::Packet" do
   it "should supply a way to get a pointer for the body" do
-    @pkt.body_ptr.should_not be_nil
+    expect(@pkt.body_ptr).not_to be_nil
 
-    @pkt.body_ptr.should be_kind_of(FFI::Pointer)
+    expect(@pkt.body_ptr).to be_kind_of(FFI::Pointer)
   end
 
   it "should supply a way to get a String for the body" do
-    @pkt.body.should_not be_nil
+    expect(@pkt.body).not_to be_nil
 
-    @pkt.body.should be_kind_of(String)
+    expect(@pkt.body).to be_kind_of(String)
   end
 
   it "should supply a timestamp as a Time object" do
-    @pkt.time.should_not be_nil
+    expect(@pkt.time).not_to be_nil
 
-    @pkt.time.should be_kind_of(Time)
+    expect(@pkt.time).to be_kind_of(Time)
   end
 
   it "should allow time timestamp to be changed" do
     t = Time.now
 
     @pkt.time = t
-    @pkt.time.to_i.should == t.to_i
+    expect(@pkt.time.to_i).to eq(t.to_i)
   end
 
   it "should return a deep copy of itself with copy()" do
     cp = @pkt.copy()
 
-    cp.object_id.should_not == @pkt.object_id
-    cp.body_ptr.object_id.should_not == @pkt.body_ptr.object_id
-    cp.body.should == @pkt.body
+    expect(cp.object_id).not_to eq(@pkt.object_id)
+    expect(cp.body_ptr.object_id).not_to eq(@pkt.body_ptr.object_id)
+    expect(cp.body).to eq(@pkt.body)
   end
 
   it "should marshal and umarshal" do
     m = Marshal.dump(@pkt)
     unm = Marshal.load(m)
 
-    unm.should be_kind_of(@pkt.class)
-    unm.time.to_i.should == @pkt.time.to_i
-    unm.body.should == @pkt.body
+    expect(unm).to be_kind_of(@pkt.class)
+    expect(unm.time.to_i).to eq(@pkt.time.to_i)
+    expect(unm.body).to eq(@pkt.body)
   end
 end
 
@@ -48,35 +48,35 @@ shared_examples_for "FFI::PCap::Packet populated" do
   it_should_behave_like "FFI::PCap::Packet"
 
   it "should have a non-zero packet length in the header" do
-    @pkt.length.should_not == 0
+    expect(@pkt.length).not_to eq(0)
   end
 
   it "should have a non-zero captured length in the header" do
-    @pkt.captured.should_not == 0
+    expect(@pkt.captured).not_to eq(0)
   end
 
   it "should have a non-empty body" do
-    @pkt.body.should_not be_empty
+    expect(@pkt.body).not_to be_empty
   end
 
   it "should have a non-null body pointer" do
-    @pkt.body_ptr.should_not be_null
+    expect(@pkt.body_ptr).not_to be_null
   end
 end
 
 shared_examples_for "FFI::PCap::Packet composed" do
   it "should return the expected header" do
-    @pkt.header.should be_kind_of(PacketHeader)
-    @pkt.header.len.should  == @test_body.size
-    @pkt.header.caplen.should == @test_body.size
-    @pkt.header.timestamp.to_time.to_i.should == 0
+    expect(@pkt.header).to be_kind_of(PacketHeader)
+    expect(@pkt.header.len).to  eq(@test_body.size)
+    expect(@pkt.header.caplen).to eq(@test_body.size)
+    expect(@pkt.header.timestamp.to_time.to_i).to eq(0)
   end
 
   it "should return the expected body String" do
-    @pkt.body.should == @test_body
+    expect(@pkt.body).to eq(@test_body)
   end
 
   it "should return a pointer to the expected body String" do
-    @pkt.body_ptr.read_string(@pkt.caplen).should == @test_body
+    expect(@pkt.body_ptr.read_string(@pkt.caplen)).to eq(@test_body)
   end
 end

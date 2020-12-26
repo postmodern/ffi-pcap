@@ -18,8 +18,8 @@ describe Dead do
       @pcap = this
 
       it "should be in a ready state in the block" do
-        @pcap.should be_ready
-        @pcap.should_not be_closed
+        expect(@pcap).to be_ready
+        expect(@pcap).not_to be_closed
       end
 
       it_should_behave_like "FFI::PCap::CommonWrapper"
