@@ -1,8 +1,4 @@
-require 'rubygems'
-
-gem 'rspec', '~> 2.0'
 require 'rspec'
-
 require 'ffi/pcap'
 require 'pathname'
 

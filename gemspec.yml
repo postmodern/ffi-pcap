@@ -18,6 +18,4 @@ dependencies:
   ffi_dry: ~> 0.1.12
 
 development_dependencies:
-  rubygems-tasks: ~> 0.2
-  rspec: ~> 2.0
-  yard: ~> 0.8
+  bundler: ~> 2.0
